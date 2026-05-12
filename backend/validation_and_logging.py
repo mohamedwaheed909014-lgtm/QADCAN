@@ -231,7 +231,7 @@ def _universal_checks(code: str) -> list[dict]:
         },
         {
             "label": "Boolean subtraction for cut features",
-            "passed": ("difference()" in code) if hole_words else True,
+            "passed": library_call or (("difference()" in code) if hole_words else True),
             "detail": "Bores, holes, slots, and cutouts must use difference().",
             "severity": "warning",
         },
@@ -461,14 +461,20 @@ FAMILY_VALIDATION_RULES: dict[str, list[tuple[str, Any, str, str]]] = {
     # â”€â”€ Sprocket / chain â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "sprocket_chain_reference": [
         ("Pitch diameter from chain formula",
-         r"pitch_d\s*=\s*chain_pitch\s*/\s*sin|pitch_diameter\s*=\s*chain_pitch\s*/\s*sin",
-         "Sprocket pitch diameter must use: chain_pitch / sin(180/N).", "error"),
+         r"use\s*<[^>]*sprocket\.scad>|pitch_d\s*=\s*chain_pitch\s*/\s*sin|pitch_diameter\s*=\s*chain_pitch\s*/\s*sin|pitch_radius\s*=\s*.*get_pitch\s*\(\s*size\s*\)\s*/\s*sin",
+         "Use sprocket.scad or derive sprocket pitch diameter/radius from chain pitch and tooth count.", "error"),
         ("Roller pocket loop",
-         r"\bfor\s*\(.*num_teeth|\bfor\s*\(.*tooth_count",
-         "Sprocket must have roller pocket cutouts placed in a for-loop.", "error"),
-        ("Root cylinder subtracted",
-         r"\broot_d\s*=|root_diameter\s*=",
-         "Sprocket must subtract a root-diameter cylinder to create tooth profile.", "warning"),
+         r"use\s*<[^>]*sprocket\.scad>|\bfor\s*\(.*num_teeth|\bfor\s*\(.*tooth_count|\bfor\s*\(.*teeth",
+         "Use sprocket.scad or place roller pocket cutouts in a for-loop.", "error"),
+        ("Sprockets.scad tooth construction",
+         r"use\s*<[^>]*sprocket\.scad>|sprocket_plate\s*\(|middle_radius|fudge_teeth_x|fudge_teeth_y",
+         "Sprocket must use sprocket.scad or the Sprockets.scad circular flank tooth construction, not a smooth cylinder.", "error"),
+        ("No gear-module sprocket logic",
+         lambda c: not bool(re.search(r"\bmodul\s*=\s*pitch\s*/\s*PI|\baddendum\b|\bdedendum\b|roller_r\s*=\s*pitch\s*/\s*2", c, re.IGNORECASE)),
+         "Roller chain sprockets must not be generated as gear-module/addendum/dedendum annuli, and roller radius is not pitch/2.", "error"),
+        ("Circular flank intersections",
+         r"use\s*<[^>]*sprocket\.scad>|intersection\s*\(\s*\).*cylinder\s*\(",
+         "Use sprocket.scad or generate teeth by intersecting circular flank cylinders.", "warning"),
     ],
 
     # â”€â”€ Structural profiles â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -559,22 +565,6 @@ FAMILY_VALIDATION_RULES: dict[str, list[tuple[str, Any, str, str]]] = {
          "Servo bracket needs mounting holes matching the servo tab span.", "error"),
     ],
 
-    # â”€â”€ Wheel / castor â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-    "wheel_castor_tyre_reference": [
-        ("Spoke or rim defined",
-         r"\bspoke_count|rim_thickness|rim_inner",
-         "Wheel should define rim or spoke geometry, not just a solid disk.", "warning"),
-        ("Axle bore present",
-         r"\bbore_d\s*=|axle_d\s*=|bore_diameter\s*=",
-         "Wheel must have a named axle bore parameter.", "error"),
-        ("Spoke for-loop present",
-         lambda c: (
-             not bool(re.search(r"\bspoke_count\b", c, re.IGNORECASE))
-             or bool(re.search(r"for\s*\(.*spoke_count", c, re.IGNORECASE))
-         ),
-         "Spokes must be placed with a for-loop using spoke_count.", "warning"),
-    ],
-
     # â”€â”€ Cam / crank / linkage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     "cam_crank_linkage_reference": [
         ("Eccentric bore uses offset translate",
@@ -637,8 +627,8 @@ _DERIVED_PATTERNS: dict[str, list[tuple[str, str, str]]] = {
     ],
     "sprocket_chain_reference": [
         ("pitch_diameter = chain_pitch / sin(180/N)",
-         r"pitch_d\s*=\s*chain_pitch\s*/\s*sin",
-         "Sprocket pitch diameter must use: chain_pitch / sin(180/N)."),
+         r"use\s*<[^>]*sprocket\.scad>|pitch_d\s*=\s*chain_pitch\s*/\s*sin|pitch_radius\s*=\s*.*get_pitch\s*\(\s*size\s*\)\s*/\s*sin",
+         "Use sprocket.scad or derive sprocket pitch diameter/radius from chain pitch and tooth count."),
     ],
     "bearing_housing_reference": [
         ("boss_diameter = bearing_od + 2*wall",

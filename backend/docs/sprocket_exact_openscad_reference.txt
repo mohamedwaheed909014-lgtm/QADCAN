@@ -1,0 +1,216 @@
+EXACT OPENSCAD SPROCKET REFERENCE
+Source library: D:/Downloads/Sprockets.scad
+Library name: Sprockets.scad v1.1
+Original author: Shawn Steele, 2013, MS-PL
+Modified by: Dallen Wilson, 2019, added keyway and set screw generation
+
+Use this as the primary sprocket OpenSCAD generation reference.
+When the user asks for a roller chain sprocket, ANSI sprocket, #25/#35/#40/#41/#50/#60/#80 sprocket, motorcycle sprocket, hub sprocket, keyway sprocket, or set screw sprocket, prefer this reference over simplified disk-with-holes examples.
+
+IMPORTANT OUTPUT POLICY
+- Default to standalone OpenSCAD that includes sprocket_plate(), get_pitch(), get_roller_diameter(), and get_thickness().
+- Do not output only a cylinder, only a bore cylinder, or a smooth disk.
+- Do not output only an external library call unless the user explicitly asks to use Sprockets.scad.
+- If the user explicitly asks for an exact library call, output:
+    use <D:/Downloads/Sprockets.scad>
+    sprocket(size=40, teeth=17, bore=10/25.4, hub_diameter=22/25.4, hub_height=14/25.4, keyway=1, setscrew=1);
+- Sprockets.scad expects bore, hub_diameter, and hub_height in inches.
+- Convert user millimeter dimensions to inches by dividing by 25.4.
+- For normal generated models, mirror the standalone geometry below. Do not generate a plain disk with circular pockets only.
+- For standalone code, use an unthreaded cylindrical set screw cross-hole unless a threads.scad-compatible thread module is explicitly available.
+- Return geometry-only OpenSCAD when requested: no markdown fences, no material paragraphs, no standards prose.
+
+PRIMARY MODULE SIGNATURE
+  sprocket(size=25, teeth=9, bore=5/16, hub_diameter=0, hub_height=0, keyway=0, setscrew=0, keyway_threads=1)
+
+PARAMETER MEANING
+- size: chain size. ANSI sizes include 25, 35, 40, 41, 50, 60, 80. Also supports bicycle sizes 1 and 2, and motorcycle sizes 420, 425, 428, 520, 525, 530, 630.
+- teeth: number of teeth around the sprocket.
+- bore: shaft bore diameter in inches.
+- hub_diameter: hub outside diameter in inches. Use 0 for no hub.
+- hub_height: total hub height in inches. Use 0 for no hub.
+- keyway: 1 creates a rectangular keyway slot at the bore.
+- setscrew: 1 creates set screw holes in the hub.
+- keyway_threads: 1 creates an additional set screw through the keyway side when threads are available.
+
+FEATURES TO PRESERVE
+- Correct pitch radius from pitch and tooth count:
+    pitch_radius = inches2mm(get_pitch(size) / sin(180 / teeth)) / 2
+- Correct roller radius from chain size:
+    roller = inches2mm(get_roller_diameter(size) / 2)
+- Correct sprocket face thickness from chain size:
+    thickness = inches2mm(get_thickness(size))
+- Teeth are not blocky rectangular teeth. Teeth are built as repeated intersections of two circular flank cylinders.
+- Roller pockets are subtractive circular holes placed at the pitch radius.
+- The root/web is filled using rectangular sectors up to middle_radius, so the hub and rim are connected.
+- Outer tips are trimmed by intersecting with a cylinder of radius:
+    pitch_radius - roller + pitch / 2
+- Bore is a vertical cylinder subtracted through the sprocket and hub.
+- Keyway is a rectangular slot subtracted from the bore side.
+- Set screw holes are radial cross-holes through the hub, normally 90 degrees apart when keyway set screw is enabled.
+- Optional hub is added as a centered cylinder in union with the sprocket plate.
+
+CHAIN SIZE TABLES FROM Sprockets.scad
+All values are inches before conversion to mm.
+
+get_pitch(size):
+  25: 1/4
+  35: 3/8
+  40: 1/2
+  41: 1/2
+  50: 5/8
+  60: 3/4
+  80: 1
+  1: 1/2
+  2: 1/2
+  420: 1/2
+  425: 1/2
+  428: 1/2
+  520: 5/8
+  525: 5/8
+  530: 5/8
+  630: 3/4
+
+get_roller_diameter(size):
+  25: 0.130
+  35: 0.200
+  40: 5/16
+  41: 0.306
+  50: 0.400
+  60: 15/32
+  80: 5/8
+  1: 5/16
+  2: 5/16
+  420: 5/16
+  425: 5/16
+  428: 0.335
+  520: 0.400
+  525: 0.400
+  530: 0.400
+  630: 15/32
+
+get_thickness(size):
+  25: 0.110
+  35: 0.168
+  40: 0.284
+  41: 0.227
+  50: 0.343
+  60: 0.459
+  80: 0.575
+  1: 0.110
+  2: 0.084
+  420: 0.227
+  425: 0.284
+  428: 0.284
+  520: 0.227
+  525: 0.284
+  530: 0.343
+  630: 0.343
+
+get_chainplate_size(size):
+  25: 0.228
+  35: 0.346
+  40: 0.469
+  41: 0.390
+  50: 0.585
+  60: 0.709
+  80: 0.949
+
+KEYWAY TABLE FROM Sprockets.scad
+Keyway width is selected from bore diameter in inches:
+  bore <= 0.375: no keyway
+  bore <= 0.5625: 0.125
+  bore <= 0.875: 0.1875
+  bore <= 1.25: 0.250
+  bore <= 1.375: 0.3125
+  bore <= 1.75: 0.375
+  bore <= 2.25: 0.5
+  bore <= 2.75: 0.625
+  bore <= 3.25: 0.75
+  bore <= 3.75: 0.875
+  bore <= 4.5: 1
+  bore <= 5.5: 1.25
+  bore <= 6.5: 1.5
+  bore <= 7.5: 1.75
+  bore <= 8.9375: 2
+  bore <= 10.9375: 2.5
+
+SET SCREW TABLE FROM Sprockets.scad
+Set screw major diameter is selected from bore diameter in inches:
+  bore <= 0.375: no set screw
+  bore <= 0.5625: 0.1875, 24 TPI
+  bore <= 0.875: 0.25, 20 TPI
+  bore <= 1.25: 0.3125, 18 TPI
+  bore <= 1.75: 0.375, 16 TPI
+  bore <= 2.75: 0.5, 13 TPI
+  bore <= 3.25: 0.625, 11 TPI
+
+EXACT TOOTH CONSTRUCTION PATTERN
+Use this structure for standalone code:
+
+  angle = 360 / teeth;
+  pitch = inches2mm(get_pitch(size));
+  roller = inches2mm(get_roller_diameter(size) / 2);
+  thickness = inches2mm(get_thickness(size));
+  pitch_radius = inches2mm(get_pitch(size) / sin(180 / teeth)) / 2;
+  middle_radius = sqrt(pow(pitch_radius, 2) - pow(pitch / 2, 2));
+  fudge_teeth_x = FUDGE_TEETH * cos(angle / 2);
+  fudge_teeth_y = FUDGE_TEETH * sin(angle / 2);
+
+  difference() {
+    intersection() {
+      cylinder(r = pitch_radius - roller + pitch / 2, h = thickness + 2);
+      union() {
+        for (i = [0 : teeth - 1])
+          rotate([0, 0, angle * i])
+            intersection() {
+              translate([-fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])
+                cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);
+              rotate([0, 0, angle])
+                translate([fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])
+                  cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);
+            }
+        for (i = [0 : teeth - 1])
+          rotate([0, 0, angle * i - angle / 2])
+            translate([-pitch / 2, -0.01, 0])
+              cube([pitch, middle_radius + 0.01, thickness]);
+      }
+    }
+    for (i = [0 : teeth - 1])
+      rotate([0, 0, angle * i])
+        translate([0, pitch_radius, -1])
+          cylinder(r = roller + FUDGE_ROLLER, h = thickness + 2);
+  }
+
+CANONICAL EXACT-LIBRARY EXAMPLES
+
+ANSI #40, 17 teeth, 10 mm bore, 22 mm hub OD, 14 mm hub height, keyway and set screw:
+  use <D:/Downloads/Sprockets.scad>
+  $fn = 180;
+  sprocket(size=40, teeth=17, bore=10/25.4, hub_diameter=22/25.4, hub_height=14/25.4, keyway=1, setscrew=1);
+
+ANSI #25, 20 teeth, 5 mm bore, 14 mm hub OD, 10 mm hub height:
+  use <D:/Downloads/Sprockets.scad>
+  $fn = 180;
+  sprocket(size=25, teeth=20, bore=5/25.4, hub_diameter=14/25.4, hub_height=10/25.4, keyway=0, setscrew=0);
+
+STANDALONE VALIDATION CRITERIA
+- Must include inches2mm() and mm2inches() if using Sprockets.scad formulas.
+- Must include get_pitch(), get_roller_diameter(), and get_thickness() tables for requested sizes.
+- Must include sprocket_plate(size, teeth) or equivalent tooth construction using circular flank intersections.
+- Must call sprocket_plate(size, teeth) from the final module.
+- Must subtract roller cylinders at [0, pitch_radius, -1] after rotation for every tooth.
+- Must not use pitch_d equal to bore_d.
+- Must not output a simple cylinder, smooth puck, or disk with only a bore.
+- Must not derive sprocket geometry from gear module, modul = pitch/PI, addendum, or dedendum.
+- Must not create teeth by repeating the same full annulus or ring in a for loop.
+- Must not use roller_r = pitch/2. Roller radius must be get_roller_diameter(size)/2.
+- Must not create a disconnected floating hub.
+- Must not subtract a large center cylinder that removes the web between hub and rim.
+- Must not model a gear involute; roller chain sprocket teeth are different from spur gear teeth.
+- Must not answer with a pulley, timing pulley, belt pulley, bearing housing, fan mount, or bracket.
+
+BEST TEST PROMPTS
+1. Generate geometry-only OpenSCAD for an ANSI #40 17-tooth sprocket using Sprockets.scad geometry, 10 mm bore, 22 mm hub OD, 14 mm hub height, keyway, and set screw. Return only valid OpenSCAD.
+2. Create a standalone OpenSCAD #40 sprocket with 17 teeth, real circular flank tooth construction, roller holes at pitch radius, connected web, hub, bore, keyway, and radial set screw holes. Do not use a simple disk-with-holes approximation.
+3. Generate an OpenSCAD call to the exact D:/Downloads/Sprockets.scad library for a #25 sprocket with 20 teeth, 5 mm bore, and 14 mm hub.

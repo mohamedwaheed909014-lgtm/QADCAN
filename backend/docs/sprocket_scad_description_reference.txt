@@ -1,0 +1,49 @@
+SPROCKET.SCAD DESCRIPTION REFERENCE
+
+This file describes how to use the project-local sprocket.scad library.
+It is not the geometry source of truth. The geometry source of truth is:
+  D:/downloads/openscad_copilot (1)/openscad_copilot/backend/docs/sprocket.scad
+
+For sprocket generation, retrieve and follow sprocket.scad. Do not invent a new
+sprocket generator and do not use the old sprocket_chain_reference examples.
+
+AUTHORITATIVE USAGE
+Use the library directly:
+  use <D:/downloads/openscad_copilot (1)/openscad_copilot/backend/docs/sprocket.scad>
+  $fn = 180;
+  sprocket(size=40, teeth=17, bore=10/25.4, hub_diameter=22/25.4, hub_height=14/25.4, keyway=1, setscrew=1);
+
+MODULE SIGNATURE
+  sprocket(size=25, teeth=9, bore=5/16, hub_diameter=0, hub_height=0, keyway=0, setscrew=0, keyway_threads=1)
+
+UNITS
+- size is the ANSI chain size number, such as 25, 35, 40, 41, 50, 60, or 80.
+- bore is in inches.
+- hub_diameter is in inches.
+- hub_height is in inches.
+- User dimensions in millimeters must be converted using /25.4 in the module call.
+
+REQUIRED GENERATION BEHAVIOR
+- For a normal sprocket request, output a small file that imports sprocket.scad and calls sprocket().
+- Do not reimplement the full geometry in the generated answer unless the user explicitly asks for standalone code.
+- Do not use gear formulas such as modul = pitch/PI, addendum, or dedendum.
+- Do not output a cylinder, smooth disk, or disk with only bore and roller holes.
+- Do not output a spur gear or timing pulley.
+
+FEATURES PROVIDED BY sprocket.scad
+- ANSI chain pitch table.
+- ANSI roller diameter table.
+- Chain-size sprocket thickness table.
+- Pitch radius calculation from chain pitch and tooth count.
+- Circular-flank sprocket tooth construction.
+- Roller pockets placed at pitch radius.
+- Connected web/root fill between teeth.
+- Optional hub.
+- Center bore.
+- Optional rectangular keyway.
+- Optional radial set screw holes.
+
+EXAMPLE PROMPTS THAT SHOULD USE THIS LIBRARY
+- Generate an ANSI #40 17 tooth sprocket with 10 mm bore, 22 mm hub OD, 14 mm hub height, keyway and set screw.
+- Generate a #25 chain sprocket with 20 teeth and 5 mm bore.
+- Generate only the OpenSCAD library call for a #40 sprocket using sprocket.scad.

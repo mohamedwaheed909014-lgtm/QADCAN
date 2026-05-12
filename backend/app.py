@@ -1109,6 +1109,13 @@ def build_messages(
             "Use nonzero helix_angle only when the user asks for helical, spiral, or herringbone gears. "
             "Do not hand-build gears from rectangular/cube teeth or lumped cylinders when a gears.scad module exists."
         )
+    if family_id == "sprocket_chain_reference":
+        family_lines.append(
+            "For sprocket requests, the project-local sprocket.scad library is authoritative. "
+            "Prefer returning a tiny OpenSCAD file that uses the library with: use <D:/downloads/openscad_copilot (1)/openscad_copilot/backend/docs/sprocket.scad>. "
+            "Call sprocket(size, teeth, bore, hub_diameter, hub_height, keyway, setscrew) with inch inputs for bore and hub dimensions. "
+            "Do not reimplement sprocket geometry from scratch, do not use gear module/addendum/dedendum logic, and never output a plain cylinder or smooth disk."
+        )
     family_lines.append("Do not include material recommendations or standard explanations in OpenSCAD comments; those are chat-after-code notes only.")
     messages.append({"role": "system", "content": "\n".join(family_lines)})
 
@@ -1215,21 +1222,73 @@ def sanitize_scad_metadata(code: str) -> str:
 
 
 GEARS_SCAD_PATH = str((BASE_DIR.parent / "gears.scad").resolve()).replace("\\", "/")
+SPROCKET_SCAD_PATH = str((BASE_DIR / "docs" / "sprocket.scad").resolve()).replace("\\", "/")
 GEARS_INCLUDE_RE = re.compile(
     r"^\s*(include|use)\s*<[^>\n]*gears\.scad>\s*;?\s*$",
+    re.IGNORECASE | re.MULTILINE,
+)
+SPROCKET_INCLUDE_RE = re.compile(
+    r"^\s*(include|use)\s*<[^>\n]*sprocket\.scad>\s*;?\s*$",
     re.IGNORECASE | re.MULTILINE,
 )
 
 
 def normalize_library_includes(code: str) -> str:
     """Make generated gears.scad imports resolvable from browser downloads and temp exports."""
+    if "sprocket.scad" in code.lower():
+        code = SPROCKET_INCLUDE_RE.sub(f"use <{SPROCKET_SCAD_PATH}>", code)
     if "gears.scad" not in code.lower():
         return code
     return GEARS_INCLUDE_RE.sub(f"include <{GEARS_SCAD_PATH}>", code)
 
 
+def deterministic_sprocket_library_call(prompt: str) -> str:
+    size = 40
+    size_match = re.search(r"#\s*(25|35|40|41|50|60|80)\b|ansi\s*#?\s*(25|35|40|41|50|60|80)\b", prompt, re.IGNORECASE)
+    if size_match:
+        size = int(next(group for group in size_match.groups() if group))
+
+    teeth = 17
+    teeth_match = re.search(r"\b(\d+)\s*(?:t|tooth|teeth)\b", prompt, re.IGNORECASE)
+    if teeth_match:
+        teeth = max(6, int(teeth_match.group(1)))
+
+    def number(pattern: str) -> float | None:
+        match = re.search(pattern, prompt, re.IGNORECASE)
+        if not match:
+            return None
+        try:
+            return float(match.group(1))
+        except (TypeError, ValueError):
+            return None
+
+    bore_mm = (
+        number(r"(\d+(?:\.\d+)?)\s*mm\s+(?:bore|shaft)")
+        or number(r"(?:bore|shaft)(?:_d| diameter)?\s*(?:=|of)?\s*(\d+(?:\.\d+)?)\s*mm?")
+        or 10
+    )
+    hub_od_mm = (
+        number(r"(\d+(?:\.\d+)?)\s*mm\s+hub\s*(?:od|outer|diameter)")
+        or number(r"hub(?:_|\s*)od\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or max(bore_mm + 12, 22)
+    )
+    hub_h_mm = (
+        number(r"(\d+(?:\.\d+)?)\s*mm\s+hub\s*(?:height|h)")
+        or number(r"hub(?:_|\s*)(?:h|height)\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or 14
+    )
+    keyway = 1 if re.search(r"\bkeyway|key\s*slot\b", prompt, re.IGNORECASE) else 0
+    setscrew = 1 if re.search(r"\bset\s*-?\s*screw|setscrew\b", prompt, re.IGNORECASE) else 0
+
+    return f"""use <{SPROCKET_SCAD_PATH}>
+$fn = 180;
+sprocket(size={size}, teeth={teeth}, bore={bore_mm:g}/25.4, hub_diameter={hub_od_mm:g}/25.4, hub_height={hub_h_mm:g}/25.4, keyway={keyway}, setscrew={setscrew});"""
+
+
 def enforce_gears_master_output(prompt: str, code: str, family_id: str | None) -> str:
     """Keep model output intact, but replace non-geometry gear placeholders."""
+    if family_id == "sprocket_chain_reference":
+        return deterministic_sprocket_library_call(prompt)
     if family_id == "gear_reference" and re.search(r"Please specify|Required user parameters|echo\s*\(", code, re.IGNORECASE):
         p = prompt.lower()
         if "bevel" in p:
@@ -1320,13 +1379,8 @@ def _looks_truncated(code: str) -> bool:
 
 
 def validate_scad(code: str, prompt: str = "") -> list[dict]:
-    return [{
-        "label": "Validation disabled",
-        "passed": True,
-        "detail": "Backend validation is disabled; OpenSCAD will be the source of truth.",
-        "severity": "warning",
-        "category": "validation",
-    }]
+    family_id = detect_primary_family(f"{prompt}\n{code}")
+    return validate_scad_full(code, prompt, family_id)
 
 
 def _validate_scad_original(code: str, prompt: str = "") -> list[dict]:
@@ -1512,6 +1566,154 @@ def _number_for_pattern(text: str, pattern: str) -> float | None:
         return float(match.group(1))
     except (TypeError, ValueError):
         return None
+
+
+def deterministic_sprocket_scad(prompt: str) -> str:
+    lowered = prompt.lower()
+
+    size = 40
+    size_match = re.search(r"#\s*(25|35|40|41|50|60|80)\b|ansi\s*#?\s*(25|35|40|41|50|60|80)\b", prompt, re.IGNORECASE)
+    if size_match:
+        size = int(next(group for group in size_match.groups() if group))
+
+    teeth = 17
+    teeth_match = re.search(r"\b(\d+)\s*(?:t|tooth|teeth)\b", prompt, re.IGNORECASE)
+    if teeth_match:
+        teeth = max(6, int(teeth_match.group(1)))
+
+    bore_d = (
+        _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+(?:bore|shaft)")
+        or _number_for_pattern(prompt, r"(?:bore|shaft)(?:_d| diameter)?\s*(?:=|of)?\s*(\d+(?:\.\d+)?)\s*mm?")
+        or 10
+    )
+    hub_od = (
+        _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+hub\s*(?:od|outer)")
+        or _number_for_pattern(prompt, r"hub(?:_|\s*)od\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or max(bore_d + 12, 22)
+    )
+    hub_h = (
+        _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+hub\s*(?:height|h)")
+        or _number_for_pattern(prompt, r"hub(?:_|\s*)(?:h|height)\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or 14
+    )
+    set_screw_d = 4.5 if re.search(r"\b(set\s*-?\s*screw|setscrew)\b", lowered) else 0
+    keyway_requested = bool(re.search(r"\bkeyway|key\s*slot\b", lowered))
+
+    return f"""$fn = 180;
+
+FUDGE_BORE = 0.25;
+FUDGE_ROLLER = 0.15;
+FUDGE_TEETH = 1.0;
+FUDGE_KEYWAY = 0.2;
+
+size = {size};
+teeth = {teeth};
+bore_d = {bore_d:g};
+hub_od = {hub_od:g};
+hub_h = {hub_h:g};
+make_keyway = {1 if keyway_requested else 0};
+set_screw_d = {set_screw_d:g};
+
+function inches2mm(inches) = inches * 25.4;
+function get_pitch(size) =
+  size == 25 ? 1/4 :
+  size == 35 ? 3/8 :
+  size == 40 ? 1/2 :
+  size == 41 ? 1/2 :
+  size == 50 ? 5/8 :
+  size == 60 ? 3/4 :
+  size == 80 ? 1 : 0;
+
+function get_roller_diameter(size) =
+  size == 25 ? 0.130 :
+  size == 35 ? 0.200 :
+  size == 40 ? 5/16 :
+  size == 41 ? 0.306 :
+  size == 50 ? 0.400 :
+  size == 60 ? 15/32 :
+  size == 80 ? 5/8 : 0;
+
+function get_thickness(size) =
+  size == 25 ? 0.110 :
+  size == 35 ? 0.168 :
+  size == 40 ? 0.284 :
+  size == 41 ? 0.227 :
+  size == 50 ? 0.343 :
+  size == 60 ? 0.459 :
+  size == 80 ? 0.575 : 0;
+
+function get_keyway_width(bore_in) =
+  bore_in <= 0.375 ? 0 :
+  bore_in <= 0.5625 ? 0.125 :
+  bore_in <= 0.875 ? 0.1875 :
+  bore_in <= 1.25 ? 0.250 :
+  bore_in <= 1.375 ? 0.3125 :
+  bore_in <= 1.75 ? 0.375 :
+  bore_in <= 2.25 ? 0.5 : 0;
+
+module sprocket_plate(size, teeth) {{
+  angle = 360 / teeth;
+  pitch = inches2mm(get_pitch(size));
+  roller = inches2mm(get_roller_diameter(size) / 2);
+  thickness = inches2mm(get_thickness(size));
+  pitch_radius = inches2mm(get_pitch(size) / sin(180 / teeth)) / 2;
+  middle_radius = sqrt(pow(pitch_radius, 2) - pow(pitch / 2, 2));
+  fudge_teeth_x = FUDGE_TEETH * cos(angle / 2);
+  fudge_teeth_y = FUDGE_TEETH * sin(angle / 2);
+
+  difference() {{
+    intersection() {{
+      cylinder(r = pitch_radius - roller + pitch / 2, h = thickness);
+      union() {{
+        for (i = [0 : teeth - 1])
+          rotate([0, 0, angle * i])
+            intersection() {{
+              translate([-fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])
+                cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);
+              rotate([0, 0, angle])
+                translate([fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])
+                  cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);
+            }}
+        for (i = [0 : teeth - 1])
+          rotate([0, 0, angle * i - angle / 2])
+            translate([-pitch / 2, -0.01, 0])
+              cube([pitch, middle_radius + 0.01, thickness]);
+      }}
+    }}
+    for (i = [0 : teeth - 1])
+      rotate([0, 0, angle * i])
+        translate([0, pitch_radius, -1])
+          cylinder(r = roller + FUDGE_ROLLER, h = thickness + 2);
+  }}
+}}
+
+module roller_chain_sprocket() {{
+  plate_h = inches2mm(get_thickness(size));
+  bore_r = bore_d / 2 + FUDGE_BORE;
+  key_w = inches2mm(get_keyway_width(bore_d / 25.4));
+
+  difference() {{
+    union() {{
+      sprocket_plate(size, teeth);
+      translate([0, 0, (plate_h - hub_h) / 2])
+        cylinder(h = hub_h, d = hub_od);
+    }}
+
+    translate([0, 0, -hub_h])
+      cylinder(h = hub_h * 3, r = bore_r);
+
+    if (make_keyway && key_w > 0)
+      translate([-(bore_r + key_w / 2), -key_w / 2, -hub_h])
+        cube([key_w + FUDGE_KEYWAY, key_w + FUDGE_KEYWAY, hub_h * 3]);
+
+    if (set_screw_d > 0)
+      translate([0, 0, plate_h / 2])
+        rotate([90, 0, 0])
+          cylinder(h = hub_od + 4, d = set_screw_d, center = true);
+  }}
+}}
+
+roller_chain_sprocket();"""
 
 
 def deterministic_pillow_block_scad(prompt: str) -> str:

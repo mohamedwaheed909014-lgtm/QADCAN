@@ -6,6 +6,8 @@
     "family_label": "Sprockets and Chain Drive",
     "units": "millimeters",
     "scope": "ANSI #25, #35, #40, #50 roller chain sprockets with hub, bore, and keyway.",
+    "primary_generation_reference": "sprocket_exact_openscad_reference.json",
+    "generation_note": "For OpenSCAD sprocket generation, prefer the exact Sprockets.scad-based reference. This file's simple disk and roller-pocket module is only a fallback explanation pattern.",
     "retrieval": {
       "primary_keywords": [
         "sprocket",
@@ -127,18 +129,20 @@
         }
       },
       "main_features": [
-        "sprocket body disk at outer_d",
+        "real sprocket tooth ring built from repeated circular flank intersections",
         "hub cylinder",
-        "tooth spaces as subtractive roller pockets at pitch circle",
-        "root relief cylinder removing material below pitch",
+        "roller pockets as subtractive cylinders at pitch radius",
+        "connected root/web fill between bore hub and tooth ring",
         "shaft bore",
-        "set-screw boss"
+        "keyway slot when requested",
+        "radial set-screw cross-hole when requested"
       ],
       "design_rules": [
         "pitch_d from formula not from bore",
         "roller pockets on pitch circle not random",
-        "root_d cylinder subtracted to create tooth height",
-        "hub extends above and below tooth plate"
+        "teeth must be built from circular flank intersections, not a plain cylinder",
+        "web/root fill must keep hub connected to rim",
+        "hub extends above tooth plate"
       ],
       "validation_criteria": [
         "pitch_d from chain_pitch/sin(180/N)",
@@ -148,8 +152,12 @@
       ],
       "failure_modes": [
         "pitch_d equal to bore_d",
+        "output is a plain cylinder or disk",
+        "simple cylinder with bore only",
+        "disk with no visible sprocket teeth",
         "roller pockets not at pitch radius",
-        "no hub — shaft grip insufficient"
+        "no hub — shaft grip insufficient",
+        "center cut removes web and disconnects hub from rim"
       ],
       "constraint_checks": [
         {
@@ -165,7 +173,7 @@
           "message": "Sprocket must have roller pocket cutouts at pitch circle."
         }
       ],
-      "openscad_module": "$fn = 128;\n\nchain_pitch = 12.7;\nroller_d    = 7.92;\nnum_teeth   = 17;\nthickness   = 8;\nbore_d      = 10;\nhub_od      = 22;\nhub_h       = 14;\nbore_clear  = 0.1;\ntooth_clear = 0.3;\n\npitch_d = chain_pitch / sin(180 / num_teeth);\nouter_d = pitch_d + roller_d * 0.8;\nroot_d  = pitch_d - roller_d * 1.1;\n\nmodule ansi40_sprocket() {\n  difference() {\n    union() {\n      cylinder(h = thickness, d = outer_d, center = true);\n      cylinder(h = hub_h, d = hub_od, center = true);\n    }\n    for (i = [0 : num_teeth - 1])\n      rotate([0, 0, 360 * i / num_teeth])\n        translate([pitch_d/2, 0, 0])\n          cylinder(h = thickness + 2, d = roller_d + tooth_clear, center = true, $fn = 32);\n    cylinder(h = thickness + 2, d = root_d, center = true);\n    cylinder(h = hub_h + 2, d = bore_d + bore_clear, center = true, $fn = 64);\n    translate([bore_d/2 + 5, 0, 0])\n      rotate([90, 0, 0])\n        cylinder(h = hub_od + 2, d = 4.5, center = true, $fn = 32);\n  }\n}\n\nansi40_sprocket();"
+      "openscad_module": "$fn = 180;\n\nFUDGE_BORE = 0.25;\nFUDGE_ROLLER = 0.15;\nFUDGE_TEETH = 1;\nFUDGE_KEYWAY = 0.2;\n\nfunction inches2mm(inches) = inches * 25.4;\nfunction get_pitch(size) = size == 25 ? 1/4 : size == 35 ? 3/8 : size == 40 ? 1/2 : size == 41 ? 1/2 : size == 50 ? 5/8 : size == 60 ? 3/4 : size == 80 ? 1 : 0;\nfunction get_roller_diameter(size) = size == 25 ? 0.130 : size == 35 ? 0.200 : size == 40 ? 5/16 : size == 41 ? 0.306 : size == 50 ? 0.400 : size == 60 ? 15/32 : size == 80 ? 5/8 : 0;\nfunction get_thickness(size) = size == 25 ? 0.110 : size == 35 ? 0.168 : size == 40 ? 0.284 : size == 41 ? 0.227 : size == 50 ? 0.343 : size == 60 ? 0.459 : size == 80 ? 0.575 : 0;\nfunction get_keyway_width(bore_in) = bore_in <= 0.375 ? 0 : bore_in <= 0.5625 ? 0.125 : bore_in <= 0.875 ? 0.1875 : bore_in <= 1.25 ? 0.250 : bore_in <= 1.375 ? 0.3125 : bore_in <= 1.75 ? 0.375 : bore_in <= 2.25 ? 0.5 : 0;\n\nmodule sprocket_plate(size, teeth) {\n  angle = 360 / teeth;\n  pitch = inches2mm(get_pitch(size));\n  roller = inches2mm(get_roller_diameter(size) / 2);\n  thickness = inches2mm(get_thickness(size));\n  pitch_radius = inches2mm(get_pitch(size) / sin(180 / teeth)) / 2;\n  middle_radius = sqrt(pow(pitch_radius, 2) - pow(pitch / 2, 2));\n  fudge_teeth_x = FUDGE_TEETH * cos(angle / 2);\n  fudge_teeth_y = FUDGE_TEETH * sin(angle / 2);\n\n  difference() {\n    intersection() {\n      cylinder(r = pitch_radius - roller + pitch / 2, h = thickness);\n      union() {\n        for (i = [0 : teeth - 1])\n          rotate([0, 0, angle * i])\n            intersection() {\n              translate([-fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])\n                cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);\n              rotate([0, 0, angle])\n                translate([fudge_teeth_x, pitch_radius - fudge_teeth_y, 0])\n                  cylinder(r = pitch - roller - FUDGE_ROLLER - FUDGE_TEETH, h = thickness);\n            }\n        for (i = [0 : teeth - 1])\n          rotate([0, 0, angle * i - angle / 2])\n            translate([-pitch / 2, -0.01, 0])\n              cube([pitch, middle_radius + 0.01, thickness]);\n      }\n    }\n    for (i = [0 : teeth - 1])\n      rotate([0, 0, angle * i])\n        translate([0, pitch_radius, -1])\n          cylinder(r = roller + FUDGE_ROLLER, h = thickness + 2);\n  }\n}\n\nmodule ansi40_sprocket_17t() {\n  size = 40;\n  teeth = 17;\n  bore_d = 10;\n  hub_od = 22;\n  hub_h = 14;\n  plate_h = inches2mm(get_thickness(size));\n  bore_r = bore_d / 2 + FUDGE_BORE;\n  key_w = inches2mm(get_keyway_width(bore_d / 25.4));\n\n  difference() {\n    union() {\n      sprocket_plate(size, teeth);\n      translate([0, 0, (plate_h - hub_h) / 2])\n        cylinder(h = hub_h, d = hub_od);\n    }\n    translate([0, 0, -hub_h])\n      cylinder(h = hub_h * 3, r = bore_r);\n    translate([-(bore_r + key_w / 2), -key_w / 2, -hub_h])\n      cube([key_w + FUDGE_KEYWAY, key_w + FUDGE_KEYWAY, hub_h * 3]);\n    translate([0, 0, plate_h / 2])\n      rotate([90, 0, 0])\n        cylinder(h = hub_od + 4, d = 4.5, center = true);\n  }\n}\n\nansi40_sprocket_17t();"
     }
   ]
 }

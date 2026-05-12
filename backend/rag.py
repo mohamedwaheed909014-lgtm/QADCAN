@@ -32,6 +32,7 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 import threading
 from functools import lru_cache
 from pathlib import Path
@@ -129,7 +130,6 @@ FAMILY_ID_TO_SHORT_KEY: dict[str, str] = {
     "structural_profiles_reference":            "structural",
     "common_trusses_reference":                 "truss",
     "threads_knobs_shaft_features_reference":   "threaded",
-    "wheel_castor_tyre_reference":              "wheel",
 }
 
 FAMILY_ID_TO_LABEL: dict[str, str] = {
@@ -181,8 +181,8 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "gear", "spur gear", "helical gear", "bevel gear", "worm gear", "worm wheel",
         "spiral gear", "spiral bevel gear", "herringbone gear", "double helical gear",
         "rack", "pinion", "planetary gear", "epicyclic gear", "ring gear", "annulus gear", "sun gear",
-        "pitch diameter", "module", "involute", "tooth count", "gear ratio",
-        "hub", "keyway", "final drive gear", "gear assembly", "crown gear",
+        "pitch diameter", "involute", "tooth count", "gear ratio",
+        "keyway", "final drive gear", "gear assembly", "crown gear",
         "cone distance", "helix angle", "spiral angle", "pressure angle",
     ],
     "gearbox_housing_reference": [
@@ -246,10 +246,6 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "knob", "thumb knob", "thread", "standoff", "shaft feature",
         "spacer", "washer", "threaded insert",
     ],
-    "wheel_castor_tyre_reference": [
-        "wheel", "castor", "caster", "tyre", "tire", "fork", "mounting plate",
-        "swivel caster", "rigid caster",
-    ],
 }
 
 
@@ -259,7 +255,7 @@ SUPPORT_DOC_KEYWORDS: dict[str, list[str]] = {
         "spiral gear", "herringbone gear", "ring gear", "annulus",
         "rack", "pinion", "rack and pinion", "bevel gear", "bevel gear pair",
         "spiral bevel gear", "planetary gear", "epicyclic gear",
-        "worm", "worm gear", "worm drive", "module", "modul",
+        "worm", "worm gear", "worm drive",
         "tooth_number", "helix_angle", "pressure_angle", "lead_angle",
     ],
     "bearing_housing_grabcad_real_examples_reference": [
@@ -282,12 +278,21 @@ SUPPORT_DOC_KEYWORDS: dict[str, list[str]] = {
     ],
     "research_paper_few_shot_examples_reference": [
         "example", "few shot", "few-shot", "reference design",
-        "baseline", "flange", "bracket",
+        "baseline",
+    ],
+    "sprocket": [
+        "sprocket", "Sprockets.scad", "roller chain sprocket",
+        "ansi sprocket", "#25 sprocket", "#35 sprocket", "#40 sprocket",
+        "#41 sprocket", "#50 sprocket", "#60 sprocket", "#80 sprocket",
+        "chain wheel", "chain sprocket", "keyway sprocket",
+        "set screw sprocket", "roller pockets", "pitch radius",
+        "circular flank tooth", "sprocket_plate",
     ],
 }
 
 PRIMARY_SUPPORT_DOC_BY_FAMILY: dict[str, str] = {
     "gear_reference": "gear_examples_primary_reference",
+    "sprocket_chain_reference": "sprocket",
 }
 
 # Populated at document load time from JSON retrieval.negative_keywords
@@ -301,6 +306,8 @@ PART_DATABASE_DOC_FAMILY: dict[str, str]       = {}
 # those documents into RAG now that gears-master is the authoritative source.
 DISABLED_RAG_DOC_STEMS: set[str] = {
     "gear_reference",
+    "sprocket_chain_reference",
+    "sprocket_exact_openscad_reference",
 }
 
 
@@ -566,7 +573,7 @@ def load_documents() -> list[Document]:
     PART_DATABASE_DOC_FAMILY.clear()
 
     frontend_json = list(FRONTEND_DIR.glob("*.json")) if FRONTEND_DIR.exists() else []
-    paths = sorted(list(DOCS_DIR.glob("*.txt")) + list(DOCS_DIR.glob("*.json")) + frontend_json)
+    paths = sorted(list(DOCS_DIR.glob("*.txt")) + list(DOCS_DIR.glob("*.json")) + list(DOCS_DIR.glob("*.scad")) + frontend_json)
 
     for path in paths:
         if path.stem in DISABLED_RAG_DOC_STEMS:
@@ -586,6 +593,9 @@ def load_documents() -> list[Document]:
                 continue
             text      = _json_to_rag_text(data, path.stem)
             file_type = "json"
+        elif path.suffix == ".scad":
+            text      = path.read_text(encoding="utf-8").strip()
+            file_type = "scad"
         else:
             text      = path.read_text(encoding="utf-8").strip()
             file_type = "txt"
@@ -610,10 +620,32 @@ def load_documents() -> list[Document]:
 # ── Keyword helpers ───────────────────────────────────────────────────────────
 def _keyword_hits(query: str, keywords: list[str]) -> int:
     lowered = query.lower()
-    return sum(1 for kw in keywords if kw in lowered)
+    hits = 0
+    for kw in keywords:
+        term = kw.lower().strip()
+        if not term:
+            continue
+        if term[0].isalnum() and term[-1].isalnum():
+            pattern = rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])"
+            if re.search(pattern, lowered):
+                hits += 1
+        elif term in lowered:
+            hits += 1
+    return hits
 
 
 def detect_primary_families(query: str) -> list[str]:
+    lowered = query.lower()
+    if re.search(r"\b(sprocket|roller chain|chain sprocket|chain wheel|ansi\s*#?\s*(25|35|40|41|50|60|80)|#\s*(25|35|40|41|50|60|80)\s*(chain|sprocket))\b", lowered):
+        remaining = [
+            doc_id for doc_id in _detect_primary_families_by_keyword(query)
+            if doc_id != "sprocket_chain_reference"
+        ]
+        return ["sprocket_chain_reference", *remaining]
+    return _detect_primary_families_by_keyword(query)
+
+
+def _detect_primary_families_by_keyword(query: str) -> list[str]:
     ranked: list[tuple[int, str]] = []
     for doc_id, keywords in PRIMARY_FAMILY_KEYWORDS.items():
         matches = _keyword_hits(query, keywords)
@@ -926,6 +958,8 @@ class KnowledgeBase:
         scored: list[tuple[float, Document]] = []
         for doc, raw in zip(docs, scores):
             if "gear_reference" in family_ids and doc.id != PRIMARY_SUPPORT_DOC_BY_FAMILY.get("gear_reference") and doc.family != "gear_reference":
+                continue
+            if family_ids and doc.id in SUPPORT_DOC_KEYWORDS and doc.family and doc.family not in family_ids:
                 continue
             adj = _adjust_score(raw, doc, family_ids, query)
             # Drop documents below their declared or default threshold

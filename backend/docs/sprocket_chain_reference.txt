@@ -3,6 +3,12 @@ Category: Power Transmission / Chain Drive
 Verified models: GrabCAD "sprocket #25 chain", Thingiverse "parametric sprocket OpenSCAD",
   Printables "roller chain sprocket", GrabCAD "ANSI 40 sprocket", Cults3D "sprocket generator"
 
+PRIMARY OPENSCAD GENERATION NOTE
+For exact OpenSCAD generation, prefer sprocket_exact_openscad_reference.txt over the simplified example in this file.
+The exact reference is based on D:/Downloads/Sprockets.scad and preserves circular flank tooth construction,
+connected web/root fill, pitch-radius roller pockets, hub, bore, keyway, and set screw features.
+Use the simplified code below only as a fallback explanation pattern, not as the preferred generated model.
+
 ROLLER CHAIN STANDARDS
 ────────────────────────
   Chain designation format: ANSI # × pitch in 1/8" increments

@@ -1,0 +1,182 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "sprocket_exact_openscad_reference",
+    "family_label": "Exact OpenSCAD Roller Chain Sprockets",
+    "units": "mixed: source library uses inches for input dimensions and converts to millimeters internally",
+    "source_library": "D:/Downloads/Sprockets.scad",
+    "scope": "Exact standalone OpenSCAD generation for roller chain sprockets with real Sprockets.scad-style circular flank teeth, roller pockets, hub, bore, keyway, and set screw holes.",
+    "retrieval": {
+      "primary_keywords": [
+        "sprocket",
+        "Sprockets.scad",
+        "roller chain sprocket",
+        "ansi sprocket",
+        "#25 sprocket",
+        "#35 sprocket",
+        "#40 sprocket",
+        "#41 sprocket",
+        "#50 sprocket",
+        "#60 sprocket",
+        "#80 sprocket",
+        "motorcycle sprocket",
+        "chain wheel",
+        "chain sprocket",
+        "sprocket hub",
+        "keyway sprocket",
+        "set screw sprocket",
+        "roller pockets",
+        "pitch radius",
+        "circular flank tooth"
+      ],
+      "negative_keywords": [
+        "timing pulley",
+        "belt pulley",
+        "GT2 pulley",
+        "spur gear",
+        "involute gear",
+        "bearing housing",
+        "fan mount",
+        "bracket",
+        "enclosure"
+      ],
+      "min_score_threshold": 0.18
+    },
+    "output_policy": {
+      "openscad_code": "Default to standalone OpenSCAD containing sprocket_plate(), chain size tables, circular flank tooth construction, roller pocket subtraction, hub, bore, keyway, and set screw holes. Use an external Sprockets.scad library call only when the user explicitly asks for the library call.",
+      "no_markdown_when_requested": true,
+      "forbidden_in_code": [
+        "markdown fences",
+        "material recommendation prose",
+        "standards explanation paragraphs",
+        "placeholder echo asking for missing dimensions",
+        "plain disk-with-holes approximation",
+        "single cylinder output",
+        "smooth cylinder with only bore"
+      ]
+    }
+  },
+  "source_module": {
+    "signature": "sprocket(size=25, teeth=9, bore=5/16, hub_diameter=0, hub_height=0, keyway=0, setscrew=0, keyway_threads=1)",
+    "parameter_units": {
+      "size": "chain family number",
+      "teeth": "count",
+      "bore": "inches",
+      "hub_diameter": "inches",
+      "hub_height": "inches",
+      "keyway": "0 or 1",
+      "setscrew": "0 or 1",
+      "keyway_threads": "0 or 1"
+    },
+    "preferred_exact_call_example": "Only use this if the user explicitly asks for a Sprockets.scad library call:\nuse <D:/Downloads/Sprockets.scad>\n$fn = 180;\nsprocket(size=40, teeth=17, bore=10/25.4, hub_diameter=22/25.4, hub_height=14/25.4, keyway=1, setscrew=1);"
+  },
+  "design_rules": [
+    "Use pitch_radius = inches2mm(get_pitch(size) / sin(180 / teeth)) / 2.",
+    "Build teeth from repeated intersections of two circular flank cylinders.",
+    "Do not use gear module logic such as modul = pitch/PI, addendum, or dedendum for roller chain sprockets.",
+    "Do not create teeth by repeating a full annulus or ring in a for-loop.",
+    "Do not set roller radius equal to pitch/2; use get_roller_diameter(size)/2.",
+    "Subtract roller holes at pitch_radius for every tooth.",
+    "Fill the root/web with repeated rectangular sectors up to middle_radius so the hub and rim remain connected.",
+    "Add hub as a cylinder in union with the sprocket plate when hub_diameter and hub_height are nonzero.",
+    "Subtract the bore as a vertical cylinder through the full sprocket and hub.",
+    "Subtract a rectangular keyway slot when keyway is requested and bore size supports it.",
+    "Subtract radial set screw cross-holes through the hub when setscrew is requested.",
+    "If threads.scad is unavailable, use cylindrical set screw holes instead of english_thread() so standalone OpenSCAD remains valid."
+  ],
+  "tables_inches": {
+    "pitch": {
+      "25": 0.25,
+      "35": 0.375,
+      "40": 0.5,
+      "41": 0.5,
+      "50": 0.625,
+      "60": 0.75,
+      "80": 1.0,
+      "1": 0.5,
+      "2": 0.5,
+      "420": 0.5,
+      "425": 0.5,
+      "428": 0.5,
+      "520": 0.625,
+      "525": 0.625,
+      "530": 0.625,
+      "630": 0.75
+    },
+    "roller_diameter": {
+      "25": 0.13,
+      "35": 0.2,
+      "40": 0.3125,
+      "41": 0.306,
+      "50": 0.4,
+      "60": 0.46875,
+      "80": 0.625,
+      "1": 0.3125,
+      "2": 0.3125,
+      "420": 0.3125,
+      "425": 0.3125,
+      "428": 0.335,
+      "520": 0.4,
+      "525": 0.4,
+      "530": 0.4,
+      "630": 0.46875
+    },
+    "sprocket_thickness": {
+      "25": 0.11,
+      "35": 0.168,
+      "40": 0.284,
+      "41": 0.227,
+      "50": 0.343,
+      "60": 0.459,
+      "80": 0.575,
+      "1": 0.11,
+      "2": 0.084,
+      "420": 0.227,
+      "425": 0.284,
+      "428": 0.284,
+      "520": 0.227,
+      "525": 0.284,
+      "530": 0.343,
+      "630": 0.343
+    },
+    "chainplate_size": {
+      "25": 0.228,
+      "35": 0.346,
+      "40": 0.469,
+      "41": 0.39,
+      "50": 0.585,
+      "60": 0.709,
+      "80": 0.949
+    }
+  },
+  "validation_criteria": [
+    "Contains Sprockets.scad exact import or standalone sprocket_plate equivalent.",
+    "Contains pitch_radius formula from chain pitch and tooth count.",
+    "Contains circular flank intersection tooth construction.",
+    "Final module calls sprocket_plate(size, teeth).",
+    "Contains roller pocket subtraction loop.",
+    "Contains connected web/root fill, not a removed center ring.",
+    "Contains hub, bore, optional keyway, and optional set screw features when requested.",
+    "Uses inches conversion for Sprockets.scad module calls when user provides millimeters."
+  ],
+  "anti_patterns": [
+    "pitch diameter or pitch radius derived from bore diameter",
+    "simple outer disk with only circular holes and no flank intersection teeth",
+    "single cylinder output",
+    "smooth cylinder with only a bore",
+    "modul = pitch/PI gear-style sprocket",
+    "addendum/dedendum gear logic",
+    "roller_r = pitch/2",
+    "for-loop that repeats a full annulus or ring instead of individual tooth flanks",
+    "large center cutout that disconnects the hub from the rim",
+    "floating hub solids",
+    "spur gear involute teeth for roller chain sprockets",
+    "timing pulley tooth profile for roller chain sprockets"
+  ],
+  "test_prompts": [
+    "Generate geometry-only OpenSCAD for an ANSI #40 17-tooth sprocket using Sprockets.scad geometry, 10 mm bore, 22 mm hub OD, 14 mm hub height, keyway, and set screw. Return only valid OpenSCAD.",
+    "Create a standalone OpenSCAD #40 sprocket with 17 teeth, real circular flank tooth construction, roller holes at pitch radius, connected web, hub, bore, keyway, and radial set screw holes. Do not use a simple disk-with-holes approximation.",
+    "Generate an OpenSCAD call to the exact D:/Downloads/Sprockets.scad library for a #25 sprocket with 20 teeth, 5 mm bore, and 14 mm hub."
+  ]
+}
