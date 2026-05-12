@@ -1,0 +1,176 @@
+FLANGES, PIPE FITTINGS AND COUPLINGS REFERENCE
+Category: Fluid Systems / Pipe Connection
+Verified models: GrabCAD "ANSI flange DN50", GrabCAD "pipe elbow 90 degree parametric",
+  Thingiverse "parametric pipe flange OpenSCAD", Printables "pipe connector parametric",
+  GrabCAD "DIN 2573 flange", Cults3D "hose barb parametric"
+
+FLANGE STANDARDS
+─────────────────
+  ANSI/ASME B16.5 (imperial):  Class 150, 300, 600, 900, 1500, 2500
+  DIN 2573 / EN 1092-1 (metric): PN6, PN10, PN16, PN25, PN40
+  JIS B 2210 (Japanese)
+
+  Flange types:
+  - Weld neck (WN): long tapered neck, butt-welded to pipe
+  - Slip-on (SO): slides over pipe, fillet weld
+  - Blind (BL): solid plate, closes pipe end
+  - Socket weld (SW): counter-bore, fillet weld inside
+  - Threaded: internal or external pipe thread, screws onto pipe
+  - Lap joint: loose flange + stub end, for adjustable bolt alignment
+
+ANSI CLASS 150 FLANGE DIMENSIONS (raised face, common sizes)
+─────────────────────────────────────────────────────────────
+  Nominal Pipe Size (NPS) → dimensions in mm:
+  NPS 1/2" (DN15): OD 89, bolt_circle 60, 4×ø16 holes, thickness 11
+  NPS 3/4" (DN20): OD 98, bolt_circle 70, 4×ø16 holes, thickness 13
+  NPS 1"   (DN25): OD 108, bolt_circle 79, 4×ø16 holes, thickness 14
+  NPS 1.5" (DN40): OD 127, bolt_circle 98, 4×ø16 holes, thickness 17
+  NPS 2"   (DN50): OD 152, bolt_circle 121, 4×ø19 holes, thickness 19
+  NPS 3"   (DN80): OD 191, bolt_circle 152, 4×ø19 holes, thickness 24
+  NPS 4"  (DN100): OD 229, bolt_circle 190, 8×ø19 holes, thickness 24
+  NPS 6"  (DN150): OD 279, bolt_circle 241, 8×ø22 holes, thickness 27
+
+DIN PN16 FLANGE DIMENSIONS
+───────────────────────────
+  DN15: OD 95, bolt_circle 65, 4×ø14 holes, thickness 14, pipe_bore 16
+  DN20: OD 105, bolt_circle 75, 4×ø14 holes, thickness 16
+  DN25: OD 115, bolt_circle 85, 4×ø14 holes, thickness 16
+  DN32: OD 140, bolt_circle 100, 4×ø18 holes, thickness 18
+  DN40: OD 150, bolt_circle 110, 4×ø18 holes, thickness 18
+  DN50: OD 165, bolt_circle 125, 4×ø18 holes, thickness 20
+  DN65: OD 185, bolt_circle 145, 8×ø18 holes, thickness 20
+  DN80: OD 200, bolt_circle 160, 8×ø18 holes, thickness 22
+  DN100: OD 220, bolt_circle 180, 8×ø18 holes, thickness 24
+
+PIPE OD STANDARDS
+──────────────────
+  Schedule 40 (ANSI) — most common:
+  DN15 (1/2"): OD 21.3 mm, wall 2.77 mm, ID 15.8 mm
+  DN20 (3/4"): OD 26.7 mm, wall 2.87 mm, ID 20.9 mm
+  DN25 (1"):   OD 33.4 mm, wall 3.38 mm, ID 26.6 mm
+  DN32 (1.25"):OD 42.2 mm, wall 3.56 mm, ID 35.0 mm
+  DN40 (1.5"): OD 48.3 mm, wall 3.68 mm, ID 40.9 mm
+  DN50 (2"):   OD 60.3 mm, wall 3.91 mm, ID 52.5 mm
+  DN80 (3"):   OD 88.9 mm, wall 5.49 mm, ID 77.9 mm
+
+  Metric (DIN EN 10255):
+  DN15: OD 21.3 mm, DN20: OD 26.9 mm, DN25: OD 33.7 mm, DN32: OD 42.4 mm
+  DN40: OD 48.3 mm, DN50: OD 60.3 mm, DN65: OD 76.1 mm, DN80: OD 88.9 mm
+
+HOSE BARB DIMENSIONS
+─────────────────────
+  For flexible hose / tubing connections:
+  Barb OD: slightly larger than hose ID for retention grip
+  Hose ID 4 mm  → barb major OD 5.0 mm, minor OD 3.8 mm
+  Hose ID 6 mm  → barb major OD 7.5 mm, minor OD 5.5 mm
+  Hose ID 8 mm  → barb major OD 9.5 mm, minor OD 7.5 mm
+  Hose ID 10 mm → barb major OD 11.5 mm, minor OD 9.5 mm
+  Hose ID 12 mm → barb major OD 14.0 mm, minor OD 11.5 mm
+  Barb count: 2–3 barbs per fitting; barb spacing = hose_ID × 0.8 mm
+  Barb angle: 20–30° lead-in angle, 60–70° retention angle (sharp = more grip)
+
+KEY PARAMETERS
+──────────────
+  pipe_od               — from standard table
+  pipe_id               — pipe_od − 2 × wall
+  flange_od             — from standard table
+  flange_thickness      — from standard table
+  bolt_circle_d         — from standard table
+  num_bolts             — 4 or 8 (from standard)
+  bolt_hole_d           — from standard (ø14–22 mm)
+  raised_face_od        — pipe_od + 30–40 mm (sealing face)
+  raised_face_height    — 1.6 mm (ANSI); 2.0 mm (DIN)
+  gasket_id             — pipe_od + 2 mm
+  gasket_od             — raised_face_od − 2 mm
+
+OPENSCAD STRUCTURE (blind flange)
+───────────────────────────────────
+  flange_od    = 165;   // DN50 PN16
+  flange_t     = 20;
+  bolt_circle  = 125;
+  n_bolts      = 4;
+  bolt_hole_d  = 18.5;  // ø18 clearance
+  rf_od        = 90;    // raised face
+  rf_h         = 2;
+  pipe_bore    = 0;     // blind = no bore
+
+  module blind_flange() {
+    difference() {
+      union() {
+        cylinder(h=flange_t, d=flange_od, $fn=128);
+        cylinder(h=flange_t+rf_h, d=rf_od, $fn=128);   // raised face
+      }
+      // bolt holes
+      for(i=[0:n_bolts-1])
+        rotate([0,0,360*i/n_bolts + 45])
+          translate([bolt_circle/2, 0, -1])
+            cylinder(h=flange_t+rf_h+2, d=bolt_hole_d, $fn=32);
+    }
+  }
+
+PIPE ELBOW (90° and 45°)
+─────────────────────────
+  centerline_radius = 1.5 × pipe_od  (standard long-radius elbow)
+  // model as rotate_extrude of pipe cross-section
+  module pipe_elbow_90(pipe_od, pipe_id, cl_r) {
+    rotate_extrude(angle=90, $fn=64)
+      translate([cl_r, 0, 0])
+        difference() {
+          circle(d=pipe_od, $fn=64);
+          circle(d=pipe_id, $fn=64);
+        }
+  }
+
+DESIGN RULES
+────────────
+  - Bolt holes in flanges: offset 22.5° from vertical centreline so bolts don't land on top/bottom
+  - Gasket face: Ra ≤ 3.2 μm (machine finish); for printed: smooth with gap-filling primer
+  - Raised face: always on both mating flanges; never mix RF with flat-face
+  - For 3D printed fluid fittings: use water-tight settings (≥ 4 perimeters, 100% infill, PETG)
+  - Hose barb: print barb direction so layers are parallel to pull-off force axis
+  - Push-fit fittings: OD of insert = hose_ID − 0.3 mm for light press; add barbs for retention
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A flange is a bolted plate or disk around a central pipe/shaft opening.
+- Main flange disk, raised boss, neck, socket, and gasket face are solid material in union().
+- Center bore, bolt holes, internal pipe passage, and gasket grooves are removed material in difference().
+- The central bore is coaxial on Z for a round flange.
+- Bolt-circle holes are repeated using angle = 360*i/bolt_count and cos()/sin() placement.
+- A pipe socket is a larger diameter recess around the central bore, not a separate off-axis hole.
+- Hose barbs are repeated tapered rings along the pipe axis.
+- Keep bolt holes inside the outer diameter with enough edge distance.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn flange and pipe-fitting rules into OpenSCAD.
+
+Rule: round flange is a disk with central bore.
+OpenSCAD action:
+  difference() {
+    cylinder(h=flange_thickness, d=flange_outer_diameter, center=true, $fn=128);
+    cylinder(h=flange_thickness+2, d=pipe_bore_diameter, center=true, $fn=96);
+  }
+
+Rule: bolt circle holes repeat around radius.
+OpenSCAD action:
+  for (i=[0:bolt_count-1]) {
+    angle = 360*i/bolt_count;
+    translate([cos(angle)*bolt_circle_diameter/2, sin(angle)*bolt_circle_diameter/2, 0])
+      cylinder(h=flange_thickness+2, d=bolt_hole_diameter, center=true, $fn=48);
+  }
+
+Rule: raised boss strengthens the pipe opening.
+OpenSCAD action:
+  cylinder(h=boss_height, d=boss_diameter, center=true, $fn=96);
+
+Rule: gasket groove is a shallow annular recess.
+OpenSCAD action:
+  difference() {
+    cylinder(h=gasket_depth, d=gasket_outer_diameter, center=true, $fn=128);
+    cylinder(h=gasket_depth+1, d=gasket_inner_diameter, center=true, $fn=128);
+  }
+
+Rule: hose barb is repeated tapered ring along pipe axis.
+OpenSCAD action:
+  for (z=[0:barb_pitch:barb_length])
+    translate([0,0,z]) cylinder(h=barb_width, d1=barb_root_d, d2=barb_tip_d, center=true, $fn=96);

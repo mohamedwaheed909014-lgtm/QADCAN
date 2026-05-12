@@ -1,0 +1,357 @@
+RESEARCH PAPER FEW-SHOT EXAMPLES REFERENCE
+Source baseline: Bachelor thesis, "3D Model Generation of Material Handling Equipment using OpenSCAD"
+Purpose: Convert the thesis baseline examples into useful few-shot RAG examples for CADIES.
+Use: These examples teach the model the expected pattern: user prompt -> mechanical interpretation -> valid parametric OpenSCAD.
+
+CORE LESSONS FROM THE RESEARCH BASELINE
+- Use OpenSCAD as a parametric CAD language, not as static geometry.
+- Put editable parameters at the top.
+- Use modules for organization.
+- Use CSG correctly: union() creates solids, difference() subtracts holes/cuts.
+- Validate that the generated model follows the user's functional design intent, not only syntax.
+- Test prompts should include basic, intermediate, and advanced complexity levels.
+- Accepted user-approved outputs should be reused as history for similar future prompts.
+
+FEW-SHOT EXAMPLE 1 - BASIC PARAMETRIC BLOCK
+User request:
+Generate a cube with length 20 mm, width 30 mm, and height 10 mm.
+
+Mechanical interpretation:
+- This is a basic rectangular prism.
+- It should be fully parameterized.
+- No cuts are required.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+length = 20;
+width = 30;
+height = 10;
+
+module parametric_block() {
+  cube([length, width, height], center=true);
+}
+
+parametric_block();
+```
+
+FEW-SHOT EXAMPLE 2 - INTERMEDIATE M6 BOLT
+User request:
+Create an M6 bolt with 20 mm length and a hexagonal head.
+
+Mechanical interpretation:
+- The shaft is a cylinder with nominal M6 diameter.
+- The head is a hexagonal prism.
+- Threads can be represented as a simplified cylinder unless detailed thread geometry is requested.
+- Use cylinder($fn=6) for the hex head.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+shaft_diameter = 6;
+shaft_length = 20;
+head_across_flats = 10;
+head_height = 4;
+
+module m6_bolt_simplified() {
+  union() {
+    translate([0, 0, -shaft_length/2])
+      cylinder(h=shaft_length, d=shaft_diameter, center=true);
+    translate([0, 0, head_height/2])
+      rotate([0, 0, 30])
+        cylinder(h=head_height, d=head_across_flats/cos(30), center=true, $fn=6);
+  }
+}
+
+m6_bolt_simplified();
+```
+
+FEW-SHOT EXAMPLE 3 - L-SHAPED BRACKET
+User request:
+Design an L-shaped bracket with two mounting slots and a support gusset.
+
+Mechanical interpretation:
+- Two perpendicular plates are solid material.
+- Gusset is extra support material at the inside corner.
+- Slots are subtractive hulls of two cylinders.
+- Holes/slots must be after union() inside difference().
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+leg_a = 60;
+leg_b = 45;
+width = 30;
+plate_thickness = 5;
+slot_length = 18;
+slot_diameter = 5.5;
+
+module slot_cut(len, d, h) {
+  hull() {
+    translate([-len/2 + d/2, 0, 0])
+      cylinder(h=h, d=d, center=true);
+    translate([ len/2 - d/2, 0, 0])
+      cylinder(h=h, d=d, center=true);
+  }
+}
+
+module l_bracket() {
+  difference() {
+    union() {
+      cube([leg_a, width, plate_thickness], center=true);
+      translate([-leg_a/2 + plate_thickness/2, 0, leg_b/2])
+        cube([plate_thickness, width, leg_b], center=true);
+      translate([-leg_a/2 + plate_thickness, 0, plate_thickness])
+        rotate([0, 45, 0])
+          cube([plate_thickness*1.5, width, plate_thickness*1.5], center=true);
+    }
+    translate([leg_a/5, 0, 0])
+      slot_cut(slot_length, slot_diameter, plate_thickness+2);
+    translate([-leg_a/2 + plate_thickness/2, 0, leg_b/2])
+      rotate([0, 90, 0])
+        slot_cut(slot_length, slot_diameter, plate_thickness+2);
+  }
+}
+
+l_bracket();
+```
+
+FEW-SHOT EXAMPLE 4 - SPUR GEAR BASELINE
+User request:
+Design a simplified 24 tooth spur gear with an 8 mm bore and hub.
+
+Mechanical interpretation:
+- Gear teeth repeat around the pitch circle.
+- Pitch diameter is derived from module and tooth count.
+- Bore and keyway are subtractive features.
+- The model is a simplified gear unless an exact involute profile is required.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+module_size = 1.5;
+teeth = 24;
+gear_thickness = 8;
+bore_diameter = 8;
+hub_diameter = 22;
+hub_width = 14;
+tooth_depth = module_size * 1.6;
+tooth_width = module_size * 1.2;
+pitch_diameter = module_size * teeth;
+pitch_radius = pitch_diameter / 2;
+
+module simplified_spur_gear() {
+  difference() {
+    union() {
+      cylinder(h=gear_thickness, d=pitch_diameter, center=true);
+      cylinder(h=hub_width, d=hub_diameter, center=true);
+      for (i=[0:teeth-1])
+        rotate([0,0,360*i/teeth])
+          translate([pitch_radius,0,0])
+            cube([tooth_depth, tooth_width, gear_thickness], center=true);
+    }
+    cylinder(h=hub_width+2, d=bore_diameter+0.3, center=true);
+    translate([0,bore_diameter/2,0])
+      cube([3,2,hub_width+2], center=true);
+  }
+}
+
+simplified_spur_gear();
+```
+
+FEW-SHOT EXAMPLE 5 - PIPE FLANGE
+User request:
+Generate a pipe flange with central bore and six bolt holes.
+
+Mechanical interpretation:
+- The flange disk and raised boss are solid material.
+- The central bore and bolt-circle holes are subtractive cuts.
+- Bolt holes repeat using trigonometric placement on a bolt circle.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+outer_diameter = 80;
+bore_diameter = 32;
+thickness = 10;
+boss_diameter = 46;
+boss_height = 5;
+bolt_count = 6;
+bolt_circle_diameter = 62;
+bolt_hole_diameter = 6.5;
+
+module pipe_flange() {
+  difference() {
+    union() {
+      cylinder(h=thickness, d=outer_diameter, center=true);
+      translate([0,0,thickness/2 + boss_height/2])
+        cylinder(h=boss_height, d=boss_diameter, center=true);
+    }
+    cylinder(h=thickness + boss_height + 2, d=bore_diameter, center=true);
+    for (i=[0:bolt_count-1]) {
+      angle = 360*i/bolt_count;
+      translate([cos(angle)*bolt_circle_diameter/2, sin(angle)*bolt_circle_diameter/2, 0])
+        cylinder(h=thickness+2, d=bolt_hole_diameter, center=true);
+    }
+  }
+}
+
+pipe_flange();
+```
+
+FEW-SHOT EXAMPLE 6 - I-BEAM CORRECTION
+User request:
+Generate an I-beam.
+
+Mechanical interpretation:
+- Do not generate a plain rectangular beam.
+- An I-beam consists of top flange, bottom flange, and a central vertical web.
+- The profile can be made from three cubes in union().
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+beam_length = 120;
+beam_height = 40;
+flange_width = 28;
+flange_thickness = 6;
+web_thickness = 6;
+
+module i_beam() {
+  union() {
+    translate([0,0, beam_height/2 - flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+    translate([0,0,-beam_height/2 + flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+    cube([beam_length, web_thickness, beam_height], center=true);
+  }
+}
+
+i_beam();
+```
+
+FEW-SHOT EXAMPLE 7 - QUEEN POST TRUSS BASELINE
+User request:
+Generate a queen post truss.
+
+Mechanical interpretation:
+- The model is an assembly of beams, not one random solid.
+- Use repeated beam modules with rotation and translation.
+- The important part is correct positioning and alignment.
+- A simplified truss should include bottom chord, top rafters, two vertical queen posts, and central tie/member.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 48;
+
+span = 120;
+height = 45;
+beam_w = 5;
+beam_t = 5;
+
+module beam_between(p1, p2) {
+  dx = p2[0] - p1[0];
+  dz = p2[2] - p1[2];
+  len = sqrt(dx*dx + dz*dz);
+  angle = atan2(dz, dx);
+  translate([(p1[0]+p2[0])/2, 0, (p1[2]+p2[2])/2])
+    rotate([0, -angle, 0])
+      cube([len, beam_w, beam_t], center=true);
+}
+
+module queen_post_truss() {
+  beam_between([-span/2,0,0], [ span/2,0,0]);
+  beam_between([-span/2,0,0], [0,0,height]);
+  beam_between([ span/2,0,0], [0,0,height]);
+  beam_between([-span/4,0,0], [-span/4,0,height*0.55]);
+  beam_between([ span/4,0,0], [ span/4,0,height*0.55]);
+  beam_between([-span/4,0,height*0.55], [span/4,0,height*0.55]);
+}
+
+queen_post_truss();
+```
+
+FEW-SHOT EXAMPLE 8 - ADVANCED PLANETARY GEAR SYSTEM
+User request:
+Design a planetary gear system with three planet gears.
+
+Mechanical interpretation:
+- This is an advanced assembly.
+- It needs a sun gear at the center, three planet gears around it, and optionally a carrier/ring representation.
+- Use modules and repeated rotation placement.
+- The simplified version may use gear disks/teeth approximation, but placement must be clear.
+
+OpenSCAD answer pattern:
+```scad
+$fn = 96;
+
+sun_teeth = 18;
+planet_teeth = 12;
+module_size = 1.5;
+gear_thickness = 8;
+planet_count = 3;
+sun_pitch_d = sun_teeth * module_size;
+planet_pitch_d = planet_teeth * module_size;
+planet_radius = (sun_pitch_d + planet_pitch_d) / 2;
+
+module simple_gear(teeth, bore_d) {
+  pitch_d = teeth * module_size;
+  pitch_r = pitch_d / 2;
+  difference() {
+    union() {
+      cylinder(h=gear_thickness, d=pitch_d, center=true);
+      for (i=[0:teeth-1])
+        rotate([0,0,360*i/teeth])
+          translate([pitch_r,0,0])
+            cube([module_size*1.5, module_size, gear_thickness], center=true);
+    }
+    cylinder(h=gear_thickness+2, d=bore_d, center=true);
+  }
+}
+
+module planetary_gear_system() {
+  simple_gear(sun_teeth, 6);
+  for (i=[0:planet_count-1]) {
+    angle = 360*i/planet_count;
+    translate([cos(angle)*planet_radius, sin(angle)*planet_radius, 0])
+      simple_gear(planet_teeth, 4);
+  }
+  difference() {
+    cylinder(h=gear_thickness/2, d=planet_radius*2+planet_pitch_d+8, center=true);
+    cylinder(h=gear_thickness/2+2, d=planet_radius*2+planet_pitch_d, center=true);
+  }
+}
+
+planetary_gear_system();
+```
+
+EVALUATION PROMPT SET FROM THE RESEARCH BASELINE
+Basic:
+- Generate a cube with length 20 mm, width 30 mm, and height 10 mm.
+- Generate a cylinder spacer with 8 mm bore and 20 mm outer diameter.
+- Generate a simple mounting plate with four M5 holes.
+
+Intermediate:
+- Create an M6 bolt with 20 mm length and hexagonal head.
+- Design an L-shaped bracket with two mounting slots.
+- Generate a pipe flange with six bolt holes.
+- Generate a simplified 24 tooth spur gear with hub and bore.
+
+Advanced:
+- Design a planetary gear system with three planet gears.
+- Generate a final drive gear baseline with hub, bore, and repeated teeth.
+- Generate an I-beam profile, not a rectangular beam.
+- Generate a queen post truss using aligned beam modules.
+
+FAILURE MODES FROM THE RESEARCH BASELINE
+- Do not misuse 3D operations on 2D shapes.
+- Do not generate a simple rectangular beam when the prompt asks for an I-beam.
+- Do not create modules correctly but place them in wrong positions.
+- Do not ignore parametricity; all important dimensions should be editable.
+- Do not omit the final module call.

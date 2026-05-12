@@ -1,0 +1,17 @@
+# ── Web framework ─────────────────────────────────────────────────
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+
+# ── LLM providers ─────────────────────────────────────────────────
+openai>=1.30.0          # used for OpenAI, OpenRouter, and HuggingFace (all OpenAI-compatible)
+requests>=2.31.0        # used for Ollama REST calls
+
+# ── RAG / embeddings ──────────────────────────────────────────────
+scikit-learn>=1.4.0     # TF-IDF fallback vectoriser + cosine_similarity
+numpy>=1.26.0           # embedding arrays
+
+# Optional: dense embeddings (much better retrieval quality)
+# sentence-transformers>=2.7.0   # local sentence-transformer model (all-MiniLM-L6-v2)
+
+# ── Data models ───────────────────────────────────────────────────
+pydantic>=2.7.0

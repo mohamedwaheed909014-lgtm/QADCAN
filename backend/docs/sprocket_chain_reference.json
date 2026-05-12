@@ -1,0 +1,171 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "sprocket_chain_reference",
+    "family_label": "Sprockets and Chain Drive",
+    "units": "millimeters",
+    "scope": "ANSI #25, #35, #40, #50 roller chain sprockets with hub, bore, and keyway.",
+    "retrieval": {
+      "primary_keywords": [
+        "sprocket",
+        "chain drive",
+        "roller chain",
+        "chain sprocket",
+        "ansi chain",
+        "#40 chain",
+        "25 chain",
+        "sprocket hub",
+        "chain wheel",
+        "chain pitch"
+      ],
+      "negative_keywords": [
+        "pulley belt",
+        "gear tooth involute",
+        "bearing housing",
+        "fan mount",
+        "enclosure",
+        "bracket"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "1045 steel",
+        "use_case": "industrial roller chain sprockets",
+        "notes": "Through-harden tooth faces to HRC 45–50 for wear life.",
+        "standards": [
+          "ISO 683-1 1045"
+        ]
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "lightweight sprockets for robots and light conveyors",
+        "notes": "Adequate for low-torque; anodise tooth flanks."
+      },
+      {
+        "material": "PA12",
+        "use_case": "3D-printed light-duty sprockets",
+        "notes": "Add 0.3–0.5 mm tooth clearance for chain engagement."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ANSI B29.1",
+        "applies_to": "roller chain pitch, roller diameter, and inner width",
+        "note": "#40: pitch 12.7 mm, roller ø7.92 mm, inner width 7.85 mm."
+      },
+      {
+        "name": "Sprocket pitch diameter formula",
+        "applies_to": "pitch circle calculation",
+        "note": "pitch_d = chain_pitch / sin(180/N)."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "ansi40_sprocket_17t",
+      "category": "sprocket",
+      "name": "ANSI #40 chain 17-tooth sprocket",
+      "aliases": [
+        "#40 sprocket",
+        "ansi 40 sprocket",
+        "roller chain sprocket",
+        "chain sprocket 17t"
+      ],
+      "standards": [
+        "ANSI B29.1"
+      ],
+      "manufacturing_processes": [
+        "machined steel",
+        "3D printed prototype"
+      ],
+      "family": "sprocket_chain_reference",
+      "standard_dimensions_mm": {
+        "chain_pitch": 12.7,
+        "roller_d": 7.92,
+        "num_teeth": 17,
+        "thickness": 8,
+        "bore_d": 10,
+        "hub_od": 22
+      },
+      "fit_guidance_mm": {
+        "bore": "shaft_d + 0.05 mm (light press)"
+      },
+      "constraint_parameters": {
+        "num_teeth": {
+          "default": 17,
+          "min": 9
+        },
+        "bore_d": {
+          "default": 10
+        },
+        "chain_pitch": {
+          "default": 12.7
+        }
+      },
+      "derived_parameters": {
+        "pitch_d": {
+          "formula": "chain_pitch / sin(180/num_teeth)"
+        },
+        "outer_d": {
+          "formula": "pitch_d + roller_d * 0.8"
+        },
+        "root_d": {
+          "formula": "pitch_d - roller_d * 1.1"
+        }
+      },
+      "main_features": [
+        "sprocket body disk at outer_d",
+        "hub cylinder",
+        "tooth spaces as subtractive roller pockets at pitch circle",
+        "root relief cylinder removing material below pitch",
+        "shaft bore",
+        "set-screw boss"
+      ],
+      "design_rules": [
+        "pitch_d from formula not from bore",
+        "roller pockets on pitch circle not random",
+        "root_d cylinder subtracted to create tooth height",
+        "hub extends above and below tooth plate"
+      ],
+      "validation_criteria": [
+        "pitch_d from chain_pitch/sin(180/N)",
+        "roller pockets for-loop",
+        "root cylinder subtracted",
+        "bore subtracted"
+      ],
+      "failure_modes": [
+        "pitch_d equal to bore_d",
+        "roller pockets not at pitch radius",
+        "no hub — shaft grip insufficient"
+      ],
+      "constraint_checks": [
+        {
+          "id": "pitch_formula",
+          "severity": "error",
+          "expression": "pitch_d = chain_pitch/sin(180/N)",
+          "message": "Sprocket pitch diameter must use the correct formula."
+        },
+        {
+          "id": "roller_pockets",
+          "severity": "error",
+          "expression": "for-loop with roller pocket cylinders",
+          "message": "Sprocket must have roller pocket cutouts at pitch circle."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\nchain_pitch = 12.7;\nroller_d    = 7.92;\nnum_teeth   = 17;\nthickness   = 8;\nbore_d      = 10;\nhub_od      = 22;\nhub_h       = 14;\nbore_clear  = 0.1;\ntooth_clear = 0.3;\n\npitch_d = chain_pitch / sin(180 / num_teeth);\nouter_d = pitch_d + roller_d * 0.8;\nroot_d  = pitch_d - roller_d * 1.1;\n\nmodule ansi40_sprocket() {\n  difference() {\n    union() {\n      cylinder(h = thickness, d = outer_d, center = true);\n      cylinder(h = hub_h, d = hub_od, center = true);\n    }\n    for (i = [0 : num_teeth - 1])\n      rotate([0, 0, 360 * i / num_teeth])\n        translate([pitch_d/2, 0, 0])\n          cylinder(h = thickness + 2, d = roller_d + tooth_clear, center = true, $fn = 32);\n    cylinder(h = thickness + 2, d = root_d, center = true);\n    cylinder(h = hub_h + 2, d = bore_d + bore_clear, center = true, $fn = 64);\n    translate([bore_d/2 + 5, 0, 0])\n      rotate([90, 0, 0])\n        cylinder(h = hub_od + 2, d = 4.5, center = true, $fn = 32);\n  }\n}\n\nansi40_sprocket();"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "hinge_joint_snapfit_reference",
+    "family_label": "Hinges, Joints and Snap-Fits",
+    "units": "millimeters",
+    "scope": "Print-in-place hinges, ball joints, snap-fit cantilever hooks, living hinges, clevis joints.",
+    "retrieval": {
+      "primary_keywords": [
+        "hinge",
+        "joint",
+        "snap fit",
+        "snap-fit",
+        "print in place hinge",
+        "knuckle",
+        "pin hinge",
+        "ball joint",
+        "living hinge",
+        "clevis",
+        "cantilever hook"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "bracket motor",
+        "gearbox",
+        "fan mount",
+        "flange pipe"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "PETG",
+        "use_case": "snap-fit arms and print-in-place hinges",
+        "notes": "Better fatigue resistance than PLA for repeated flex; 0.35 mm clearance."
+      },
+      {
+        "material": "TPU 95A",
+        "use_case": "living hinges and flexible snap tabs",
+        "notes": "0.5–0.8 mm thickness for living hinge; very low insertion force."
+      },
+      {
+        "material": "PLA",
+        "use_case": "light-duty one-shot snap fits and prototype hinges",
+        "notes": "Brittle under repeated flex; use only for low-cycle applications."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "Snap-fit beam deflection limit",
+        "applies_to": "arm thickness and hook height",
+        "note": "Max strain = hook_height / (arm_length × factor); keep < 70% yield for PLA (2.5%), PETG (3.5%)."
+      },
+      {
+        "name": "ISO 286-1",
+        "applies_to": "print-in-place hinge pin clearance",
+        "note": "0.3–0.4 mm gap between pin and barrel for printed assembly."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "print_in_place_hinge_5knuckle",
+      "category": "hinge",
+      "name": "5-knuckle print-in-place hinge",
+      "aliases": [
+        "print in place hinge",
+        "pivot hinge",
+        "parametric hinge",
+        "openscad hinge"
+      ],
+      "standards": [
+        "ISO 286-1"
+      ],
+      "manufacturing_processes": [
+        "3D printed FDM (print in place)"
+      ],
+      "family": "hinge_joint_snapfit_reference",
+      "standard_dimensions_mm": {
+        "leaf_length": 40,
+        "leaf_width": 20,
+        "leaf_thickness": 3,
+        "pin_diameter": 5,
+        "knuckle_count": 5,
+        "clearance": 0.35
+      },
+      "fit_guidance_mm": {
+        "pin_barrel": "pin_d + 2*clearance bore in barrel knuckles"
+      },
+      "constraint_parameters": {
+        "leaf_length": {
+          "default": 40
+        },
+        "pin_diameter": {
+          "default": 5,
+          "min": 3
+        },
+        "clearance": {
+          "default": 0.35,
+          "note": "0.3 min for PLA, 0.4 for PETG"
+        }
+      },
+      "derived_parameters": {
+        "knuckle_length": {
+          "formula": "leaf_length / (2*knuckle_count - 1)"
+        }
+      },
+      "main_features": [
+        "leaf A with odd knuckles and pin",
+        "leaf B with even knuckles and barrel bores",
+        "clearance gap between leaves",
+        "alternating knuckles along pin axis"
+      ],
+      "design_rules": [
+        "knuckles from leaf A carry the pin (solid cylinder)",
+        "knuckles from leaf B carry barrel with bore = pin_d + 2*clearance",
+        "leaves separate by clearance gap so they can rotate after print"
+      ],
+      "validation_criteria": [
+        "two leaf groups with alternating translate()",
+        "pin bore in barrel knuckles",
+        "clearance gap between leaves"
+      ],
+      "failure_modes": [
+        "single solid hinge block — will not move",
+        "barrel bore same diameter as pin — stuck",
+        "clearance gap missing"
+      ],
+      "constraint_checks": [
+        {
+          "id": "barrel_bore",
+          "severity": "error",
+          "expression": "barrel cylinders with bore > pin_d",
+          "message": "Hinge barrel bore must be pin_d + 2*clearance for freedom of movement."
+        }
+      ],
+      "openscad_module": "$fn = 64;\n\nleaf_length     = 40;\nleaf_width      = 20;\nleaf_thickness  = 3;\npin_d           = 5;\nknuckle_count   = 5;\nclearance       = 0.35;\n\nknuckle_l = leaf_length / (2 * knuckle_count - 1);\n\nmodule hinge_leaf_a() {\n  for (i = [0 : knuckle_count - 1]) {\n    x = i * 2 * knuckle_l;\n    translate([x, 0, 0]) {\n      cube([knuckle_l, leaf_width, leaf_thickness]);\n      translate([knuckle_l/2, leaf_width/2, leaf_thickness])\n        rotate([90, 0, 0])\n          cylinder(h = leaf_width, d = pin_d, center = true);\n    }\n  }\n}\n\nmodule hinge_leaf_b() {\n  for (i = [0 : knuckle_count - 2]) {\n    x = (i * 2 + 1) * knuckle_l;\n    translate([x, 0, leaf_thickness + clearance]) {\n      cube([knuckle_l, leaf_width, leaf_thickness]);\n      translate([knuckle_l/2, leaf_width/2, 0])\n        difference() {\n          rotate([90, 0, 0]) cylinder(h = leaf_width + 2, d = pin_d + 4, center = true);\n          rotate([90, 0, 0]) cylinder(h = leaf_width + 4, d = pin_d + 2*clearance, center = true);\n        }\n    }\n  }\n}\n\nmodule print_in_place_hinge() {\n  hinge_leaf_a();\n  hinge_leaf_b();\n}\n\nprint_in_place_hinge();"
+    }
+  ]
+}

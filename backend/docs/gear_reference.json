@@ -1,0 +1,797 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "gear_reference",
+    "family_label": "Gears / Spur / Helical / Bevel / Worm",
+    "units": "millimeters",
+    "scope": "Spur, helical, bevel, worm, rack-and-pinion, and planetary gears for 3D printing and light machining.",
+    "retrieval": {
+      "primary_keywords": [
+        "gear",
+        "spur gear",
+        "helical gear",
+        "spiral gear",
+        "bevel gear",
+        "spiral bevel gear",
+        "worm gear",
+        "worm wheel",
+        "herringbone gear",
+        "rack",
+        "pinion",
+        "planetary gear",
+        "epicyclic gear",
+        "ring gear",
+        "annulus gear",
+        "sun gear",
+        "pitch diameter",
+        "module",
+        "involute",
+        "tooth count",
+        "keyway",
+        "hub",
+        "gear assembly",
+        "final drive gear",
+        "gear ratio",
+        "cone distance",
+        "helix angle",
+        "spiral angle",
+        "pressure angle",
+        "gears.scad",
+        "gears-master",
+        "chrisspen gears",
+        "herringbone gear",
+        "rack and pinion"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "pillow block",
+        "bracket",
+        "fan mount",
+        "enclosure",
+        "flange",
+        "pipe fitting",
+        "clamp",
+        "jig"
+      ],
+      "min_score_threshold": 0.15
+    },
+    "material_suggestions": [
+      {
+        "material": "POM (Delrin / Acetal)",
+        "use_case": "printed or machined gears under moderate load",
+        "notes": "Low friction, self-lubricating, dimensionally stable; preferred for plastic gear meshes.",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "Nylon PA12 / PA-CF",
+        "use_case": "functional 3D printed gears with impact resistance",
+        "notes": "Good fatigue life; absorbs moisture so dimension allowances needed.",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "1045 / C45 steel",
+        "use_case": "machined power transmission gears",
+        "notes": "Standard gear steel; can be through-hardened to 50–55 HRC for wear resistance.",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "8620 / 20MnCr5 case-hardening steel",
+        "use_case": "high-load automotive and industrial gears",
+        "notes": "Carburize then quench; hard case with tough core. Typical case depth 0.8–1.2 mm.",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "lightweight low-torque gears",
+        "notes": "Easy to machine; softer than steel so only mesh with steel if loads are light.",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "Bronze (CuSn12)",
+        "use_case": "worm wheels and high-sliding-speed meshes",
+        "notes": "Sacrificial wear partner for steel worm; good embeddability for contamination tolerance.",
+        "output_channel": "chat_after_code_only"
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ISO 53 / DIN 867",
+        "applies_to": "basic rack tooth profile for involute spur and helical gears",
+        "note": "Defines addendum = 1m, dedendum = 1.25m, pressure angle 20°."
+      },
+      {
+        "name": "ISO 54",
+        "applies_to": "standard gear modules",
+        "note": "Preferred module series: 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10."
+      },
+      {
+        "name": "DIN 6885A",
+        "applies_to": "parallel key (keyway) dimensions",
+        "note": "Keyway width = shaft_d/4; depth in shaft = width/2."
+      },
+      {
+        "name": "AGMA 2101 / ISO 6336",
+        "applies_to": "gear tooth strength and pitting resistance",
+        "note": "Use for load capacity calculations; face width 8–12× module for spur gears."
+      },
+      {
+        "name": "Grashof condition",
+        "applies_to": "four-bar linkage classification",
+        "note": "s + l < p + q for at least one link to rotate fully."
+      }
+    ],
+    "source_references": [
+      {
+        "title": "Thingiverse involute gear library (GregFrost thing:3575)",
+        "url": "https://www.thingiverse.com/thing:3575",
+        "note": "Widely used OpenSCAD involute gear module; basis for parametric gear generation."
+      },
+      {
+        "title": "gears-master OpenSCAD gear generator examples",
+        "path": "D:/downloads/gears-master (1)/gears-master/examples",
+        "note": "Primary local reference for generated gear module names, parameters, assemblies, and example calls."
+      },
+      {
+        "title": "ISO 53 Basic rack tooth profile",
+        "note": "Addendum, dedendum, and pressure-angle rules used throughout this record."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Return geometry-only OpenSCAD with named parameters, modules, boolean cuts, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "non-gear part families",
+        "string metadata variables such as material, standard_used, or notes"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "spur_gear_m2_n20",
+      "family": "gear_reference",
+      "category": "spur_gear",
+      "name": "Spur gear — module 2, 20 teeth (general purpose)",
+      "aliases": [
+        "spur gear",
+        "m2 gear",
+        "20 tooth gear",
+        "drive gear",
+        "involute gear",
+        "pitch gear",
+        "gear with hub",
+        "gear with keyway"
+      ],
+      "standards": [
+        "ISO 53 tooth profile",
+        "ISO 54 module series",
+        "DIN 6885A keyway"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined from billet",
+        "hobbed steel"
+      ],
+      "standard_dimensions_mm": {
+        "module_size": 2,
+        "tooth_count": 20,
+        "pitch_diameter": 40,
+        "outside_diameter": 44,
+        "root_diameter": 35,
+        "face_width": 10,
+        "bore_diameter": 5,
+        "hub_diameter": 16,
+        "hub_width": 14
+      },
+      "fit_guidance_mm": {
+        "bore_clearance": "+0.2 to +0.3 for running fit; 0.0 to +0.05 for press fit",
+        "backlash_printed": "0.2–0.3 mm (add to tooth thickness each side)",
+        "backlash_machined": "0.05–0.1 mm",
+        "keyway_fit": "JS9/h9 for sliding; P9/h9 for fixed"
+      },
+      "constraint_parameters": {
+        "module_size": {
+          "label": "tooth module",
+          "unit": "mm",
+          "default": 2,
+          "min": 1,
+          "max": 10,
+          "note": "Use ISO 54 preferred values: 1, 1.25, 1.5, 2, 2.5, 3, 4, 5"
+        },
+        "tooth_count": {
+          "label": "number of teeth",
+          "default": 20,
+          "min": 14,
+          "note": "Minimum 14 teeth at 20° pressure angle to avoid undercutting"
+        },
+        "pressure_angle": {
+          "label": "tooth pressure angle",
+          "unit": "degrees",
+          "default": 20,
+          "options": [
+            14.5,
+            20,
+            25
+          ]
+        },
+        "face_width": {
+          "label": "gear width along axis",
+          "unit": "mm",
+          "formula": "8 to 12 × module_size",
+          "default": 10
+        },
+        "bore_diameter": {
+          "label": "shaft bore",
+          "unit": "mm",
+          "default": 5
+        }
+      },
+      "derived_parameters": {
+        "pitch_diameter": {
+          "formula": "module_size * tooth_count",
+          "note": "do not confuse with bore diameter"
+        },
+        "outside_diameter": {
+          "formula": "pitch_diameter + 2 * module_size",
+          "note": "tip circle"
+        },
+        "root_diameter": {
+          "formula": "pitch_diameter - 2.5 * module_size",
+          "note": "dedendum = 1.25m"
+        },
+        "center_distance_pair": {
+          "formula": "module_size * (teeth_gear1 + teeth_gear2) / 2",
+          "note": "same module and pressure angle required for mesh"
+        },
+        "hub_diameter_min": {
+          "formula": "bore_diameter + 6",
+          "note": "minimum 3 mm wall around bore"
+        },
+        "keyway_width": {
+          "formula": "bore_diameter / 4  (DIN 6885A)",
+          "note": "round down to standard key size: 2, 3, 4, 5, 6, 8, 10 mm"
+        }
+      },
+      "main_features": [
+        "gear body disk at pitch diameter",
+        "involute or simplified tooth profile repeated around pitch circle",
+        "hub cylinder extending beyond face width for shaft engagement",
+        "shaft bore through hub with clearance",
+        "optional keyway slot in bore for torque transmission",
+        "optional lightening holes in web for weight reduction",
+        "optional set-screw boss perpendicular to bore"
+      ],
+      "design_rules": [
+        "For plain spur gear output, call gears.scad spur_gear(..., helix_angle=0, optimized=true); do not hand-build rectangular or block teeth.",
+        "Always derive pitch_diameter from module and tooth_count, never from bore",
+        "Minimum 17 teeth on driving pinion to prevent undercutting at 20° PA",
+        "Face width must be 8–12× module for adequate tooth strength",
+        "Mating gears must share identical module AND pressure angle",
+        "Print gears on their side (teeth horizontal) for best layer-bonding strength",
+        "Add 0.2 mm backlash clearance per gear when designing for mesh fit",
+        "Hub should extend ≥ 1.5× bore diameter along axis for set-screw grip",
+        "Lightening holes must not intrude within 2 mm of root circle"
+      ],
+      "validation_criteria": [
+        "plain spur gear uses helix_angle=0 unless the user explicitly asks for helical/spiral teeth",
+        "pitch_diameter = module × tooth_count (not bore-derived)",
+        "outside_diameter = pitch_diameter + 2 × module",
+        "root_diameter = pitch_diameter - 2.5 × module",
+        "bore subtracted from hub, not from gear disk directly",
+        "keyway does not breach hub outer wall (hub_d ≥ bore_d + 2 × keyway_width)",
+        "tooth count ≥ 14 (undercutting check)"
+      ],
+      "failure_modes": [
+        "blocky rectangular or cylinder-lump teeth instead of gears.scad involute-style spur_gear output",
+        "using bore_diameter as pitch_diameter — generates undersized gear",
+        "placing teeth at root circle instead of pitch circle",
+        "omitting hub — shaft grip too weak",
+        "keyway depth too deep — bore wall thinner than 1 mm",
+        "face width less than 6 mm — tooth snaps under load",
+        "non-integer tooth count — module and pitch diameter mismatch"
+      ],
+      "constraint_checks": [
+        {
+          "id": "pitch_diameter_from_module",
+          "severity": "error",
+          "expression": "pitch_diameter == module_size * tooth_count",
+          "message": "Pitch diameter must equal module × tooth count."
+        },
+        {
+          "id": "min_teeth",
+          "severity": "warning",
+          "expression": "tooth_count >= 14",
+          "message": "Fewer than 14 teeth causes undercutting at 20° pressure angle."
+        },
+        {
+          "id": "face_width_rule",
+          "severity": "warning",
+          "expression": "face_width >= 8 * module_size",
+          "message": "Face width below 8× module may cause early tooth fatigue failure."
+        }
+      ],
+      "standards_used": [
+        {
+          "name": "ISO 53 / DIN 867 basic rack",
+          "applies_to": "addendum, dedendum, pressure angle",
+          "note": "addendum = 1m, dedendum = 1.25m, standard pressure angle 20°."
+        },
+        {
+          "name": "ISO 54 preferred modules",
+          "applies_to": "module selection",
+          "note": "Preferred values: 1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10."
+        },
+        {
+          "name": "DIN 6885A parallel key",
+          "applies_to": "keyway width and depth",
+          "note": "Width = shaft_d/4; shaft groove depth = width/2."
+        }
+      ],
+      "material_suggestions": [
+        {
+          "material": "POM (Delrin)",
+          "use_case": "light-duty printed or machined spur gears",
+          "notes": "Self-lubricating; excellent for meshing with steel or aluminium.",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "1045 steel hobbed",
+          "use_case": "power transmission spur gears",
+          "notes": "Through-harden to HRC 50 for wear life; case-harden 8620 for higher loads.",
+          "output_channel": "chat_after_code_only"
+        }
+      ],
+      "openscad_module": "include <D:/Downloads/openscad_copilot (1)/openscad_copilot/gears.scad>\n\nspur_gear(\n  modul=2,\n  tooth_number=20,\n  width=10,\n  bore=5,\n  pressure_angle=20,\n  helix_angle=0,\n  optimized=true\n);"
+    },
+    {
+      "id": "worm_gear_m2_30t",
+      "family": "gear_reference",
+      "category": "worm_gear",
+      "name": "Worm wheel — module 2, 30 teeth (1-start worm pair)",
+      "aliases": [
+        "worm wheel",
+        "worm gear",
+        "worm drive gear",
+        "worm and wheel",
+        "high reduction gear",
+        "right angle gear",
+        "self-locking gear"
+      ],
+      "standards": [
+        "ISO 53 worm gear module",
+        "DIN 3975 worm gear geometry"
+      ],
+      "manufacturing_processes": [
+        "machined bronze or POM",
+        "3D printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "module_size": 2,
+        "worm_wheel_teeth": 30,
+        "worm_starts": 1,
+        "reduction_ratio": 30,
+        "worm_pitch_diameter": 20,
+        "worm_wheel_pitch_diameter": 60,
+        "centre_distance": 40,
+        "lead_angle_deg": 7.1,
+        "face_width_worm_wheel": 22
+      },
+      "fit_guidance_mm": {
+        "worm_shaft_clearance": "+0.3",
+        "mesh_backlash": "0.1–0.2 mm total",
+        "worm_wheel_bore": "+0.2 running fit"
+      },
+      "constraint_parameters": {
+        "module_size": {
+          "label": "worm module",
+          "default": 2,
+          "min": 1,
+          "max": 8
+        },
+        "worm_wheel_teeth": {
+          "label": "worm wheel tooth count",
+          "default": 30,
+          "min": 20
+        },
+        "worm_starts": {
+          "label": "number of worm starts",
+          "default": 1,
+          "options": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "note": "1 start = self-locking; 4 starts = back-driveable"
+        },
+        "worm_pitch_diameter": {
+          "label": "worm cylinder pitch diameter",
+          "unit": "mm",
+          "default": 20
+        }
+      },
+      "derived_parameters": {
+        "reduction_ratio": {
+          "formula": "worm_wheel_teeth / worm_starts"
+        },
+        "worm_wheel_pitch_d": {
+          "formula": "module_size * worm_wheel_teeth"
+        },
+        "centre_distance": {
+          "formula": "(worm_pitch_diameter + worm_wheel_pitch_d) / 2"
+        },
+        "lead_angle": {
+          "formula": "atan(module_size * worm_starts / worm_pitch_diameter)",
+          "note": "degrees; below 10° = self-locking"
+        }
+      },
+      "main_features": [
+        "worm wheel disk with helical tooth groove cross-section",
+        "throated (concave) rim face to wrap worm",
+        "bore and hub for output shaft",
+        "worm cylinder with helical thread"
+      ],
+      "design_rules": [
+        "For worm gear output, call gears.scad worm_gear(...); do not approximate the wheel with simple peg teeth.",
+        "Pair worm (steel) with worm wheel (bronze or POM) to manage wear",
+        "Self-locking: lead angle < 10° (1 or 2 starts with small module)",
+        "Back-driveable: lead angle > 20° (4 starts)",
+        "Centre distance must match (worm_pitch_d + wheel_pitch_d) / 2",
+        "Worm wheel face width = 2 × worm pitch diameter for full engagement"
+      ],
+      "validation_criteria": [
+        "centre_distance matches formula",
+        "lead angle derived from module, starts, and worm_pitch_diameter",
+        "worm and wheel share same module"
+      ],
+      "failure_modes": [
+        "worm and wheel different modules — no mesh",
+        "insufficient lubrication — adhesive wear on bronze wheel",
+        "back-driving a self-locking worm — shock load on teeth"
+      ],
+      "constraint_checks": [
+        {
+          "id": "same_module",
+          "severity": "error",
+          "expression": "worm.module == wheel.module",
+          "message": "Worm and worm wheel must have the same module."
+        }
+      ],
+      "standards_used": [
+        {
+          "name": "ISO 53 worm module",
+          "applies_to": "tooth pitch and module selection",
+          "note": "Same preferred module series as spur gears."
+        },
+        {
+          "name": "DIN 3975",
+          "applies_to": "worm gear geometry and tooth form",
+          "note": "Defines throated wheel geometry and centre-distance calculations."
+        }
+      ],
+      "material_suggestions": [
+        {
+          "material": "Steel worm + bronze (CuSn12) wheel",
+          "use_case": "industrial worm drives",
+          "notes": "Bronze sacrificial wear partner; good score and embedability.",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "Steel worm + POM wheel",
+          "use_case": "light-duty / 3D printer worm drives",
+          "notes": "Self-lubricating POM works well for low-speed low-load worm meshes.",
+          "output_channel": "chat_after_code_only"
+        }
+      ],
+      "openscad_module": "include <D:/Downloads/openscad_copilot (1)/openscad_copilot/gears.scad>\n\nworm_gear(\n  modul=2,\n  tooth_number=30,\n  thread_starts=1,\n  width=22,\n  length=30,\n  worm_bore=6,\n  gear_bore=8,\n  pressure_angle=20,\n  lead_angle=7.1,\n  optimized=true,\n  together_built=true,\n  show_spur=1,\n  show_worm=1\n);"
+    },
+    {
+      "id": "bevel_gear_pair_m2_20_20",
+      "family": "gear_reference",
+      "category": "bevel_gear",
+      "name": "Straight bevel gear pair - module 2, 20:20 miter gears",
+      "aliases": [
+        "bevel gear",
+        "straight bevel gear",
+        "miter gear",
+        "90 degree gear",
+        "crown gear",
+        "conical gear"
+      ],
+      "standards": [
+        "ISO 23509 bevel gear geometry",
+        "AGMA 2005 bevel gear rating"
+      ],
+      "manufacturing_processes": [
+        "5-axis machined",
+        "face milled",
+        "3D printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "module_size": 2,
+        "pinion_teeth": 20,
+        "gear_teeth": 20,
+        "shaft_angle_deg": 90,
+        "pitch_diameter_pinion": 40,
+        "pitch_diameter_gear": 40,
+        "pitch_angle_pinion_deg": 45,
+        "pitch_angle_gear_deg": 45,
+        "face_width": 10,
+        "bore_diameter": 8
+      },
+      "derived_parameters": {
+        "ratio": {
+          "formula": "gear_teeth / pinion_teeth"
+        },
+        "pitch_angle_pinion": {
+          "formula": "atan(pinion_teeth / gear_teeth) for 90 degree shafts"
+        },
+        "pitch_angle_gear": {
+          "formula": "90 - pitch_angle_pinion"
+        },
+        "cone_distance": {
+          "formula": "sqrt(pitch_radius_pinion^2 + pitch_radius_gear^2)"
+        },
+        "face_width_limit": {
+          "formula": "min(10 * module_size, cone_distance / 3)"
+        }
+      },
+      "main_features": [
+        "truncated cone gear blank, not a flat cylinder",
+        "teeth repeated around the cone and tapered toward the apex",
+        "large end has outside diameter, small end is reduced by face_width along pitch cone",
+        "hub and bore remain coaxial with each gear shaft",
+        "paired gears intersect at the pitch cone apex, usually at 90 degrees"
+      ],
+      "design_rules": [
+        "Use bevel gears only for intersecting shafts; use worm or hypoid for non-intersecting crossed shafts",
+        "For equal miter gears, both pitch angles are 45 degrees",
+        "Face width should not exceed one third of cone distance",
+        "Both gears must share module, pressure angle, shaft angle, and matching cone apex",
+        "Simplified OpenSCAD should show a tapered conical body and tapered teeth, not a spur gear disk"
+      ],
+      "validation_criteria": [
+        "defines shaft_angle, pitch_angle_pinion, pitch_angle_gear, and cone_distance",
+        "uses cylinder with different r1/r2 or d1/d2 for conical bevel body",
+        "teeth are repeated with tooth_count and taper from large end to small end",
+        "bore is subtracted along the shaft axis"
+      ],
+      "failure_modes": [
+        "flat spur gear used for a bevel gear request",
+        "face width longer than cone distance third, causing pointed weak teeth",
+        "gear pair axes offset instead of intersecting at the cone apex"
+      ]
+    },
+    {
+      "id": "helical_spiral_gear_m2_24",
+      "family": "gear_reference",
+      "category": "spiral_gear",
+      "name": "Helical / spiral gear - module 2, 24 teeth, 20 degree helix",
+      "aliases": [
+        "spiral gear",
+        "helical gear",
+        "angled tooth gear",
+        "quiet gear",
+        "left hand helical gear",
+        "right hand helical gear"
+      ],
+      "standards": [
+        "ISO 21771 cylindrical involute gears",
+        "ISO 53 basic rack profile"
+      ],
+      "manufacturing_processes": [
+        "hobbed",
+        "skived",
+        "3D printed with twist extrusion"
+      ],
+      "standard_dimensions_mm": {
+        "normal_module": 2,
+        "normal_pressure_angle_deg": 20,
+        "helix_angle_deg": 20,
+        "tooth_count": 24,
+        "transverse_module": 2.128,
+        "pitch_diameter": 51.1,
+        "face_width": 18,
+        "bore_diameter": 8
+      },
+      "derived_parameters": {
+        "transverse_module": {
+          "formula": "normal_module / cos(helix_angle)"
+        },
+        "pitch_diameter": {
+          "formula": "transverse_module * tooth_count"
+        },
+        "axial_pitch": {
+          "formula": "PI * normal_module / tan(helix_angle)"
+        },
+        "total_twist": {
+          "formula": "360 * face_width / axial_pitch"
+        },
+        "handed_pair": {
+          "formula": "parallel shaft gears need opposite helix hands"
+        }
+      },
+      "main_features": [
+        "cylindrical gear with teeth twisted across face width",
+        "helix hand parameter: left or right",
+        "hub, bore, optional keyway, and lightening holes like a spur gear",
+        "paired helical gears have smoother contact but generate axial thrust"
+      ],
+      "design_rules": [
+        "Use normal module and normal pressure angle as real gear design inputs",
+        "Derive transverse module from normal_module / cos(helix_angle)",
+        "Keep printed helix angle around 15 to 25 degrees for strength and clean teeth",
+        "Add thrust washers or bearings in the surrounding assembly because helical gears create axial load",
+        "For double-helical or herringbone gears, mirror the helix at the center to cancel thrust"
+      ],
+      "validation_criteria": [
+        "defines helix_angle and normal_module",
+        "derives transverse_module and pitch_diameter",
+        "uses linear_extrude(twist=...) or equivalent stepped rotation for spiral teeth",
+        "states or models opposite helix hands for a mating pair"
+      ],
+      "failure_modes": [
+        "calling a spur gear a spiral gear without tooth twist",
+        "using spur pitch diameter formula without helix correction",
+        "forgetting axial thrust support in helical mesh"
+      ]
+    },
+    {
+      "id": "spiral_bevel_gear_pair_m2_16_32",
+      "family": "gear_reference",
+      "category": "spiral_bevel_gear",
+      "name": "Spiral bevel gear pair - module 2, 16:32, 90 degree shafts",
+      "aliases": [
+        "spiral bevel gear",
+        "curved tooth bevel gear",
+        "automotive differential gear",
+        "right angle spiral gear"
+      ],
+      "standards": [
+        "ISO 23509 bevel and hypoid gear geometry",
+        "AGMA 2005 bevel gear rating"
+      ],
+      "manufacturing_processes": [
+        "Gleason face milled",
+        "Klingelnberg face hobbed",
+        "3D printed visual prototype"
+      ],
+      "standard_dimensions_mm": {
+        "module_size": 2,
+        "pinion_teeth": 16,
+        "gear_teeth": 32,
+        "ratio": 2,
+        "shaft_angle_deg": 90,
+        "spiral_angle_deg": 35,
+        "pressure_angle_deg": 20,
+        "face_width": 12
+      },
+      "derived_parameters": {
+        "pitch_angle_pinion": {
+          "formula": "atan(pinion_teeth / gear_teeth) for 90 degree shafts"
+        },
+        "pitch_angle_gear": {
+          "formula": "90 - pitch_angle_pinion"
+        },
+        "cone_distance": {
+          "formula": "sqrt((module * pinion_teeth / 2)^2 + (module * gear_teeth / 2)^2)"
+        },
+        "face_width_limit": {
+          "formula": "cone_distance / 3"
+        },
+        "tooth_spiral_sweep": {
+          "formula": "spiral_angle controls curved tooth rotation across face"
+        }
+      },
+      "main_features": [
+        "bevel gear cone body plus curved/spiral teeth",
+        "teeth sweep around the cone rather than staying straight radial",
+        "pinion and gear pitch cones intersect at common apex",
+        "higher contact ratio and smoother operation than straight bevel gears",
+        "hub, bore, and mounting flange or bolt circle for real assemblies"
+      ],
+      "design_rules": [
+        "Represent simplified spiral bevel teeth by rotating tooth features progressively along cone height",
+        "Use spiral angle around 30 to 35 degrees for realistic automotive-style geometry",
+        "Face width stays below one third cone distance",
+        "Both gears must share module, pressure angle, shaft angle, and compatible spiral hand",
+        "Do not model as a flat helical gear; it needs both cone taper and spiral tooth sweep"
+      ],
+      "validation_criteria": [
+        "defines spiral_angle, pitch angles, and cone_distance",
+        "uses tapered conical bodies",
+        "tooth placement includes both angular repetition and twist/sweep across face",
+        "has separate pinion and gear members with correct ratio"
+      ],
+      "failure_modes": [
+        "missing cone taper",
+        "missing spiral tooth sweep",
+        "using identical straight bevel logic for a spiral bevel request"
+      ]
+    },
+    {
+      "id": "planetary_gearset_m1_18_24_66",
+      "family": "gear_reference",
+      "category": "planetary_gear",
+      "name": "Planetary gear set - module 1, sun 18, three planets 24, ring 66",
+      "aliases": [
+        "planetary gear",
+        "epicyclic gear",
+        "sun gear",
+        "planet gear",
+        "ring gear",
+        "annulus gear",
+        "planet carrier"
+      ],
+      "standards": [
+        "ISO 21771 cylindrical involute gears",
+        "ISO 6336 gear capacity"
+      ],
+      "manufacturing_processes": [
+        "3D printed gearbox",
+        "machined and hobbed gearset"
+      ],
+      "standard_dimensions_mm": {
+        "module_size": 1,
+        "sun_teeth": 18,
+        "planet_teeth": 24,
+        "ring_teeth": 66,
+        "planet_count": 3,
+        "face_width": 8,
+        "sun_pitch_diameter": 18,
+        "planet_pitch_diameter": 24,
+        "ring_pitch_diameter": 66,
+        "carrier_pin_circle_diameter": 42
+      },
+      "derived_parameters": {
+        "ring_teeth_rule": {
+          "formula": "ring_teeth = sun_teeth + 2 * planet_teeth"
+        },
+        "carrier_pin_circle_radius": {
+          "formula": "module_size * (sun_teeth + planet_teeth) / 2"
+        },
+        "fixed_ring_reduction": {
+          "formula": "1 + ring_teeth / sun_teeth"
+        },
+        "planet_spacing_rule": {
+          "formula": "(sun_teeth + ring_teeth) must divide cleanly by planet_count for equal phasing"
+        },
+        "planet_center_angle": {
+          "formula": "360 / planet_count"
+        }
+      },
+      "main_features": [
+        "central sun gear with external teeth",
+        "multiple planet gears equally spaced on carrier pins",
+        "internal ring gear with inward-facing teeth",
+        "carrier plate with pin bosses and bearing/bushing holes",
+        "coaxial input/output shaft bores"
+      ],
+      "design_rules": [
+        "Ring tooth count must equal sun_teeth + 2 * planet_teeth for same module mesh",
+        "Planet centers sit at radius module * (sun_teeth + planet_teeth) / 2",
+        "Use at least three planets for balanced load sharing",
+        "Internal ring teeth point inward; do not model the ring as an external spur gear",
+        "Give planets clearance from carrier plate and add pin holes or bearing seats",
+        "For fixed ring, reduction ratio is 1 + ring_teeth / sun_teeth"
+      ],
+      "validation_criteria": [
+        "defines sun_teeth, planet_teeth, ring_teeth, and planet_count",
+        "computes ring_teeth = sun + 2*planet or validates that relationship",
+        "places planets with cos/sin on carrier_pin_circle_radius",
+        "models ring gear as internal teeth or subtractive tooth gaps inside annulus",
+        "includes a carrier plate with planet pin holes"
+      ],
+      "failure_modes": [
+        "ring tooth count not compatible with sun and planets",
+        "planet centers placed by eye instead of formula",
+        "external ring gear teeth instead of internal annulus teeth",
+        "no carrier pins, so the assembly is not a planetary gearbox"
+      ]
+    }
+  ]
+}

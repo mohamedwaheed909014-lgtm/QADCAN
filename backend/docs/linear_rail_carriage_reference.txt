@@ -1,0 +1,156 @@
+LINEAR RAILS, RODS AND CARRIAGES REFERENCE
+Category: Linear Motion
+Verified models: Thingiverse thing:3858045 (EasyMcguire horizontal/vertical bearing blocks),
+  Printables "lead screw carriage" search, GrabCAD "MGN12 linear rail carriage",
+  Cults3D "linear rail end stop", Thingiverse "linear rod holder 8mm parametric"
+
+GUIDE TYPES
+───────────
+1. Smooth Rod + Linear Bearing (LM-series)
+   - Most common in FDM 3D printers
+   - Rods: chrome-plated steel, ground; common: ø6, ø8, ø10, ø12 mm
+   - Bearings: LM6UU, LM8UU, LM10UU, LM12UU (open or closed)
+
+2. MGN / MGW Linear Rail (profile rail)
+   - Profiled steel rail, recirculating ball carriage
+   - Rails: MGN7, MGN9, MGN12, MGN15, MGR15, MGW12 (width in mm)
+   - Carriages: H (long) or C (short) suffix
+
+3. Supported Round Rail (SBR type)
+   - Round rail in aluminium support channel
+   - SBR8, SBR12, SBR16, SBR20; carriage: SC8UU, SC16UU etc.
+
+4. V-Slot / OpenBuilds Profile
+   - Aluminium extrusion with V-groove; V-slot wheels roll on groove
+   - 2020, 2040, 4040, 4080 profiles; wheels: ø24 OD
+
+5. Lead Screw Assembly
+   - T-type: T8 (8 mm, 2 mm pitch), T12 (12 mm, 2 mm pitch)
+   - Ball screw: SFU1204, SFU1605, SFU2005
+   - Lead nut: brass anti-backlash or simple POM
+
+STANDARD LINEAR BEARING DIMENSIONS
+────────────────────────────────────
+  LM6UU  : bore  6 mm, OD 12 mm, length 19 mm, flange OD —
+  LM8UU  : bore  8 mm, OD 15 mm, length 24 mm
+  LM8LUU : bore  8 mm, OD 15 mm, length 45 mm  (long version)
+  LM10UU : bore 10 mm, OD 19 mm, length 29 mm
+  LM12UU : bore 12 mm, OD 21 mm, length 30 mm
+  LM16UU : bore 16 mm, OD 28 mm, length 37 mm
+
+MGN RAIL CARRIAGE FOOTPRINTS (bolt holes, M3)
+──────────────────────────────────────────────
+  MGN7H  : 20×20 mm carriage, 4×M2   holes on 12×8 mm pattern
+  MGN9H  : 29×20 mm carriage, 4×M3   holes on 20×14 mm pattern
+  MGN12H : 33×27 mm carriage, 4×M3   holes on 20×20 mm pattern
+  MGN15H : 44×32 mm carriage, 4×M4   holes on 30×24 mm pattern
+  MGN12C : 27×27 mm (short); same bolt pattern as MGN12H
+
+KEY PARAMETERS
+──────────────
+  rod_diameter          — 6, 8, 10, 12 mm (smooth rod)
+  rod_spacing           — centre distance between two parallel rods
+  bearing_od            — from LM table above (rod_d × 1.875 approx)
+  bearing_length        — from LM table above
+  carriage_length       — bearing_length + 2 × end_wall ≥ bearing_length + 10 mm
+  carriage_width        — rod_spacing + bearing_od + 2 × side_wall
+  carriage_height       — bearing_od + top_wall + bottom_clearance
+  end_wall              — ≥ 5 mm; retains bearing against axial force
+  side_wall             — ≥ 4 mm
+  top_wall              — ≥ 3 mm for mounting surface
+  mounting_hole_d       — M3=3.3, M4=4.5, M5=5.5
+  nut_trap_d            — nut flat-to-flat + 0.2 mm (M3: 5.7, M4: 7.1, M5: 8.1 mm)
+  nut_trap_depth        — nut height + 0.2 mm  (M3: 2.6, M4: 3.4, M5: 4.2 mm)
+  lead_nut_od           — T8 anti-backlash: 22 mm OD, 10 mm tall, 4×M3 on ø16 bolt circle
+  lead_nut_thread_d     — T8: 8 mm bore, 2 mm pitch
+
+OPENSCAD STRUCTURE (rod carriage block)
+────────────────────────────────────────
+  rod_d        = 8;
+  rod_spacing  = 40;
+  lm_od        = 15;    // LM8UU
+  lm_length    = 24;    // LM8UU
+  end_wall     = 6;
+  side_wall    = 5;
+  top_wall     = 4;
+  mount_hole_d = 4.5;
+
+  car_length = lm_length + 2*end_wall;
+  car_width  = rod_spacing + lm_od + 2*side_wall;
+  car_height = lm_od + top_wall;
+
+  module rod_carriage() {
+    difference() {
+      cube([car_length, car_width, car_height], center=true);
+      // two rod bores
+      for(y=[-rod_spacing/2, rod_spacing/2])
+        translate([0, y, -top_wall/2])
+          rotate([0,90,0])
+            cylinder(h=car_length+2, d=lm_od+0.2, center=true, $fn=64);
+      // mounting holes on top face
+      for(x=[-car_length/4, car_length/4])
+        for(y=[-car_width/4, car_width/4])
+          translate([x, y, car_height/2-1])
+            cylinder(h=top_wall+2, d=mount_hole_d, $fn=32);
+    }
+  }
+
+LEAD SCREW NUT CARRIAGE
+────────────────────────
+  nut_od            = 22;     // T8 anti-backlash brass nut
+  nut_bolt_circle   = 16;     // 4× M3 on 16 mm bolt circle
+  nut_height        = 10;     // total nut height
+  nut_pocket_depth  = nut_height + 0.5;
+
+  module nut_pocket() {
+    cylinder(h=nut_pocket_depth, d=nut_od+0.4, $fn=64);
+    for(a=[0,90,180,270])
+      rotate([0,0,a+45])
+        translate([nut_bolt_circle/2, 0, 0])
+          cylinder(h=nut_pocket_depth+5, d=3.3, $fn=32);
+  }
+
+DESIGN RULES
+────────────
+  - Rod bore = LM bearing OD + 0.0 to +0.05 mm (transition fit, slight resistance)
+  - For two-rod carriages: rod parallelism is critical; expose rod_spacing as parameter
+  - Anti-rotation: two-rod arrangement naturally prevents rotation; single rod needs rail groove
+  - Minimum bearing engagement length: ≥ 2.5 × bore_diameter for smooth motion
+  - Lead nut pocket: add 0.5 mm axial clearance so nut floats slightly (reduces binding)
+  - V-slot wheel: M5 eccentric nut for adjusting preload (print spacer 0.1–0.5 mm thick)
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A linear carriage is a moving plate/block that attaches to a rail or bearings.
+- Carriage plate, bearing blocks, nut mount, and tool plate are solid material in union().
+- Rail clearance, bearing bores, screw holes, counterbores, and belt clamp slots are removed material in difference().
+- Bearing bores must be parallel and aligned along the travel axis.
+- Rail mounting holes are usually repeated along the rail length.
+- Belt clamp features are slots or channels that capture belt teeth.
+- Lead nut pockets should align with the screw axis and include clearance for the screw.
+- Use symmetric placement around origin for paired bearings or rails.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn linear-rail carriage rules into OpenSCAD.
+
+Rule: carriage plate is a flat rectangular solid.
+OpenSCAD action:
+  cube([plate_length, plate_width, plate_thickness], center=true);
+
+Rule: rail mounting holes repeat along travel direction.
+OpenSCAD action:
+  for (x=[-rail_hole_spacing/2, rail_hole_spacing/2])
+    translate([x,0,0]) cylinder(h=plate_thickness+2, d=rail_screw_diameter, center=true, $fn=48);
+
+Rule: bearing bores are parallel along the motion axis.
+OpenSCAD action:
+  for (y=[-bearing_spacing/2,bearing_spacing/2])
+    translate([0,y,bearing_z]) rotate([0,90,0]) cylinder(h=plate_length+2, d=bearing_bore_diameter, center=true, $fn=64);
+
+Rule: belt clamp is a slot/channel for belt capture.
+OpenSCAD action:
+  translate([belt_slot_x,0,plate_thickness/2]) cube([belt_slot_length, belt_width+clearance, belt_slot_depth], center=true);
+
+Rule: lead nut pocket aligns with screw axis.
+OpenSCAD action:
+  translate([nut_x,0,0]) cylinder(h=plate_thickness+2, d=lead_nut_pocket_diameter, center=true, $fn=6);

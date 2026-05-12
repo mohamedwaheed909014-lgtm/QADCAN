@@ -1,0 +1,177 @@
+BRACKETS AND MOTOR MOUNTS REFERENCE
+Category: Structural / Mounting
+Verified models: MyMiniFactory #157533 (NEMA23 2020 bridge bracket), MyMiniFactory #30128 (angle bracket 50mm),
+  Printables #1536529 (parametric under-desk mount OpenSCAD), Thingiverse thing:3858045 (mounting flange),
+  GrabCAD "L-bracket", Cults3D "NEMA 17 motor mount", Thingiverse NEMA17 mounts collection
+
+BRACKET TYPES
+─────────────
+1. L-Bracket (angle bracket)
+   - Two orthogonal plates; standard structural connector
+   - Equal-leg or unequal-leg versions
+
+2. T-Bracket / Gusset
+   - Three plates meeting at a point; triangulated for stiffness
+   - Higher load capacity than L alone
+
+3. U-Channel / C-Channel Bracket
+   - Three-sided profile; wraps around a beam or tube
+
+4. Motor Mount / NEMA Flange Mount
+   - Plate with circular bolt pattern for NEMA stepper motors
+   - Central shaft clearance hole
+
+5. Bridge Mount (2020 extrusion)
+   - Spans across 20×20 or 40×20 aluminium profile
+   - T-nut slots, M5 hardware
+
+6. Tube/Rod Clamp Bracket
+   - Saddle clamp for round bar or tube
+   - Used on 3D printers, CNC frames, lighting rigs
+
+7. Cantilever Bracket / Shelf Bracket
+   - Wall-mounted with triangular gusset
+   - Load-bearing; gusset must be modelled as filled solid
+
+NEMA STEPPER MOTOR DIMENSIONS (standard face mount patterns)
+─────────────────────────────────────────────────────────────
+  NEMA 08: faceplate 20.3×20.3 mm, bolt circle ø16 mm,  4×M2,   shaft ø4 mm
+  NEMA 11: faceplate 28.2×28.2 mm, bolt circle ø23 mm,  4×M2.5, shaft ø5 mm
+  NEMA 14: faceplate 35.2×35.2 mm, bolt circle ø26 mm,  4×M3,   shaft ø5 mm
+  NEMA 17: faceplate 42.3×42.3 mm, bolt circle ø31 mm,  4×M3,   shaft ø5 mm  ← most common
+  NEMA 23: faceplate 57.3×57.3 mm, bolt circle ø47.1 mm,4×M5,   shaft ø6.35 or 8 mm
+  NEMA 34: faceplate 86.4×86.4 mm, bolt circle ø69.6 mm,4×M6,   shaft ø12.7 or 14 mm
+  NEMA 42: faceplate 110×110 mm,   bolt circle ø89 mm,  4×M8,   shaft ø19 mm
+
+KEY PARAMETERS
+──────────────
+  plate_thickness       — 4–6 mm FDM structural; 8–12 mm for motor mounts
+  leg_a_length          — first plate length
+  leg_b_length          — second plate length (= leg_a for equal L)
+  width                 — depth into page (extrusion width)
+  hole_diameter         — clearance; M3=3.3, M4=4.5, M5=5.5, M6=6.6, M8=8.8
+  edge_margin           — hole centre to plate edge; ≥ 1.5 × hole_diameter
+  hole_spacing_x        — horizontal bolt pattern spacing
+  hole_spacing_y        — vertical bolt pattern spacing
+  slot_length           — for adjustment slots; hole_diameter + travel
+  nema_bolt_circle_d    — from table above (e.g. 31 mm for NEMA17)
+  nema_face_size        — from table above (e.g. 42.3 mm for NEMA17)
+  shaft_clearance_d     — motor shaft bore: NEMA17 = 22 mm clearance hole for shaft boss
+  counterbore_d         — bolt head OD + 1 mm
+  gusset_thickness      — ≥ plate_thickness
+  fillet_radius         — 1–3 mm for printable parts
+
+OPENSCAD STRUCTURE (L-bracket)
+───────────────────────────────
+  plate_thickness = 4;
+  leg_a = 50;
+  leg_b = 50;
+  width = 30;
+  hole_d = 5.5;    // M5
+  edge_m = 8;
+
+  module l_bracket() {
+    union() {
+      // horizontal leg
+      difference() {
+        cube([leg_a, width, plate_thickness]);
+        // holes
+        for(x=[edge_m, leg_a-edge_m])
+          for(y=[edge_m, width-edge_m])
+            translate([x, y, -1]) cylinder(h=plate_thickness+2, d=hole_d, $fn=32);
+      }
+      // vertical leg
+      translate([0, 0, plate_thickness])
+        difference() {
+          cube([plate_thickness, width, leg_b]);
+          for(z=[edge_m, leg_b-edge_m])
+            for(y=[edge_m, width-edge_m])
+              translate([-1, y, z]) rotate([0,90,0])
+                cylinder(h=plate_thickness+2, d=hole_d, $fn=32);
+        }
+    }
+  }
+
+OPENSCAD STRUCTURE (NEMA17 motor mount)
+────────────────────────────────────────
+  nema_bolt_circle = 31;
+  nema_face = 42.3;
+  shaft_boss_d = 22;
+  bolt_hole_d = 3.3;
+  plate_t = 5;
+  plate_w = 60;
+
+  module nema17_mount() {
+    difference() {
+      cube([plate_w, plate_w, plate_t], center=true);
+      // shaft clearance
+      cylinder(h=plate_t+2, d=shaft_boss_d, center=true, $fn=64);
+      // bolt pattern (4 holes on circle)
+      for(a=[45,135,225,315])
+        rotate([0,0,a])
+          translate([nema_bolt_circle/2, 0, 0])
+            cylinder(h=plate_t+2, d=bolt_hole_d, center=true, $fn=32);
+    }
+  }
+
+SLOTTED HOLE (adjustment slot) PATTERN
+────────────────────────────────────────
+  module slot(slot_l, slot_d, depth) {
+    hull() {
+      translate([-slot_l/2, 0, 0]) cylinder(h=depth, d=slot_d, $fn=32);
+      translate([ slot_l/2, 0, 0]) cylinder(h=depth, d=slot_d, $fn=32);
+    }
+  }
+
+DESIGN RULES
+────────────
+  - Corner fillet radius ≥ 1 mm to reduce stress concentration in 3D prints
+  - For vertical loads on L-brackets: add diagonal gusset triangle
+  - Gusset height = max(leg_a, leg_b) × 0.6 for good stiffness
+  - Bolt hole edge margin: ≥ 1.5 × hole_d from hole centre to nearest edge
+  - NEMA motor mounts: counter-bore bolt holes from motor side (M3 cap head: ø5.5, depth 3)
+  - 2020 extrusion hardware: M5×8 button head + M5 T-nut (slot width 6 mm, T-head 5.85×2.75 mm)
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- Bracket plates are solid cubes. Put base plates, vertical plates, ribs, bosses, and gussets in union().
+- Holes, slots, motor shaft openings, and counterbores are removed material. Put them in difference().
+- Use Z as plate thickness for flat brackets; use X or Y as thickness for vertical plates.
+- Slotted holes mean hull() between two cylinders, then subtract the hull from the plate.
+- Motor mounts need one central shaft clearance and a repeated bolt pattern around it.
+- NEMA bolt patterns are square patterns; place holes at +/- spacing/2 in X and Y.
+- Gussets represent triangular support; approximate with rotated cubes or triangular prism polyhedron if needed.
+- Keep hole edge margin by deriving hole positions from plate size and edge_margin.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn bracket and motor-mount rules into OpenSCAD.
+
+Rule: L bracket is two perpendicular plates.
+OpenSCAD action:
+  union() {
+    cube([leg_length, bracket_width, plate_thickness], center=true);
+    translate([-leg_length/2 + plate_thickness/2,0,vertical_height/2])
+      cube([plate_thickness, bracket_width, vertical_height], center=true);
+  }
+
+Rule: gusset strengthens the inside corner.
+OpenSCAD action:
+  translate([-leg_length/2 + plate_thickness,0,plate_thickness])
+    rotate([0,45,0])
+      cube([plate_thickness*1.5, bracket_width, plate_thickness*1.5], center=true);
+
+Rule: slot is an elongated mounting hole.
+OpenSCAD action:
+  module slot_cut(slot_length, slot_diameter, cut_height) {
+    hull() {
+      translate([-slot_length/2+slot_diameter/2,0,0]) cylinder(h=cut_height, d=slot_diameter, center=true, $fn=48);
+      translate([ slot_length/2-slot_diameter/2,0,0]) cylinder(h=cut_height, d=slot_diameter, center=true, $fn=48);
+    }
+  }
+
+Rule: motor mount uses central shaft clearance plus square bolt pattern.
+OpenSCAD action:
+  cylinder(h=plate_thickness+2, d=motor_shaft_clearance, center=true, $fn=96);
+  for (x=[-motor_bolt_spacing/2, motor_bolt_spacing/2])
+    for (y=[-motor_bolt_spacing/2, motor_bolt_spacing/2])
+      translate([x,y,0]) cylinder(h=plate_thickness+2, d=motor_bolt_diameter, center=true, $fn=48);

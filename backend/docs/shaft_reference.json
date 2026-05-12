@@ -1,0 +1,224 @@
+{
+  "type": "mechanical_parts_database",
+  "subset": "shaft_family",
+  "units": "millimeters",
+  "parts": [
+    {
+      "id": "shaft_stepped_general",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Stepped shaft with multiple bearing seats",
+      "standards": ["ISO shaft fits (h7/g6)"],
+      "standard_dimensions_mm": {
+        "length": 120,
+        "main_diameter": 20,
+        "step1_diameter": 15,
+        "step2_diameter": 10,
+        "step_lengths": [40, 40, 40]
+      },
+      "fit_guidance_mm": {
+        "bearing_seat_fit": "-0.01 to -0.02",
+        "clearance_fit": "+0.02 to +0.05"
+      },
+      "required_features": [
+        "Multiple coaxial diameters",
+        "Step transitions"
+      ],
+      "openscad_module": "$fn=128; module shaft(){cylinder(h=40,d=20);translate([0,0,40])cylinder(h=40,d=15);translate([0,0,80])cylinder(h=40,d=10);} shaft();"
+    },
+
+    {
+      "id": "shaft_keyed",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Keyed shaft (DIN 6885)",
+      "standards": ["DIN 6885A"],
+      "standard_dimensions_mm": {
+        "shaft_d": 20,
+        "length": 100,
+        "key_width": 6,
+        "key_depth": 3
+      },
+      "required_features": [
+        "Rectangular keyway",
+        "Subtractive slot"
+      ],
+      "openscad_module": "$fn=128; module shaft(){difference(){cylinder(h=100,d=20);translate([0,9,50])cube([6,3,110],center=true);}} shaft();"
+    },
+
+    {
+      "id": "shaft_threaded",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Threaded shaft (lead screw)",
+      "standards": ["ISO metric thread"],
+      "standard_dimensions_mm": {
+        "diameter": 8,
+        "length": 150,
+        "pitch": 2
+      },
+      "required_features": [
+        "Helical thread"
+      ],
+      "openscad_module": "$fn=128; module shaft(){linear_extrude(height=150,twist=360*150/2)circle(d=8);} shaft();"
+    },
+
+    {
+      "id": "shaft_splined",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Splined shaft",
+      "standards": ["DIN 5480 approximation"],
+      "standard_dimensions_mm": {
+        "outer_d": 20,
+        "length": 80,
+        "teeth": 12
+      },
+      "required_features": [
+        "External spline teeth",
+        "Radial symmetry"
+      ],
+      "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=80,d=18);for(i=[0:11])rotate([0,0,360*i/12])translate([10,0,0])cube([2,2,80],center=true);}} shaft();"
+    },
+{
+  "id": "shaft_transmission",
+  "family": "shaft_reference",
+  "category": "shaft",
+  "name": "Transmission shaft",
+  "aliases": ["gear shaft", "power transmission shaft"],
+  "standards": ["General machine design", "ISO fits"],
+
+  "standard_dimensions_mm": {
+    "length": 160,
+    "main_diameter": 25,
+    "bearing_diameter": 20,
+    "end_diameter": 15
+  },
+
+  "required_features": [
+    "Stepped shaft geometry",
+    "Bearing seats",
+    "Gear mounting section",
+    "Optional keyway"
+  ],
+
+  "design_rules": [
+    "Bearing seats must match bearing inner diameter",
+    "Gear seat must include torque transmission feature (keyway or spline)"
+  ],
+
+  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=40,d=15);translate([0,0,40])cylinder(h=30,d=20);translate([0,0,70])cylinder(h=60,d=25);translate([0,0,130])cylinder(h=30,d=20);translate([0,0,160])cylinder(h=40,d=15);}} shaft();"
+},{
+  "id": "shaft_input",
+  "family": "shaft_reference",
+  "category": "shaft",
+  "name": "Input shaft",
+  "aliases": ["drive shaft", "motor shaft"],
+
+  "standard_dimensions_mm": {
+    "diameter": 20,
+    "length": 120,
+    "gear_section_d": 30
+  },
+
+  "required_features": [
+    "Gear mounted on shaft",
+    "Bearing support sections",
+    "Torque input interface"
+  ],
+
+  "design_rules": [
+    "Must align with motor or power source",
+    "Include gear or spline interface"
+  ],
+
+  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=40,d=20);translate([0,0,40])cylinder(h=40,d=30);translate([0,0,80])cylinder(h=40,d=20);}} shaft();"
+},{
+  "id": "shaft_line",
+  "family": "shaft_reference",
+  "category": "shaft",
+  "name": "Line shaft",
+  "aliases": ["long transmission shaft"],
+
+  "standard_dimensions_mm": {
+    "diameter": 25,
+    "length": 300
+  },
+
+  "required_features": [
+    "Long uniform shaft",
+    "Multiple mounting positions"
+  ],
+
+  "design_rules": [
+    "Maintain straightness",
+    "Avoid excessive deflection"
+  ],
+
+  "openscad_module": "$fn=128; module shaft(){cylinder(h=300,d=25);} shaft();"
+},{
+  "id": "shaft_machine",
+  "family": "shaft_reference",
+  "category": "shaft",
+  "name": "Machine shaft",
+
+  "standard_dimensions_mm": {
+    "diameter": 30,
+    "length": 150
+  },
+
+  "required_features": [
+    "Supports rotating components",
+    "Multiple mounting sections"
+  ],
+
+  "design_rules": [
+    "Designed for general-purpose rotation",
+    "Can include gears, pulleys, or bearings"
+  ],
+
+  "openscad_module": "$fn=128; module shaft(){cylinder(h=150,d=30);} shaft();"
+},{
+  "id": "shaft_spindle",
+  "family": "shaft_reference",
+  "category": "shaft",
+  "name": "Spindle shaft",
+  "aliases": ["machine spindle"],
+
+  "standard_dimensions_mm": {
+    "diameter": 20,
+    "length": 120,
+    "head_diameter": 40
+  },
+
+  "required_features": [
+    "High precision shaft",
+    "Tool mounting head"
+  ],
+
+  "design_rules": [
+    "High concentricity required",
+    "Smooth surface finish"
+  ],
+
+  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=100,d=20);translate([0,0,100])cylinder(h=20,d=40);}} shaft();"
+},
+    {
+      "id": "shaft_d_flat",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "D-shaft (motor shaft)",
+      "standards": ["General motor shaft practice"],
+      "standard_dimensions_mm": {
+        "diameter": 6,
+        "length": 50,
+        "flat_depth": 1
+      },
+      "required_features": [
+        "Flat cut surface"
+      ],
+      "openscad_module": "$fn=128; module shaft(){difference(){cylinder(h=50,d=6);translate([0,2.5,25])cube([6,1,60],center=true);}} shaft();"
+    }
+
+  ]
+}

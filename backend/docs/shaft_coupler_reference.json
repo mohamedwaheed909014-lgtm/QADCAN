@@ -1,0 +1,169 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "shaft_coupler_reference",
+    "family_label": "Shaft Couplers",
+    "units": "millimeters",
+    "scope": "Rigid clamp couplers, flexible/helical couplers, Oldham couplers, jaw couplers.",
+    "retrieval": {
+      "primary_keywords": [
+        "shaft coupler",
+        "coupler",
+        "clamping slit",
+        "flexible coupler",
+        "oldham coupler",
+        "helical coupler",
+        "split collar",
+        "motor shaft coupler",
+        "5mm to 8mm",
+        "rigid coupler"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "gearbox",
+        "fan",
+        "enclosure",
+        "flange pipe",
+        "clamp jig"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "rigid and flexible machined shaft couplers",
+        "notes": "Good strength; clamp slit gives enough flex for clamping force."
+      },
+      {
+        "material": "PA12-CF",
+        "use_case": "functional 3D-printed couplers",
+        "notes": "Orient vertical for best torsional strength in layers."
+      },
+      {
+        "material": "POM",
+        "use_case": "Oldham coupler centre disc",
+        "notes": "Self-lubricating; good sliding contact with hubs."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "General coupler sizing",
+        "applies_to": "OD and length",
+        "note": "OD ≥ max(shaft_a, shaft_b) + 8 mm wall each side; length 25–40 mm for NEMA17 to T8."
+      },
+      {
+        "name": "DIN 6885A keyway",
+        "applies_to": "D-flat and keyway on shaft ends",
+        "note": "Flat depth typically 1 mm for ø5–6 mm shafts."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "rigid_clamp_coupler_5to8",
+      "category": "rigid_coupler",
+      "name": "Rigid clamp coupler 5 mm to 8 mm",
+      "aliases": [
+        "rigid coupler",
+        "clamp coupler",
+        "5mm to 8mm coupler",
+        "nema17 to t8 coupler",
+        "shaft coupling"
+      ],
+      "standards": [
+        "General coupler sizing"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined aluminum"
+      ],
+      "family": "shaft_coupler_reference",
+      "standard_dimensions_mm": {
+        "shaft_a": 5,
+        "shaft_b": 8,
+        "outer_d": 20,
+        "coupler_length": 30,
+        "clamp_gap": 1.2,
+        "screw_d": 3.2
+      },
+      "fit_guidance_mm": {
+        "bore_a": "shaft_a + 0.2 running fit",
+        "bore_b": "shaft_b + 0.2 running fit"
+      },
+      "constraint_parameters": {
+        "shaft_a": {
+          "default": 5
+        },
+        "shaft_b": {
+          "default": 8
+        },
+        "outer_d": {
+          "default": 20,
+          "note": "≥ max(shaft)+8 mm wall"
+        }
+      },
+      "derived_parameters": {
+        "bore_a_depth": {
+          "formula": "coupler_length/2",
+          "note": "each bore from opposite end"
+        },
+        "wall_min": {
+          "formula": "(outer_d - shaft_b)/2 - 0.2",
+          "note": "must be ≥ 3 mm"
+        }
+      },
+      "main_features": [
+        "outer cylinder body",
+        "bore A from top half",
+        "bore B from bottom half (different diameter)",
+        "radial clamp slit through half the body",
+        "two cross clamping screw holes crossing slit"
+      ],
+      "design_rules": [
+        "both bores coaxial on Z axis entering from opposite ends",
+        "clamp slit is flat cube passing through body width",
+        "slit must reach at least 1 mm past bore centre",
+        "clamping screws cross the slit — rotate 90° to slit plane",
+        "minimum wall between bore and OD ≥ 3 mm"
+      ],
+      "validation_criteria": [
+        "two bores in difference at different Z offsets",
+        "clamp slit cube in difference",
+        "two screw holes crossing slit"
+      ],
+      "failure_modes": [
+        "bores side-by-side instead of coaxial — misaligned shafts",
+        "slit does not reach bore — clamp cannot close",
+        "screws parallel to slit instead of perpendicular — no clamping force"
+      ],
+      "constraint_checks": [
+        {
+          "id": "coaxial_bores",
+          "severity": "error",
+          "expression": "bore_a and bore_b both centered on Z axis",
+          "message": "Both shaft bores must be coaxial on the same central axis."
+        },
+        {
+          "id": "clamp_slit",
+          "severity": "error",
+          "expression": "cube slit passes through body",
+          "message": "Clamp coupler needs a radial slit that reaches the bore."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\nshaft_a        = 5;\nshaft_b        = 8;\nbore_clearance = 0.2;\nouter_d        = 20;\ncoupler_l      = 30;\nclamp_gap      = 1.2;\nscrew_d        = 3.2;\n\nmodule rigid_clamp_coupler() {\n  difference() {\n    cylinder(h = coupler_l, d = outer_d, center = true);\n    translate([0, 0,  coupler_l/4])\n      cylinder(h = coupler_l/2 + 1, d = shaft_a + bore_clearance, center = true, $fn = 64);\n    translate([0, 0, -coupler_l/4])\n      cylinder(h = coupler_l/2 + 1, d = shaft_b + bore_clearance, center = true, $fn = 64);\n    cube([outer_d + 2, clamp_gap, coupler_l * 0.6], center = true);\n    for (z = [coupler_l/4, -coupler_l/4])\n      translate([0, 0, z])\n        rotate([90, 0, 0])\n          cylinder(h = outer_d + 2, d = screw_d, center = true, $fn = 32);\n  }\n}\n\nrigid_clamp_coupler();"
+    }
+  ]
+}

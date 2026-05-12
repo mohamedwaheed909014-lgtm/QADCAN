@@ -1,0 +1,388 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "structural_profiles_reference",
+    "family_label": "Structural Profiles and Extrusions",
+    "units": "millimeters",
+    "scope": "I-beams, H-beams, U-channels, T-sections, RHS, CHS, 2020/2040/4040 aluminium extrusions, queen-post trusses.",
+    "retrieval": {
+      "primary_keywords": [
+        "i-beam",
+        "i beam",
+        "h-beam",
+        "structural profile",
+        "extrusion",
+        "2020 extrusion",
+        "i section",
+        "wide flange",
+        "truss",
+        "queen post",
+        "angle section",
+        "rhs",
+        "chs",
+        "t-slot profile",
+        "standard i-beam",
+        "standard i beam",
+        "s-beam",
+        "s beam",
+        "classic i-beam",
+        "tapered flange",
+        "narrow flange",
+        "narrow i-beam",
+        "narrow i beam",
+        "ipe beam",
+        "w-beam",
+        "w beam",
+        "hea beam",
+        "heb beam",
+        "universal column"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "fan mount",
+        "enclosure",
+        "flange pipe",
+        "clamp jig"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "S235 / S275 hot-rolled steel",
+        "use_case": "welded structural I-beams, channels, and angles",
+        "notes": "Yield 235/275 MPa; cut, weld, and prime.",
+        "standards": [
+          "EN 10025 S235",
+          "EN 10025 S275"
+        ]
+      },
+      {
+        "material": "6060-T5 aluminum extrusion",
+        "use_case": "2020/2040/4040 profile frames",
+        "notes": "Anodised finish; slot for T-nuts; good corrosion resistance.",
+        "standards": [
+          "ISO 209 AlMgSi"
+        ]
+      },
+      {
+        "material": "PETG / PLA",
+        "use_case": "3D-printed structural prototype connectors and caps",
+        "notes": "Use for brackets and end-caps only, not load-bearing beams."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "EN 10034 I and H sections",
+        "applies_to": "I-beam and H-beam flange/web proportions",
+        "note": "IPE 100: height 100 mm, flange 55 mm, web 4.1 mm, flange 5.7 mm."
+      },
+      {
+        "name": "2020 aluminium extrusion (OpenBuilds)",
+        "applies_to": "slot width and T-nut dimensions",
+        "note": "20×20 mm section; 6 mm slot; M5 T-nut head 5.85×2.75 mm."
+      },
+      {
+        "name": "Queen-post truss geometry",
+        "applies_to": "truss member layout and proportion",
+        "note": "Rise/span ratio 0.3–0.5; queen posts at span/4 from centre; straining beam at queen post tops."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "i_beam_parametric",
+      "category": "i_beam",
+      "name": "Parametric I-beam (flanges + web)",
+      "aliases": [
+        "i-beam",
+        "i beam",
+        "h-beam",
+        "ipe beam",
+        "hea beam",
+        "steel beam",
+        "structural beam",
+        "wide flange beam"
+      ],
+      "standards": [
+        "EN 10034"
+      ],
+      "manufacturing_processes": [
+        "3D printed (model)",
+        "rolled steel",
+        "welded plate"
+      ],
+      "family": "structural_profiles_reference",
+      "standard_dimensions_mm": {
+        "beam_length": 180,
+        "beam_height": 60,
+        "flange_width": 36,
+        "flange_thickness": 8,
+        "web_thickness": 7
+      },
+      "fit_guidance_mm": {
+        "end_connection": "drilled bolt holes or welded end plate"
+      },
+      "constraint_parameters": {
+        "beam_length": {
+          "default": 180
+        },
+        "beam_height": {
+          "default": 60
+        },
+        "flange_width": {
+          "default": 36
+        }
+      },
+      "derived_parameters": {
+        "web_height": {
+          "formula": "beam_height - 2*flange_thickness",
+          "note": "clear height between flanges"
+        }
+      },
+      "main_features": [
+        "top flange horizontal cuboid at +beam_height/2",
+        "bottom flange horizontal cuboid at -beam_height/2",
+        "central web cuboid connecting flanges",
+        "optional lightening holes through web",
+        "optional end-plate bolt holes"
+      ],
+      "design_rules": [
+        "THREE cubes in union — NOT one solid rectangle",
+        "top flange at Z = beam_height/2 - flange_thickness/2",
+        "bottom flange at Z = -(beam_height/2 - flange_thickness/2)",
+        "web centered at Z=0 with height = beam_height - 2*flange_thickness",
+        "a single cube([beam_length, flange_width, beam_height]) is WRONG"
+      ],
+      "validation_criteria": [
+        "three cube() calls in union for flanges and web",
+        "flange at ±beam_height/2 positions",
+        "web height = beam_height - 2*flange_thickness"
+      ],
+      "failure_modes": [
+        "single solid rectangular block — functionally wrong I-beam",
+        "web and flanges merged into one box — not parametric",
+        "missing web — just two plates"
+      ],
+      "constraint_checks": [
+        {
+          "id": "three_cubes",
+          "severity": "error",
+          "expression": "three cube() in union for flanges+web",
+          "message": "I-beam MUST be three cubes: top flange, bottom flange, and web. A single cube is a rectangular bar, not an I-beam."
+        },
+        {
+          "id": "no_single_bar",
+          "severity": "error",
+          "expression": "no single cube spanning full beam_height",
+          "message": "Do not use a single solid bar as an I-beam."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\nbeam_length       = 180;\nbeam_height       = 60;\nflange_width      = 36;\nflange_thickness  = 8;\nweb_thickness     = 7;\nweb_height        = beam_height - 2 * flange_thickness;\n\nmodule i_beam_profile() {\n  union() {\n    translate([0, 0, beam_height/2 - flange_thickness/2])\n      cube([beam_length, flange_width, flange_thickness], center = true);\n    translate([0, 0, -(beam_height/2 - flange_thickness/2)])\n      cube([beam_length, flange_width, flange_thickness], center = true);\n    cube([beam_length, web_thickness, web_height], center = true);\n  }\n}\n\ni_beam_profile();"
+    },
+    {
+      "id": "standard_tapered_i_beam",
+      "family": "structural_profiles_reference",
+      "category": "standard_i_beam",
+      "name": "Standard tapered-flange I-beam / S-shape",
+      "aliases": [
+        "standard I-beam",
+        "classic I beam",
+        "S beam",
+        "S-shape beam",
+        "tapered flange I beam"
+      ],
+      "standards": [
+        "AISC S-shapes",
+        "EN/legacy tapered flange I sections"
+      ],
+      "standard_dimensions_mm": {
+        "beam_length": 180,
+        "beam_height": 80,
+        "flange_width": 44,
+        "flange_thickness_outer": 6,
+        "flange_thickness_inner": 10,
+        "web_thickness": 6
+      },
+      "constraint_parameters": {
+        "beam_height": {
+          "default": 80
+        },
+        "flange_width": {
+          "default": 44,
+          "formula": "0.45 to 0.65 * beam_height"
+        },
+        "flange_taper": {
+          "default": "1:6 or about 9.46 degrees"
+        }
+      },
+      "derived_parameters": {
+        "web_height": {
+          "formula": "beam_height - 2 * flange_thickness_inner"
+        },
+        "flange_width_ratio": {
+          "formula": "flange_width / beam_height, target 0.45 to 0.65"
+        }
+      },
+      "main_features": [
+        "narrow tapered top flange",
+        "narrow tapered bottom flange",
+        "central vertical web",
+        "flanges thicker near web than at outer edges"
+      ],
+      "design_rules": [
+        "Use this when prompt says standard I-beam, classic I-beam, S-beam, or tapered flange.",
+        "Do not model as wide H beam.",
+        "Use tapered flange polygons or hull approximations, not constant wide flanges.",
+        "Expose beam_height, flange_width, flange_thickness_outer, flange_thickness_inner, web_thickness, beam_length."
+      ],
+      "validation_criteria": [
+        "top and bottom flanges exist",
+        "central web exists",
+        "flange_width < 0.70 * beam_height",
+        "tapered flange thickness is represented or named"
+      ],
+      "failure_modes": [
+        "using wide H-beam proportions",
+        "using a single rectangular block",
+        "missing flange taper"
+      ],
+      "openscad_module": "$fn = 48;\n\nbeam_length = 180;\nbeam_height = 80;\nflange_width = 44;\nflange_thickness_outer = 6;\nflange_thickness_inner = 10;\nweb_thickness = 6;\nweb_height = beam_height - 2 * flange_thickness_inner;\n\nmodule tapered_flange_i_beam() {\n  union() {\n    linear_extrude(height = beam_length, center = true)\n      polygon(points=[[-flange_width/2, beam_height/2-flange_thickness_outer], [flange_width/2, beam_height/2-flange_thickness_outer], [web_thickness/2, beam_height/2-flange_thickness_inner], [-web_thickness/2, beam_height/2-flange_thickness_inner]]);\n    linear_extrude(height = beam_length, center = true)\n      polygon(points=[[-flange_width/2, -beam_height/2+flange_thickness_outer], [flange_width/2, -beam_height/2+flange_thickness_outer], [web_thickness/2, -beam_height/2+flange_thickness_inner], [-web_thickness/2, -beam_height/2+flange_thickness_inner]]);\n    cube([web_thickness, web_height, beam_length], center=true);\n  }\n}\n\ntapered_flange_i_beam();"
+    },
+    {
+      "id": "narrow_flange_i_beam",
+      "family": "structural_profiles_reference",
+      "category": "narrow_flange_i_beam",
+      "name": "Narrow-flange I-beam / IPE-like section",
+      "aliases": [
+        "narrow flange",
+        "narrow I beam",
+        "IPE beam",
+        "slim I section"
+      ],
+      "standards": [
+        "EN 10365 IPE sections"
+      ],
+      "standard_dimensions_mm": {
+        "beam_length": 180,
+        "beam_height": 80,
+        "flange_width": 42,
+        "flange_thickness": 7,
+        "web_thickness": 5
+      },
+      "constraint_parameters": {
+        "flange_width": {
+          "formula": "0.40 to 0.60 * beam_height"
+        },
+        "web_thickness": {
+          "note": "slender central web"
+        }
+      },
+      "derived_parameters": {
+        "web_height": {
+          "formula": "beam_height - 2 * flange_thickness"
+        },
+        "flange_width_ratio": {
+          "formula": "flange_width / beam_height, target 0.40 to 0.60"
+        }
+      },
+      "main_features": [
+        "flat narrow top flange",
+        "flat narrow bottom flange",
+        "slender central web"
+      ],
+      "design_rules": [
+        "Use this when prompt says narrow flange, IPE, or slim I-beam.",
+        "Flanges are parallel and narrow, not tapered.",
+        "Model with three rectangular prisms."
+      ],
+      "validation_criteria": [
+        "three solids: top flange, bottom flange, web",
+        "flange_width < 0.70 * beam_height",
+        "web centered between flanges"
+      ],
+      "failure_modes": [
+        "wide H-beam proportions",
+        "single rectangular bar"
+      ],
+      "openscad_module": "$fn = 48;\n\nbeam_length = 180;\nbeam_height = 80;\nflange_width = 42;\nflange_thickness = 7;\nweb_thickness = 5;\nweb_height = beam_height - 2 * flange_thickness;\n\nmodule narrow_flange_i_beam() {\n  union() {\n    translate([0, beam_height/2 - flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    translate([0, -beam_height/2 + flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    cube([web_thickness, web_height, beam_length], center=true);\n  }\n}\n\nnarrow_flange_i_beam();"
+    },
+    {
+      "id": "wide_flange_h_beam",
+      "family": "structural_profiles_reference",
+      "category": "wide_flange_h_beam",
+      "name": "Wide-flange H-beam / W-beam / HEA-style section",
+      "aliases": [
+        "wide flange",
+        "wide flange beam",
+        "H beam",
+        "H-beam",
+        "W beam",
+        "W-beam",
+        "HEA beam",
+        "HEB beam",
+        "universal column"
+      ],
+      "standards": [
+        "AISC W-shapes",
+        "EN 10365 HEA/HEB sections"
+      ],
+      "standard_dimensions_mm": {
+        "beam_length": 180,
+        "beam_height": 80,
+        "flange_width": 80,
+        "flange_thickness": 9,
+        "web_thickness": 6
+      },
+      "constraint_parameters": {
+        "flange_width": {
+          "formula": "0.80 to 1.20 * beam_height"
+        },
+        "flange_thickness": {
+          "note": "often thicker than narrow IPE flange"
+        }
+      },
+      "derived_parameters": {
+        "web_height": {
+          "formula": "beam_height - 2 * flange_thickness"
+        },
+        "flange_width_ratio": {
+          "formula": "flange_width / beam_height, target 0.80 to 1.20"
+        }
+      },
+      "main_features": [
+        "wide flat top flange",
+        "wide flat bottom flange",
+        "central web",
+        "H-like silhouette"
+      ],
+      "design_rules": [
+        "Use this when prompt says H-beam, wide flange, W-beam, HEA, HEB, or universal column.",
+        "Flange width should be close to beam height.",
+        "Do not use narrow I-beam proportions."
+      ],
+      "validation_criteria": [
+        "three solids: top flange, bottom flange, web",
+        "flange_width >= 0.75 * beam_height",
+        "web centered between flanges"
+      ],
+      "failure_modes": [
+        "using narrow IPE proportions for an H beam",
+        "single rectangular bar"
+      ],
+      "openscad_module": "$fn = 48;\n\nbeam_length = 180;\nbeam_height = 80;\nflange_width = 80;\nflange_thickness = 9;\nweb_thickness = 6;\nweb_height = beam_height - 2 * flange_thickness;\n\nmodule wide_flange_h_beam() {\n  union() {\n    translate([0, beam_height/2 - flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    translate([0, -beam_height/2 + flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    cube([web_thickness, web_height, beam_length], center=true);\n  }\n}\n\nwide_flange_h_beam();"
+    }
+  ]
+}

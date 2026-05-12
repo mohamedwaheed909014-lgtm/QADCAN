@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenSCAD Mechanical Copilot</title>
+  <link rel="stylesheet" href="styles.css?v=20260426a" />
+</head>
+<body>
+  <div class="page-shell">
+
+    <!-- TOP BAR -->
+    <header class="topbar">
+      <div class="topbar-brand">
+        <span class="brand-icon">⬡</span>
+        <div>
+          <div class="brand-name">OpenSCAD Copilot</div>
+          <div class="brand-sub">Parametric Mechanical Parts · RAG-Assisted</div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="meta-pill" id="doc-count">Loading…</div>
+        <div class="meta-pill" id="rag-mode">Loading…</div>
+        <div class="status-indicator">
+          <div id="status-dot" class="status-dot"></div>
+          <span id="status-text" class="status-label">Connecting…</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- WORKSPACE -->
+    <main class="workspace">
+
+      <!-- LEFT: Settings sidebar -->
+      <aside class="settings-panel">
+
+        <div class="settings-section">
+          <p class="settings-heading">Model</p>
+          <div class="field">
+            <label class="field-label" for="provider">Provider</label>
+            <select id="provider"></select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="model">Model</label>
+            <select id="model"></select>
+          </div>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-heading">Parameters</p>
+          <div class="field">
+            <div class="field-row">
+              <label class="field-label" for="temperature">Temperature</label>
+              <span class="slider-value" id="temperature-value">0.20</span>
+            </div>
+            <input id="temperature" type="range" min="0" max="1.2" step="0.05" value="0.2" />
+          </div>
+          <div class="field">
+            <label class="field-label">RAG retrieval</label>
+            <div class="info-note">Select knowledge records, or leave empty for automatic mechanical part retrieval.</div>
+          </div>
+          <div class="field">
+            <div class="field-row">
+              <label class="field-label">Knowledge records</label>
+              <span class="slider-value" id="knowledge-selected">0 selected</span>
+            </div>
+            <div class="knowledge-actions">
+              <button id="select-all-knowledge" class="mini-btn" type="button">All</button>
+              <button id="clear-knowledge" class="mini-btn" type="button">None</button>
+            </div>
+            <div id="knowledge-files" class="knowledge-files">
+              Loading knowledge records...
+            </div>
+          </div>
+          <label class="toggle-row">
+            <input id="allow-fallback" type="checkbox" />
+            <span class="toggle-label">Fallback to another provider if selected provider fails</span>
+          </label>
+        </div>
+
+        <div class="settings-section">
+          <p class="settings-heading">Quick Parts</p>
+          <div class="quick-prompts" id="quick-prompts">
+            <button type="button" class="chip">20 mm 6204 pillow block for CNC leadscrew</button>
+            <button type="button" class="chip">32 tooth spur gear with 8 mm bore</button>
+            <button type="button" class="chip">NEMA 17 motor mounting bracket</button>
+            <button type="button" class="chip">flexible shaft coupler for 5 mm to 8 mm shafts</button>
+            <button type="button" class="chip">electronics enclosure with lid and screw posts</button>
+            <button type="button" class="chip">timing pulley for GT2 belt</button>
+            <button type="button" class="chip">linear rail carriage adapter plate</button>
+            <button type="button" class="chip">clamp fixture for a 25 mm tube</button>
+          </div>
+        </div>
+
+        <button id="clear-button" class="clear-button" type="button">
+          ↺ &nbsp;New conversation
+        </button>
+
+      </aside>
+
+      <!-- RIGHT: Chat + Output -->
+      <div class="main-col">
+
+        <!-- Chat card -->
+        <section class="chat-card">
+          <div id="chat-window" class="chat-window">
+            <div class="welcome-state">
+              <div class="welcome-icon">⬡</div>
+              <div class="welcome-title">What would you like to design?</div>
+              <div class="welcome-body">
+                Describe a gear, bracket, shaft coupler, enclosure, bearing housing, pulley, clamp, linkage, or other mechanical part.
+                After generation just keep chatting to refine — change dimensions,
+                add features, or ask follow-up questions exactly as you would
+                in a normal conversation.
+              </div>
+              <div class="welcome-examples">
+                <span class="example-tag">Try: "change bore to 25 mm"</span>
+                <span class="example-tag">Try: "add chamfers to top edges"</span>
+                <span class="example-tag">Try: "increase wall thickness to 10 mm"</span>
+                <span class="example-tag">Try: "make the mounting holes M5"</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-input-wrap">
+            <div class="chat-input-row">
+              <textarea
+                id="prompt"
+                class="chat-textarea"
+                placeholder="Describe a part, or continue refining…"
+                rows="1"
+              ></textarea>
+              <button id="submit-button" class="send-button" type="button" disabled>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                  <path d="M2 8h12M9 3l5 5-5 5"
+                        stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+            <div class="input-hint">
+              <kbd>Enter</kbd> to send &nbsp;·&nbsp; <kbd>Shift+Enter</kbd> for new line
+            </div>
+          </div>
+        </section>
+
+        <!-- 3D preview -->
+        <section class="preview-panel">
+          <div class="preview-toolbar">
+            <div class="preview-toolbar-left">
+              <span class="preview-lang-badge">STL Preview</span>
+              <span class="preview-status" id="preview-status">waiting for generated geometry</span>
+            </div>
+            <div class="preview-toolbar-actions">
+              <label class="preview-toggle">
+                <input id="auto-preview" type="checkbox" checked />
+                <span>Auto</span>
+              </label>
+              <button id="render-preview-button" class="preview-btn" type="button" disabled>Render</button>
+              <button id="reset-preview-button" class="preview-btn" type="button" disabled>Reset view</button>
+            </div>
+          </div>
+          <div class="preview-viewport" id="preview-viewport">
+            <canvas id="preview-canvas"></canvas>
+            <div class="preview-empty" id="preview-empty">
+              <strong>No model rendered yet</strong>
+              <span>Generate OpenSCAD code to inspect the mesh here.</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Code output -->
+        <section class="code-panel">
+          <div class="code-toolbar">
+            <div class="code-toolbar-left">
+              <span class="code-lang-badge">OpenSCAD</span>
+              <span class="code-filename" id="code-filename">no file yet</span>
+            </div>
+            <div class="code-toolbar-actions">
+              <button id="accept-button"     class="code-btn accept-btn" type="button" disabled>Accept</button>
+              <button id="copy-button"       class="code-btn" type="button" disabled>⧉ Copy</button>
+              <button id="download-button"   class="code-btn" type="button" disabled>↓ .scad</button>
+              <button id="export-stl-button" class="code-btn stl-btn"    type="button" disabled>⬡ Export STL</button>
+            </div>
+          </div>
+          <pre id="code-output" class="code-output">// Parametric OpenSCAD code will appear here.
+// Describe a part to get started, then keep chatting to refine it.</pre>
+        </section>
+
+        <!-- References + Validation -->
+        <div class="bottom-grid">
+          <section class="card">
+            <div class="card-header">
+              <p class="kicker">RAG</p>
+              <h2>Retrieved Knowledge</h2>
+            </div>
+            <div id="references" class="empty-state">No retrieval results yet.</div>
+          </section>
+          <section class="card">
+            <div class="card-header">
+              <p class="kicker">Checks</p>
+              <h2>Validity Signals</h2>
+            </div>
+            <div id="validation" class="empty-state">Checks appear after generation.</div>
+          </section>
+          <section class="card log-card">
+            <div class="card-header">
+              <p class="kicker">Debug</p>
+              <h2>Generation Log <button id="refresh-log-btn" class="mini-btn" type="button">Refresh</button></h2>
+            </div>
+            <div id="generation-log" class="empty-state">Click Refresh to load recent generation events.</div>
+          </section>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+      }
+    }
+  </script>
+  <script type="module" src="main.js?v=1000"></script>
+</body>
+</html>

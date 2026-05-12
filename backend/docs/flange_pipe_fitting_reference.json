@@ -1,0 +1,170 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "flange_pipe_fitting_reference",
+    "family_label": "Flanges, Pipe Fittings and Couplings",
+    "units": "millimeters",
+    "scope": "ANSI and DIN pipe flanges, blind flanges, weld-neck flanges, hose barbs, pipe elbows.",
+    "retrieval": {
+      "primary_keywords": [
+        "flange",
+        "pipe flange",
+        "blind flange",
+        "weld neck",
+        "bolt circle flange",
+        "dn50",
+        "ansi flange",
+        "din flange",
+        "hose barb",
+        "pipe coupling",
+        "central bore",
+        "raised face"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "pillow block",
+        "gear",
+        "bracket",
+        "fan mount",
+        "enclosure",
+        "linear rail"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "Carbon steel A105 / S235",
+        "use_case": "welded pipe flanges in general service",
+        "notes": "Most common flange material; coat for corrosion protection.",
+        "standards": [
+          "ASME A105",
+          "EN 10025 S235"
+        ]
+      },
+      {
+        "material": "Stainless 316L",
+        "use_case": "chemical, food, and marine pipe flanges",
+        "notes": "Superior corrosion resistance; higher cost.",
+        "standards": [
+          "ISO 15510 316L"
+        ]
+      },
+      {
+        "material": "PETG / PA12",
+        "use_case": "3D-printed low-pressure fluid model flanges",
+        "notes": "Print at 100% infill with ≥4 perimeters for water-tight walls."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ASME B16.5",
+        "applies_to": "ANSI flange bolt circle, OD, and thickness by pressure class",
+        "note": "Class 150 NPS 2\": OD 152 mm, bolt_circle 121 mm, 4×ø19 mm, thickness 19 mm."
+      },
+      {
+        "name": "DIN 2573 / EN 1092-1 PN16",
+        "applies_to": "metric flange dimensions",
+        "note": "DN50 PN16: OD 165 mm, bolt_circle 125 mm, 4×ø18 mm, thickness 20 mm."
+      },
+      {
+        "name": "ASME B16.5 bolt offsetting",
+        "applies_to": "bolt hole angular placement",
+        "note": "Offset by 22.5° from vertical so bolts do not land on centreline top/bottom."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "blind_flange_dn50_pn16",
+      "category": "blind_flange",
+      "name": "Blind flange DN50 PN16",
+      "aliases": [
+        "blind flange",
+        "pipe end cap flange",
+        "closure flange",
+        "dn50 flange"
+      ],
+      "standards": [
+        "EN 1092-1 PN16",
+        "DIN 2573"
+      ],
+      "manufacturing_processes": [
+        "machined",
+        "cast then machined",
+        "3D printed model"
+      ],
+      "family": "flange_pipe_fitting_reference",
+      "standard_dimensions_mm": {
+        "flange_od": 165,
+        "bolt_circle": 125,
+        "n_bolts": 4,
+        "bolt_hole_d": 18.5,
+        "thickness": 20,
+        "raised_face_od": 90,
+        "raised_face_h": 2
+      },
+      "fit_guidance_mm": {
+        "bolt_holes": "ø18 mm clearance holes for M16 studs"
+      },
+      "constraint_parameters": {
+        "flange_od": {
+          "default": 165
+        },
+        "bolt_circle": {
+          "default": 125
+        },
+        "n_bolts": {
+          "default": 4
+        }
+      },
+      "derived_parameters": {
+        "bolt_hole_angle": {
+          "formula": "360 * i / n_bolts + 22.5",
+          "note": "offset 22.5° from vertical"
+        }
+      },
+      "main_features": [
+        "main flange disk cylinder",
+        "raised face boss on front",
+        "bolt circle holes repeated using for-loop",
+        "no central bore (blind)"
+      ],
+      "design_rules": [
+        "bolt holes placed using cos()/sin() on bolt_circle_d",
+        "offset bolt pattern by 22.5° so bolts not on vertical centre",
+        "raised face is smaller-diameter boss on front face"
+      ],
+      "validation_criteria": [
+        "bolt holes use for-loop with cos/sin placement",
+        "raised face cylinder in union",
+        "no central bore for blind flange"
+      ],
+      "failure_modes": [
+        "bolt holes at fixed positions not parametric",
+        "bolt holes on vertical centreline instead of offset",
+        "raised face missing"
+      ],
+      "constraint_checks": [
+        {
+          "id": "bolt_loop",
+          "severity": "error",
+          "expression": "for-loop with cos/sin for bolt holes",
+          "message": "Flange bolt holes must use parametric cos/sin placement on bolt circle."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\nflange_od       = 165;\nflange_t        = 20;\nbolt_circle     = 125;\nn_bolts         = 4;\nbolt_hole_d     = 18.5;\nraised_face_od  = 90;\nraised_face_h   = 2;\nbolt_offset_deg = 22.5;\n\nmodule blind_flange_dn50() {\n  difference() {\n    union() {\n      cylinder(h = flange_t, d = flange_od, center = true);\n      translate([0, 0, flange_t/2 + raised_face_h/2])\n        cylinder(h = raised_face_h, d = raised_face_od, center = true);\n    }\n    for (i = [0 : n_bolts - 1]) {\n      angle = 360 * i / n_bolts + bolt_offset_deg;\n      translate([cos(angle) * bolt_circle/2, sin(angle) * bolt_circle/2, 0])\n        cylinder(h = flange_t + raised_face_h + 2, d = bolt_hole_d, center = true, $fn = 32);\n    }\n  }\n}\n\nblind_flange_dn50();"
+    }
+  ]
+}

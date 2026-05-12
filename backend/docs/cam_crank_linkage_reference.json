@@ -1,0 +1,163 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "cam_crank_linkage_reference",
+    "family_label": "Cams, Cranks and Linkages",
+    "units": "millimeters",
+    "scope": "Eccentric disc cams, plate cams, four-bar linkages, slider-cranks, scotch yoke, Geneva mechanisms.",
+    "retrieval": {
+      "primary_keywords": [
+        "cam",
+        "crank",
+        "linkage",
+        "eccentric",
+        "slider crank",
+        "four bar",
+        "scotch yoke",
+        "geneva",
+        "connecting rod",
+        "pivot",
+        "follower",
+        "mechanism"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "bracket",
+        "fan",
+        "enclosure",
+        "flange"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "POM (Delrin / Acetal)",
+        "use_case": "printed or machined cam and linkage arms",
+        "notes": "Self-lubricating at pivot contacts; low friction; dimensionally stable."
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined cranks and connecting rods",
+        "notes": "Good strength-to-weight; easy to drill pivot holes."
+      },
+      {
+        "material": "1045 steel",
+        "use_case": "loaded cranks and cam shafts",
+        "notes": "Through-harden to HRC 50 for cam lobe wear surfaces."
+      },
+      {
+        "material": "PETG / PA12",
+        "use_case": "3D-printed prototype mechanisms",
+        "notes": "PETG for light-duty; PA12 for functional with metal pivot pins."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "Grashof condition",
+        "applies_to": "four-bar linkage classification",
+        "note": "s + l < p + q for at least one link to rotate fully."
+      },
+      {
+        "name": "ISO 286-1 fits",
+        "applies_to": "pivot bore clearances",
+        "note": "H8/f7 for running clearance at pivot pins; pin bore = pin_d + 0.2 mm."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "eccentric_disc_cam",
+      "category": "cam",
+      "name": "Eccentric disc cam",
+      "aliases": [
+        "eccentric cam",
+        "offset cam",
+        "disc cam",
+        "simple cam"
+      ],
+      "standards": [
+        "ISO 286-1"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined",
+        "turned"
+      ],
+      "family": "cam_crank_linkage_reference",
+      "standard_dimensions_mm": {
+        "cam_diameter": 60,
+        "eccentricity": 10,
+        "cam_thickness": 12,
+        "bore_diameter": 8
+      },
+      "fit_guidance_mm": {
+        "bore": "shaft_d + 0.2 mm running fit",
+        "set_screw": "M4 radial through hub"
+      },
+      "constraint_parameters": {
+        "cam_diameter": {
+          "default": 60
+        },
+        "eccentricity": {
+          "default": 10,
+          "note": "stroke = 2 × eccentricity; keep ≤ cam_radius × 0.4"
+        },
+        "bore_diameter": {
+          "default": 8
+        }
+      },
+      "derived_parameters": {
+        "stroke": {
+          "formula": "2 * eccentricity"
+        },
+        "min_wall": {
+          "formula": "cam_radius - eccentricity - bore_radius",
+          "note": "must be ≥ 4 mm"
+        }
+      },
+      "main_features": [
+        "main disc cylinder",
+        "off-centre shaft bore",
+        "optional set-screw boss",
+        "flat face for follower contact"
+      ],
+      "design_rules": [
+        "bore subtracted at [eccentricity, 0, 0] not at origin",
+        "keep eccentricity ≤ cam_diameter/4 to retain wall",
+        "set-screw is radial cylinder from edge toward bore"
+      ],
+      "validation_criteria": [
+        "bore at eccentricity offset not at center",
+        "disc is single cylinder in union",
+        "difference has bore and optional set-screw"
+      ],
+      "failure_modes": [
+        "bore placed at disc center — not eccentric",
+        "eccentricity so large bore breaks disc wall",
+        "set-screw subtracted in wrong direction"
+      ],
+      "constraint_checks": [
+        {
+          "id": "eccentric_bore",
+          "severity": "error",
+          "expression": "bore translate uses eccentricity not [0,0,0]",
+          "message": "Eccentric cam bore must be offset from disc centre by eccentricity."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\ncam_diameter  = 60;\neccentricity  = 10;\ncam_thickness = 12;\nbore_diameter = 8;\nbore_clearance = 0.2;\n\nmodule eccentric_cam() {\n  difference() {\n    cylinder(h = cam_thickness, d = cam_diameter, center = true);\n    translate([eccentricity, 0, 0])\n      cylinder(h = cam_thickness + 2, d = bore_diameter + bore_clearance, center = true, $fn = 64);\n    translate([eccentricity + bore_diameter/2 + 3, 0, 0])\n      rotate([90, 0, 0])\n        cylinder(h = cam_diameter, d = 4.5, center = true, $fn = 32);\n  }\n}\n\neccentric_cam();"
+    }
+  ]
+}

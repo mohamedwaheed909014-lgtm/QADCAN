@@ -1,0 +1,166 @@
+HINGES, JOINTS AND SNAP-FITS REFERENCE
+Category: Mechanical Joints / Living Mechanisms
+Verified models: Thingiverse "print-in-place hinge parametric", Printables "snap fit box hinge",
+  GrabCAD "piano hinge", Thingiverse "ball joint socket OpenSCAD",
+  Cults3D "living hinge OpenSCAD", Printables "parametric hinge OpenSCAD"
+
+HINGE TYPES
+────────────
+1. Butt Hinge (standard two-leaf)
+   - Two flat plates + barrel pin
+   - Leaf length 20–100 mm, width 15–30 mm, pin ø3–6 mm
+
+2. Print-in-Place Hinge (single piece)
+   - Pin and barrel printed together with 0.3–0.5 mm clearance
+   - Knuckle count: 3, 5 (odd for symmetric opening)
+
+3. Living Hinge (flexure)
+   - Single thin membrane 0.5–1.2 mm; bends in place
+   - Best in TPU or thin PETG; not reliable in rigid PLA
+
+4. Piano / Continuous Hinge
+   - Long barrel runs full length of joint
+   - Multiple knuckles for load distribution
+
+5. Ball-and-Socket Joint
+   - Sphere in hemispherical socket; multi-axis rotation
+   - Used in robot arms, camera mounts, lights
+
+6. Clevis / Pin Joint
+   - Fork + blade + pin; single-axis rotation
+   - Common in linkage mechanisms
+
+PRINT-IN-PLACE HINGE PARAMETERS
+──────────────────────────────────
+  leaf_length          — length of each hinge plate (e.g. 40 mm)
+  leaf_width           — width perpendicular to hinge axis (e.g. 20 mm)
+  leaf_thickness       — 2–4 mm (thicker = stronger but heavier)
+  pin_diameter         — 4–8 mm; larger = stronger barrel
+  pin_clearance        — 0.3–0.4 mm between pin and barrel bore
+  knuckle_count        — 3 or 5 knuckles
+  knuckle_length       — leaf_length / (knuckle_count × 2 − 1)
+  barrel_length        — leaf_length (continuous barrel)
+  gap_between_leaves   — 0.3–0.5 mm (for free swing after printing)
+  opening_angle        — 180° full open; constrain with stop feature if less needed
+
+  module print_in_place_hinge(leaf_l=40, leaf_w=20, leaf_t=3,
+                               pin_d=5, knuckles=3, clearance=0.35) {
+    knuckle_l = leaf_l / (2*knuckles - 1);
+    // leaf A (knuckles at positions 1,3,5)
+    for(i=[0:knuckles-1])
+      translate([i*2*knuckle_l, 0, 0]) {
+        cube([knuckle_l, leaf_w, leaf_t]);                    // flat part
+        translate([knuckle_l/2, leaf_w/2, leaf_t])
+          rotate([90,0,0])
+            cylinder(h=leaf_w, d=pin_d, center=true, $fn=32); // pin
+      }
+    // leaf B (knuckles at positions 2,4) — barrels with clearance bore
+    for(i=[0:knuckles-2])
+      translate([(i*2+1)*knuckle_l, 0, leaf_t - clearance]) {
+        cube([knuckle_l, leaf_w, leaf_t]);
+        translate([knuckle_l/2, leaf_w/2, 0])
+          rotate([90,0,0])
+            cylinder(h=leaf_w, d=pin_d+2*clearance+2, center=true, $fn=32);
+      }
+  }
+
+BALL AND SOCKET JOINT
+──────────────────────
+  ball_diameter        — 15–30 mm; larger = more stable, more friction
+  socket_depth         — ball_diameter × 0.55–0.6 (retains ball, allows motion)
+  socket_od            — ball_diameter + 2 × wall (≥ 4 mm wall)
+  socket_opening       — ball_diameter − 2 mm (snap in; requires flex)
+  clearance            — 0.3–0.5 mm on ball diameter for smooth motion
+  friction_material    — PETG or TPU socket; PLA ball for smooth sliding
+
+  module ball_socket(ball_d=20, wall=4, clearance=0.4) {
+    socket_d = ball_d + 2*clearance;
+    difference() {
+      sphere(d=socket_d + 2*wall, $fn=64);          // outer shell
+      sphere(d=socket_d, $fn=64);                   // ball cavity
+      translate([0, 0, socket_d/2*0.5])
+        cylinder(h=socket_d, d=socket_d, $fn=64);   // open top (≥50% of sphere)
+    }
+  }
+
+SNAP-FIT CANTILEVER HOOK
+─────────────────────────
+  arm_length           — 8–15 mm (longer = more flexible, less force)
+  arm_width            — 3–8 mm (wider = higher retention force)
+  arm_thickness        — 1.2–2.5 mm (thinner = less insertion force)
+  hook_height          — 0.5–1.5 mm (overhang that locks)
+  hook_lead_angle      — 30–45° chamfer on entry side (ease of insertion)
+  hook_lock_angle      — 90° (max retention) or 45–60° (easy release)
+  beam_deflection      — hook_height / (arm_thickness × factor) → keep < 70% yield strain
+
+  Retention force ≈ (E × arm_thickness³ × hook_height) / (4 × arm_length³)
+  PLA E modulus ≈ 3500 MPa; PETG ≈ 2100 MPa; TPU ≈ 50 MPa
+
+  module snap_tab(length=12, width=6, thickness=1.8, hook_h=0.8) {
+    union() {
+      cube([length, width, thickness]);
+      // hook at end
+      translate([length, 0, 0])
+        rotate([0, -30, 0])
+          cube([hook_h*1.5, width, hook_h]);
+    }
+  }
+
+LIVING HINGE
+─────────────
+  hinge_width          — perpendicular to fold axis; 10–30 mm
+  hinge_thickness      — 0.5–0.8 mm TPU; 0.6–1.0 mm flexible PETG
+  hinge_length         — along fold axis; 2–5 mm (short = stiffer)
+  stiffener_width      — panel thickness each side: 2–4 mm
+
+CLEVIS JOINT
+─────────────
+  pin_diameter         — M4, M5 or M6 bolt
+  clevis_gap           — blade_thickness + 0.4 mm
+  eye_od               — pin_d + 2 × wall (≥ 3 mm each side)
+  clevis_fork_od       — eye_od + 2 × wall
+
+DESIGN RULES
+────────────
+  - Print-in-place: print slowly (20–30 mm/s); 0.3–0.4 mm clearance; lay flat on bed
+  - Ball joint: print socket in 2 halves or with opening facing up; no supports needed
+  - Snap-fit: PLA arms work for light duty; PETG preferred for repeated flex (fatigue)
+  - Living hinge: single wall perimeter only for flex zone; 0° infill (none) in hinge zone
+  - Clevis pin: use M-bolt as pin; nyloc nut on end prevents backing out under vibration
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A hinge has alternating knuckles, a pin axis, and leaves/plates that attach to parts.
+- Leaves and knuckles are solid material in union().
+- Pin bore, mounting holes, clearances between knuckles, and snap reliefs are removed material in difference().
+- Hinge knuckles are short cylinders aligned on the hinge axis, usually X or Y.
+- Alternating knuckles are placed along the hinge axis with gaps.
+- Snap-fit arms are cantilever beams with relief space around them.
+- Living hinge zones are thin flexible strips; model as a thin rectangular bridge.
+- Do not merge all knuckles into one continuous cylinder if the prompt asks for a real hinge.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn hinge, joint, and snap-fit rules into OpenSCAD.
+
+Rule: hinge leaf is a flat mounting plate.
+OpenSCAD action:
+  cube([leaf_length, leaf_width, leaf_thickness], center=true);
+
+Rule: hinge knuckle is a cylinder aligned on hinge axis.
+OpenSCAD action:
+  translate([0,knuckle_y,knuckle_z])
+    rotate([0,90,0]) cylinder(h=knuckle_length, d=knuckle_outer_diameter, center=true, $fn=64);
+
+Rule: alternating knuckles are separated by clearance gaps.
+OpenSCAD action:
+  for (x=[-hinge_width/3, hinge_width/3])
+    translate([x,0,0]) rotate([0,90,0]) cylinder(h=knuckle_length, d=knuckle_outer_diameter, center=true, $fn=64);
+
+Rule: pin bore passes through all knuckles.
+OpenSCAD action:
+  rotate([0,90,0]) cylinder(h=hinge_width+2, d=pin_diameter+clearance, center=true, $fn=48);
+
+Rule: snap-fit arm is a cantilever beam with relief gap.
+OpenSCAD action:
+  cube([arm_length, arm_width, arm_thickness], center=true);
+  translate([0,0,-relief_gap]) cube([arm_length+2, arm_width+2, relief_gap], center=true);

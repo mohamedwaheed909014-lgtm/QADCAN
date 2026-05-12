@@ -1,0 +1,179 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "pulley_belt_drive_reference",
+    "family_label": "Pulleys and Belt Drive",
+    "units": "millimeters",
+    "scope": "GT2/GT3 timing pulleys, idler pulleys, V-belt sheaves, belt tension calculations.",
+    "retrieval": {
+      "primary_keywords": [
+        "pulley",
+        "belt drive",
+        "gt2",
+        "gt2 pulley",
+        "timing pulley",
+        "belt pulley",
+        "idler pulley",
+        "toothed pulley",
+        "20 tooth",
+        "flanged pulley",
+        "pitch diameter pulley"
+      ],
+      "negative_keywords": [
+        "sprocket chain",
+        "gear",
+        "bearing housing",
+        "bracket",
+        "fan",
+        "enclosure",
+        "flange pipe"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined GT2 and HTD pulleys",
+        "notes": "Best surface finish for belt engagement; light; anodise for wear."
+      },
+      {
+        "material": "POM (Delrin)",
+        "use_case": "printed or machined idler pulleys",
+        "notes": "Self-lubricating; good for belt contact surfaces."
+      },
+      {
+        "material": "PETG / PA12",
+        "use_case": "3D-printed timing pulleys for prototypes",
+        "notes": "PA12 preferred; increase $fn to tooth_count × 4 for smooth tooth form."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "GT2 belt profile",
+        "applies_to": "tooth pitch, height, and radius",
+        "note": "pitch 2.0 mm, tooth height ≈ 0.75 mm, tooth radius 0.555 mm."
+      },
+      {
+        "name": "GT2 pitch diameter formula",
+        "applies_to": "pulley sizing",
+        "note": "pitch_d = teeth × 2.0 / PI. 20T GT2: pitch_d = 12.73 mm, OD ≈ 14.8 mm."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "gt2_pulley_20t",
+      "category": "timing_pulley",
+      "name": "GT2 20-tooth timing pulley",
+      "aliases": [
+        "gt2 pulley",
+        "20t gt2",
+        "timing pulley",
+        "belt pulley",
+        "gt2 20 teeth"
+      ],
+      "standards": [
+        "GT2 belt profile"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined aluminum"
+      ],
+      "family": "pulley_belt_drive_reference",
+      "standard_dimensions_mm": {
+        "teeth": 20,
+        "belt_pitch": 2.0,
+        "pitch_d": 12.73,
+        "belt_width": 6,
+        "bore_d": 5,
+        "hub_d": 12,
+        "hub_w": 10,
+        "flange_h": 1.5
+      },
+      "fit_guidance_mm": {
+        "bore": "shaft_d + 0.1 for press; + 0.2 for running fit"
+      },
+      "constraint_parameters": {
+        "teeth": {
+          "default": 20,
+          "min": 16
+        },
+        "belt_width": {
+          "default": 6,
+          "options": [
+            6,
+            9,
+            15
+          ]
+        },
+        "bore_d": {
+          "default": 5
+        }
+      },
+      "derived_parameters": {
+        "pitch_d": {
+          "formula": "teeth * belt_pitch / PI"
+        },
+        "pulley_od": {
+          "formula": "pitch_d + 1.5"
+        },
+        "flange_d": {
+          "formula": "pulley_od + 2*flange_h + 1"
+        }
+      },
+      "main_features": [
+        "main pulley rim cylinder at pitch diameter",
+        "two flanges at top and bottom of belt width",
+        "hub cylinder extending for bore engagement",
+        "shaft bore through hub",
+        "set-screw hole radially through hub",
+        "simplified tooth features around pitch circle"
+      ],
+      "design_rules": [
+        "pitch_d computed from teeth and pitch — not from bore",
+        "flanges larger than pulley_od to retain belt",
+        "teeth are subtractive or additive features around pitch circle",
+        "set-screw hole perpendicular to bore aimed at bore center",
+        "hub extends beyond belt width for secure shaft grip"
+      ],
+      "validation_criteria": [
+        "pitch_d derived from formula",
+        "flanges at both ends of belt width",
+        "bore through full hub length",
+        "set-screw radial hole present"
+      ],
+      "failure_modes": [
+        "pitch_d equal to bore_d — completely wrong",
+        "no flanges — belt walks off",
+        "set-screw missing — pulley slips on shaft"
+      ],
+      "constraint_checks": [
+        {
+          "id": "pitch_formula",
+          "severity": "error",
+          "expression": "pitch_d = teeth * pitch / PI",
+          "message": "GT2 pulley pitch diameter must be derived from teeth × pitch / PI."
+        },
+        {
+          "id": "flanges",
+          "severity": "warning",
+          "expression": "two flange cylinders present",
+          "message": "Timing pulley should have flanges to retain the belt."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\nteeth         = 20;\nbelt_pitch    = 2.0;\nbelt_width    = 6;\nbore_d        = 5;\nbore_clearance = 0.15;\nhub_d         = 12;\nhub_w         = 12;\nflange_h      = 1.5;\nflange_t      = 1.5;\n\npitch_d   = teeth * belt_pitch / PI;\npulley_od = pitch_d + 1.5;\nflange_d  = pulley_od + 2 * flange_h;\ntotal_h   = belt_width + 2 * flange_t;\n\nmodule gt2_pulley_20t() {\n  difference() {\n    union() {\n      cylinder(h = total_h, d = flange_d, center = true);\n      cylinder(h = hub_w, d = hub_d, center = true);\n    }\n    cylinder(h = belt_width, d = pulley_od, center = true);\n    cylinder(h = hub_w + 2, d = bore_d + bore_clearance, center = true, $fn = 64);\n    rotate([90, 0, 0])\n      cylinder(h = pulley_od + 2, d = 3.2, center = true, $fn = 32);\n    for (i = [0 : teeth - 1])\n      rotate([0, 0, 360 * i / teeth])\n        translate([pitch_d/2, 0, 0])\n          cylinder(h = belt_width + 2, r = belt_pitch * 0.3, center = true, $fn = 12);\n  }\n}\n\ngt2_pulley_20t();"
+    }
+  ]
+}

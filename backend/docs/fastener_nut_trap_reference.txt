@@ -1,0 +1,145 @@
+FASTENERS, NUT TRAPS AND HEAT INSERTS REFERENCE
+Category: Fastening Hardware
+Verified models: Thingiverse "M3 nut trap test" (multiple), Printables "heat set insert holder",
+  GrabCAD "bolt and nut ISO standard", Thingiverse "parametric nut trap OpenSCAD"
+
+ISO METRIC BOLT CLEARANCE HOLES
+──────────────────────────────────
+  Bolt  Close  Normal  Loose   Cap head OD  Cap head H   Hex nut F-F  Hex nut H   Washer OD
+  M2    2.2    2.4     2.6     3.8          2.0          4.0          1.6          5.0
+  M2.5  2.7    2.9     3.1     4.5          2.5          5.0          2.0          6.0
+  M3    3.2    3.4     3.6     5.5          3.0          5.5          2.4          7.0
+  M4    4.3    4.5     4.8     7.0          4.0          7.0          3.2          9.0
+  M5    5.3    5.5     5.8     8.5          5.0          8.0          4.0         10.0
+  M6    6.4    6.6     7.0    10.0          6.0         10.0          5.0         12.0
+  M8    8.4    9.0     9.0    13.0          8.0         13.0          6.5         17.0
+  M10  10.5   11.0    12.0    16.0         10.0         17.0          8.0         21.0
+  M12  12.5   13.0    14.5    18.0         12.0         19.0         10.0         24.0
+
+ISO METRIC NUT DIMENSIONS
+───────────────────────────
+  M2  : flat-to-flat 4.0 mm, height 1.6 mm, corner-to-corner 4.62 mm
+  M2.5: flat-to-flat 5.0 mm, height 2.0 mm
+  M3  : flat-to-flat 5.5 mm, height 2.4 mm, corner-to-corner 6.35 mm
+  M4  : flat-to-flat 7.0 mm, height 3.2 mm, corner-to-corner 8.08 mm
+  M5  : flat-to-flat 8.0 mm, height 4.0 mm, corner-to-corner 9.24 mm
+  M6  : flat-to-flat 10.0 mm, height 5.0 mm, corner-to-corner 11.55 mm
+  M8  : flat-to-flat 13.0 mm, height 6.5 mm, corner-to-corner 15.01 mm
+  M10 : flat-to-flat 17.0 mm, height 8.0 mm
+
+NUT TRAP DIMENSIONS (printed pocket)
+──────────────────────────────────────
+  Add 0.15–0.2 mm to flat-to-flat for printable hex pocket:
+  M3 trap: flat_to_flat = 5.7 mm, depth = 2.6 mm  (hex_d = F-F / cos(30°) = 6.58 mm outer circle)
+  M4 trap: flat_to_flat = 7.2 mm, depth = 3.4 mm
+  M5 trap: flat_to_flat = 8.2 mm, depth = 4.2 mm
+  M6 trap: flat_to_flat = 10.2 mm, depth = 5.2 mm
+  M8 trap: flat_to_flat = 13.2 mm, depth = 6.7 mm
+
+  // Hex nut pocket module
+  module hex_nut_trap(flat_to_flat, nut_height, bolt_d) {
+    // nut pocket from below (for side-insertion, rotate 90°)
+    cylinder(h=nut_height+0.2, d=flat_to_flat/cos(30), $fn=6);
+    // bolt clearance through
+    cylinder(h=nut_height+20, d=bolt_d+0.4, $fn=32);
+  }
+
+SQUARE NUT TRAPS (often easier to print)
+──────────────────────────────────────────
+  M3 square nut: 5.5 × 5.5 mm, thickness 2.4 mm  → pocket 5.7 × 5.7 × 2.6 mm
+  M4 square nut: 7.0 × 7.0 mm, thickness 3.2 mm  → pocket 7.2 × 7.2 × 3.4 mm
+  M5 square nut: 8.0 × 8.0 mm, thickness 4.0 mm  → pocket 8.2 × 8.2 × 4.2 mm
+
+  module square_nut_trap(nut_w, nut_h, bolt_d) {
+    cube([nut_w+0.2, nut_w+0.2, nut_h+0.2], center=true);
+    cylinder(h=nut_h+20, d=bolt_d+0.4, center=true, $fn=32);
+  }
+
+HEAT-SET (BRASS) INSERT DIMENSIONS
+────────────────────────────────────
+  M2  insert: OD 3.2 mm, length 4.0 mm → print hole ø3.2 mm
+  M3  insert: OD 4.5 mm, length 5.7 mm → print hole ø4.2–4.5 mm
+  M4  insert: OD 6.0 mm, length 7.1 mm → print hole ø5.6–6.0 mm
+  M5  insert: OD 7.0 mm, length 7.1 mm → print hole ø6.6–7.0 mm
+  Knurled insert (CNC Kitchen type, common):
+  M3 × 4 mm : OD 4.6 mm → hole ø4.0 mm (0.2 mm squeeze for brass)
+
+COUNTERSUNK (CSK) HOLES (90° included angle)
+──────────────────────────────────────────────
+  M3 CSK: head OD 6.0 mm, angle 90°  → cone cylinder: d1=bolt_d, d2=6.5, h=3.0
+  M4 CSK: head OD 8.0 mm            → d2=8.5, h=4.0
+  M5 CSK: head OD 9.5 mm            → d2=10.0, h=5.0
+  M6 CSK: head OD 12.0 mm           → d2=12.5, h=6.0
+
+  module csk_hole(bolt_d, csk_d, depth) {
+    cylinder(h=depth+50, d=bolt_d+0.4, $fn=32);
+    cylinder(h=depth, d1=csk_d, d2=bolt_d, $fn=32);
+  }
+
+T-NUT FOR ALUMINIUM EXTRUSION
+──────────────────────────────
+  2020 T-nut (M5): head 5.85 × 2.75 mm, fits 6 mm slot
+  3030 T-nut (M6): head 7.90 × 3.30 mm
+  4040 T-nut (M8): head 9.80 × 4.00 mm
+  Drop-in T-nut spring: spring steel, drops into slot at any position
+
+BOLT PATTERN ARRAYS
+────────────────────
+  // Rectangular 4-hole pattern
+  module bolt_pattern_rect(lx, ly, hole_d, depth) {
+    for(x=[-lx/2, lx/2]) for(y=[-ly/2, ly/2])
+      translate([x, y, 0]) cylinder(h=depth+2, d=hole_d, $fn=32);
+  }
+  // Circular N-hole pattern
+  module bolt_pattern_circle(bolt_circle_d, n_holes, hole_d, depth) {
+    for(i=[0:n_holes-1])
+      rotate([0,0,360*i/n_holes])
+        translate([bolt_circle_d/2, 0, 0])
+          cylinder(h=depth+2, d=hole_d, $fn=32);
+  }
+
+DESIGN RULES
+────────────
+  - Side-entry nut traps: orient so nut slides in from side during assembly; depth = nut height + 0.2 mm
+  - Bottom nut traps: flat bottom; add 0.5 mm extra depth for imperfect first layers
+  - Heat inserts: print hole 0.2–0.4 mm smaller than insert OD; insert while hot, flush with surface
+  - Minimum wall around bolt hole: ≥ 1.5 × bolt_diameter from hole edge to part edge
+  - For through-bolts: use nut trap on far side OR capture nut with separate cap
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- Fastener features are mostly removed material inside a host part.
+- Clearance holes are cylinders subtracted through the part.
+- Counterbores are larger shallow cylinders subtracted coaxially with the main hole.
+- Countersinks are conical cuts using cylinder(d1=head_d, d2=hole_d).
+- Hex nut traps are hexagonal prism voids made by cylinder($fn=6) and subtracted.
+- Heat-set insert pockets are cylindrical holes sized near insert outside diameter.
+- Captive nut pockets need a side access slot if the nut is inserted from the edge.
+- Always include surrounding host material in union() first, then subtract fastener features in difference().
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn fastener and nut-trap rules into OpenSCAD.
+
+Rule: clearance hole removes a cylinder through the part.
+OpenSCAD action:
+  cylinder(h=part_thickness+2, d=bolt_clearance_diameter, center=true, $fn=48);
+
+Rule: counterbore is a larger shallow coaxial recess.
+OpenSCAD action:
+  translate([0,0,part_thickness/2-counterbore_depth/2])
+    cylinder(h=counterbore_depth+0.2, d=head_diameter+clearance, center=true, $fn=64);
+
+Rule: countersink is a conical recess.
+OpenSCAD action:
+  translate([0,0,part_thickness/2-countersink_depth/2])
+    cylinder(h=countersink_depth, d1=head_diameter, d2=bolt_clearance_diameter, center=true, $fn=64);
+
+Rule: hex nut trap is a six-sided prism void.
+OpenSCAD action:
+  rotate([0,0,30])
+    cylinder(h=nut_thickness+clearance, d=nut_across_corners+clearance, center=true, $fn=6);
+
+Rule: side-entry captive nut slot allows insertion.
+OpenSCAD action:
+  translate([slot_length/2,0,nut_z])
+    cube([slot_length, nut_across_flats+clearance, nut_thickness+clearance], center=true);

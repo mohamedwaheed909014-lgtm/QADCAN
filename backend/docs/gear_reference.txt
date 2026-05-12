@@ -1,0 +1,260 @@
+GEAR REFERENCE
+Category: Power Transmission / Gearing
+Verified models: Thingiverse thing:3575 (GregFrost Involute Spur+Bevel), thing:1604369 (janssen86 full gear library),
+  thing:4194148 (eleotlecram OpenSCAD gear library), thing:7316286 (scottneumann configurable gears+pulleys),
+  Printables #468248 (enhanced planetary gear bearing), thing:6902903 (neri-engineering spur/helical library)
+
+GEAR TYPES
+──────────
+1. Spur Gear          — straight parallel teeth, simplest, most common
+2. Helical Gear       — angled teeth, quieter, axial thrust load
+3. Bevel Gear         — intersecting axes (usually 90°), tapered teeth
+4. Worm / Worm Gear   — high reduction ratio, non-reversible, 90° crossed axes
+5. Rack & Pinion      — rotary → linear motion conversion
+6. Internal/Ring Gear — teeth on inside bore, used in planetary sets
+7. Planetary Gear Set — sun + planet + ring; compact, high reduction, coaxial I/O
+
+INVOLUTE SPUR GEAR GEOMETRY (ISO 53 / DIN 867)
+───────────────────────────────────────────────
+  module m          — tooth size in mm (pitch_diameter / number_of_teeth)
+                      standard values: 0.5 0.8 1.0 1.25 1.5 2.0 2.5 3.0 4.0 5.0
+  number_of_teeth n — must satisfy: n_pinion ≥ 14 to avoid undercutting (pressure_angle 20°)
+  pressure_angle α  — standard 20° (also 14.5° and 25°)
+  pitch_diameter d  — d = m × n
+  addendum a        — a = m  (tooth tip above pitch circle)
+  dedendum b        — b = 1.25 × m  (tooth root below pitch circle)
+  outside_diameter  — d + 2m
+  root_diameter     — d − 2.5m
+  face_width        — typically 8–12 × m for spur gears
+  center_distance   — (d1 + d2) / 2  = m × (n1 + n2) / 2
+  backlash          — 0.1–0.3 mm printed; 0.05–0.1 mm machined
+
+COMMON MODULE / TOOTH COUNT COMBINATIONS (real designs)
+────────────────────────────────────────────────────────
+  m=1, n=20 → d=20 mm    (small robot joint)
+  m=2, n=20 → d=40 mm    (3D printer drive gear, extruder)
+  m=2, n=30 → d=60 mm    (CNC reduction stage)
+  m=2, n=40/20 → 2:1     (motor reduction)
+  m=3, n=15/45 → 3:1     (gearbox first stage)
+  m=2, n=20/60 → 3:1 rack+pinion on CNC
+  m=1, n=12 (sun) n=10×3 (planets) n=32 (ring) → planetary
+
+KEY PARAMETERS
+──────────────
+  gear_module         — controls tooth size (1–5 for printed parts)
+  num_teeth           — n ≥ 14 to avoid undercutting
+  pressure_angle      — 20° standard
+  face_width          — gear thickness in Z
+  bore_diameter       — shaft bore; add 0.2–0.3 mm clearance
+  hub_diameter        — ≥ bore + 6 mm wall
+  hub_length          — ≥ face_width (or extend beyond for keyway/set-screw)
+  set_screw_diameter  — M3 for shafts ≤10 mm, M4 for ≤20 mm
+  keyway_width        — shaft_d/4 (DIN 6885A standard)
+  keyway_depth        — keyway_width/2
+  helix_angle         — 0° spur; 15–30° helical (keep ≤45° for printability)
+  backlash_adjust     — 0.1–0.25 mm offset applied to tooth profile for mesh clearance
+
+OPENSCAD APPROACH (vanilla, no library)
+────────────────────────────────────────
+  // Simplified spur gear using cylinder + tooth approximation
+  module spur_gear(m=2, n=20, width=8, bore=5) {
+    pitch_r   = m * n / 2;
+    outer_r   = pitch_r + m;
+    root_r    = pitch_r - 1.25*m;
+    tooth_w   = PI * m * 0.5;   // approximate tooth width at pitch circle
+    difference() {
+      union() {
+        cylinder(h=width, r=root_r, center=true, $fn=128);
+        for(i=[0:n-1])
+          rotate([0,0,360*i/n])
+            translate([pitch_r, 0, 0])
+              cylinder(h=width, r=tooth_w/2, center=true, $fn=8);
+      }
+      cylinder(h=width+2, d=bore+0.3, center=true, $fn=64);
+    }
+  }
+
+WORM GEAR PARAMETERS
+─────────────────────
+  worm_module       — same as gear module; controls mesh pitch
+  lead_angle        — atan(module × starts / worm_pitch_diameter); typically 3–25°
+  num_starts        — 1 (self-locking) to 4 (back-driveable)
+  worm_gear_teeth   — 20–60 typical
+  reduction_ratio   — worm_gear_teeth / num_starts
+  centre_distance   — (worm_OD/2) + (worm_gear_pitch_d/2)
+
+RACK PARAMETERS
+───────────────
+  rack_module       — must match pinion module
+  rack_length       — travel + pinion_diameter (to allow full engagement)
+  rack_height       — ≥ 2.5 × module + mount_thickness
+  rack_width        — ≥ face_width of mating pinion
+
+DESIGN RULES
+────────────
+  - Minimum 17 teeth on driving pinion to avoid undercutting at 20° pressure angle
+  - For 3D printing: module ≥ 1.5; face width ≥ 6 mm for strength
+  - Mating gear pair must share identical module AND pressure angle
+  - For high torque: helical gears, face width = 10–12 × module
+  - Print gears on their side (teeth horizontal) for best tooth strength
+  - Add 0.2 mm backlash clearance per gear when designing mesh fits
+
+REAL-WORLD GEAR TYPE MODELING RULES
+───────────────────────────────────
+Spur gear:
+  - Straight teeth on a cylindrical blank.
+  - pitch_diameter = module * tooth_count.
+  - outside_diameter = pitch_diameter + 2 * module.
+  - root_diameter = pitch_diameter - 2.5 * module.
+  - Include hub, bore, optional keyway, and optional lightening holes.
+  - Use a for-loop around tooth_count for teeth; do not make a smooth disk only.
+
+Helical / spiral gear:
+  - A spiral gear in this app means a cylindrical helical gear unless the user asks for spiral bevel.
+  - Use normal_module and helix_angle as design inputs.
+  - transverse_module = normal_module / cos(helix_angle).
+  - pitch_diameter = transverse_module * tooth_count.
+  - Model tooth twist with linear_extrude(twist=...) or stepped rotated tooth slices.
+  - Parallel helical gear pairs use opposite hands; helical gears create axial thrust.
+  - For herringbone gears, mirror left and right helix halves at the center to cancel thrust.
+
+Straight bevel gear:
+  - For intersecting shafts, usually 90 degrees.
+  - Use conical gear bodies, not flat cylinders.
+  - For 90 degree shafts: pitch_angle_pinion = atan(pinion_teeth / gear_teeth), pitch_angle_gear = 90 - pitch_angle_pinion.
+  - cone_distance = sqrt(pinion_pitch_radius^2 + gear_pitch_radius^2).
+  - face_width should be <= cone_distance / 3.
+  - Teeth taper toward the cone apex and repeat around the shaft axis.
+  - Equal-tooth miter gears have 45 degree pitch angles.
+
+Spiral bevel gear:
+  - Combines bevel cone taper with spiral tooth sweep.
+  - Use pitch angles and cone_distance like a bevel gear.
+  - Add spiral_angle, usually about 30 to 35 degrees.
+  - Model simplified teeth as repeated tapered teeth that progressively rotate across face width.
+  - Do not output a flat helical gear for a spiral bevel request.
+  - Real examples include automotive differential pinion and ring gears.
+
+Worm gear:
+  - A worm drive has a screw-like worm and a matching worm wheel on crossed 90 degree axes.
+  - worm_wheel_pitch_diameter = module * worm_wheel_teeth.
+  - reduction_ratio = worm_wheel_teeth / worm_starts.
+  - centre_distance = (worm_pitch_diameter + worm_wheel_pitch_diameter) / 2.
+  - lead_angle = atan(module * worm_starts / worm_pitch_diameter).
+  - One-start worms with low lead angle are often self-locking; multi-start worms are more efficient and can back-drive.
+  - Use steel worm with bronze or POM wheel for realistic wear behavior.
+  - The wheel should have a broad face and preferably a concave/throated rim impression.
+
+Planetary gear set:
+  - Contains sun gear, planet gears, internal ring gear, and carrier.
+  - All gears share module and pressure angle.
+  - ring_teeth = sun_teeth + 2 * planet_teeth.
+  - planet_center_radius = module * (sun_teeth + planet_teeth) / 2.
+  - Fixed-ring reduction ratio = 1 + ring_teeth / sun_teeth.
+  - Planets are placed equally with cos/sin around the carrier pin circle.
+  - Ring gear teeth face inward; do not model the ring as an external gear.
+  - Carrier must include planet pin holes or bearing seats.
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A gear is a rotating disk with repeated teeth around a pitch circle.
+- Hub, web, rim, and teeth are solid material in union().
+- Shaft bore, keyway, lightening holes, and set-screw holes are removed material in difference().
+- Tooth count controls angular repetition; place each tooth with rotate([0,0,360*i/teeth]).
+- Pitch radius is derived from module and tooth count, not from bore diameter.
+- If exact involute teeth are not implemented, make a simplified parametric tooth approximation and name parameters clearly.
+- Lightening holes are repeated around a smaller bolt circle and subtracted.
+- A gear pair should place two gears separated by the sum of pitch radii.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn gear-design rules into OpenSCAD.
+
+Rule: pitch radius comes from module and tooth count.
+OpenSCAD action:
+  pitch_diameter = module_size * tooth_count;
+  pitch_radius = pitch_diameter / 2;
+  outer_radius = pitch_radius + module_size;
+
+Rule: simplified tooth repeats around gear center.
+OpenSCAD action:
+  for (i=[0:tooth_count-1])
+    rotate([0,0,360*i/tooth_count])
+      translate([pitch_radius,0,0])
+        cube([tooth_depth, tooth_width, gear_thickness], center=true);
+
+Rule: gear body and hub are solid material.
+OpenSCAD action:
+  union() {
+    cylinder(h=gear_thickness, d=pitch_diameter, center=true, $fn=tooth_count*6);
+    cylinder(h=hub_width, d=hub_diameter, center=true, $fn=96);
+  }
+
+Rule: shaft bore and keyway are removed material.
+OpenSCAD action:
+  cylinder(h=hub_width+2, d=bore_diameter+clearance, center=true, $fn=96);
+  translate([0,bore_diameter/2,0]) cube([keyway_width, keyway_depth*2, hub_width+2], center=true);
+
+Rule: lightening holes repeat inside web.
+OpenSCAD action:
+  for (i=[0:lightening_count-1])
+    rotate([0,0,360*i/lightening_count])
+      translate([lightening_radius,0,0]) cylinder(h=gear_thickness+2, d=lightening_hole_d, center=true, $fn=48);
+
+CURATED MODELING-GAP CORRECTION: FINAL DRIVE GEAR ASSEMBLY
+Source baseline: research paper failure-mode correction for complex mechanical assemblies.
+Use this when the user asks for a final drive gear, drive gear, gear with hub, gear with keyway, gear with bolt circle, or gear assembly.
+
+Real mechanical interpretation:
+- A final drive gear is not only a toothed disk.
+- It should clearly separate gear teeth, gear body/web, hub, shaft bore, keyway, and mounting bolt circle.
+- Tooth count and module define pitch diameter.
+- The bore diameter is the shaft interface; it must not be used as pitch diameter.
+- Mounting holes are repeated around a bolt circle and must be subtracted from the solid gear body.
+
+OpenSCAD action:
+```scad
+$fn = 96;
+
+module_size = 2;
+teeth = 36;
+gear_thickness = 10;
+bore_diameter = 12;
+bore_clearance = 0.3;
+hub_diameter = 32;
+hub_width = 18;
+keyway_width = 4;
+keyway_depth = 2;
+bolt_count = 6;
+bolt_circle_diameter = 46;
+bolt_hole_diameter = 5.5;
+
+pitch_diameter = module_size * teeth;
+pitch_radius = pitch_diameter / 2;
+tooth_depth = module_size * 1.6;
+tooth_width = module_size * 1.1;
+
+module final_drive_gear() {
+  difference() {
+    union() {
+      cylinder(h=gear_thickness, d=pitch_diameter, center=true, $fn=teeth*4);
+      cylinder(h=hub_width, d=hub_diameter, center=true, $fn=96);
+      for (i=[0:teeth-1])
+        rotate([0,0,360*i/teeth])
+          translate([pitch_radius,0,0])
+            cube([tooth_depth, tooth_width, gear_thickness], center=true);
+    }
+
+    cylinder(h=hub_width+2, d=bore_diameter+bore_clearance, center=true, $fn=96);
+    translate([0,bore_diameter/2,0])
+      cube([keyway_width, keyway_depth*2, hub_width+2], center=true);
+
+    for (i=[0:bolt_count-1]) {
+      angle = 360*i/bolt_count;
+      translate([cos(angle)*bolt_circle_diameter/2, sin(angle)*bolt_circle_diameter/2, 0])
+        cylinder(h=gear_thickness+2, d=bolt_hole_diameter, center=true, $fn=48);
+    }
+  }
+}
+
+final_drive_gear();
+```

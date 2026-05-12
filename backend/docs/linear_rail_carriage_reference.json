@@ -1,0 +1,157 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "linear_rail_carriage_reference",
+    "family_label": "Linear Rails, Rods and Carriages",
+    "units": "millimeters",
+    "scope": "LM-series rod carriages, MGN rail adapter plates, V-slot wheel plates, smooth-rod end holders.",
+    "retrieval": {
+      "primary_keywords": [
+        "linear rail",
+        "carriage",
+        "guide rail",
+        "linear bearing",
+        "mgn12",
+        "mgn9",
+        "lm8uu",
+        "rod carriage",
+        "v-slot carriage",
+        "linear guide",
+        "smooth rod",
+        "carriage block"
+      ],
+      "negative_keywords": [
+        "lead screw nut",
+        "gear",
+        "fan mount",
+        "enclosure",
+        "flange pipe",
+        "bearing housing pillow"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined carriage plates for CNC and robotics",
+        "notes": "Rigid; bore rod holes to H7 for tight LM bearing fit."
+      },
+      {
+        "material": "PA12-CF",
+        "use_case": "functional 3D-printed carriage blocks",
+        "notes": "Lower creep than PLA; add metal rod inserts for bore accuracy."
+      },
+      {
+        "material": "PETG",
+        "use_case": "prototype carriages and low-speed applications",
+        "notes": "Acceptable for light-duty; bore may wear over time."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "LM-series linear bearing standard",
+        "applies_to": "bearing OD, bore, and length",
+        "note": "LM8UU: bore 8 mm, OD 15 mm, length 24 mm. Housing bore = OD + 0.0/+0.05 mm transition fit."
+      },
+      {
+        "name": "MGN12H carriage footprint",
+        "applies_to": "bolt hole pattern",
+        "note": "MGN12H: 33×27 mm, 4×M3 holes on 20×20 mm pattern."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "dual_rod_carriage_lm8uu",
+      "category": "rod_carriage",
+      "name": "Dual LM8UU rod carriage",
+      "aliases": [
+        "rod carriage",
+        "linear bearing block",
+        "lm8uu carriage",
+        "dual rod block",
+        "bearing carriage"
+      ],
+      "standards": [
+        "LM-series"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined"
+      ],
+      "family": "linear_rail_carriage_reference",
+      "standard_dimensions_mm": {
+        "rod_spacing": 40,
+        "lm_od": 15,
+        "lm_length": 24,
+        "side_wall": 5,
+        "top_wall": 4,
+        "end_wall": 6
+      },
+      "fit_guidance_mm": {
+        "rod_bore": "LM8UU OD + 0.1 mm = 15.1 mm (transition/press fit)"
+      },
+      "constraint_parameters": {
+        "rod_spacing": {
+          "default": 40,
+          "note": "must match printer or CNC frame"
+        },
+        "lm_od": {
+          "default": 15,
+          "note": "LM8UU; LM10UU = 19 mm"
+        }
+      },
+      "derived_parameters": {
+        "carriage_length": {
+          "formula": "lm_length + 2*end_wall"
+        },
+        "carriage_width": {
+          "formula": "rod_spacing + lm_od + 2*side_wall"
+        }
+      },
+      "main_features": [
+        "rectangular solid carriage",
+        "two parallel rod bores along travel axis",
+        "mounting holes on top face for payload",
+        "optional nut pocket for lead screw if combined with actuator"
+      ],
+      "design_rules": [
+        "rod bores horizontal along X axis, symmetric about Y=0 at rod_spacing/2",
+        "bore diameter = lm_od + 0.1 mm (transition fit)",
+        "mounting holes on top face in symmetric grid",
+        "carriage length ≥ lm_length + 2*end_wall"
+      ],
+      "validation_criteria": [
+        "two rod bores parallel in difference",
+        "mounting holes on top face",
+        "carriage solid cube in union"
+      ],
+      "failure_modes": [
+        "single rod bore instead of two",
+        "bore too large — bearing slips",
+        "no mounting holes on top"
+      ],
+      "constraint_checks": [
+        {
+          "id": "two_bores",
+          "severity": "error",
+          "expression": "two rod bore cylinders",
+          "message": "Dual-rod carriage needs two parallel rod bores."
+        }
+      ],
+      "openscad_module": "$fn = 64;\n\nrod_d       = 8;\nlm_od       = 15;\nlm_length   = 24;\nrod_spacing = 40;\nend_wall    = 6;\nside_wall   = 5;\ntop_wall    = 4;\nmount_hole_d = 4.5;\n\ncar_l = lm_length + 2*end_wall;\ncar_w = rod_spacing + lm_od + 2*side_wall;\ncar_h = lm_od + top_wall;\n\nmodule dual_rod_carriage() {\n  difference() {\n    cube([car_l, car_w, car_h], center = true);\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, -top_wall/2])\n        rotate([0, 90, 0])\n          cylinder(h = car_l + 2, d = lm_od + 0.1, center = true, $fn = 64);\n    for (x = [-car_l/4, car_l/4])\n      for (y = [-car_w/4, car_w/4])\n        translate([x, y, car_h/2])\n          cylinder(h = top_wall + 2, d = mount_hole_d, center = true, $fn = 32);\n  }\n}\n\ndual_rod_carriage();"
+    }
+  ]
+}

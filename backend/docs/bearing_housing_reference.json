@@ -1,0 +1,1241 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.1.0",
+    "family": "bearing_housing_reference",
+    "family_label": "Bearing Housing / Pillow Block",
+    "units": "millimeters",
+    "scope": "Only mounted bearing housings: pillow blocks, square flanged housings, two-bolt flanged housings, take-up housings, and simple shaft support blocks.",
+    "material_suggestions": [
+      {
+        "material": "Cast iron",
+        "use_case": "industrial pillow blocks and rigid machine frames",
+        "notes": "good damping and compressive strength; not ideal for lightweight printed prototypes",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "Cast steel or low-carbon steel",
+        "use_case": "shock-loaded or welded machine structures",
+        "notes": "higher toughness than cast iron; usually machined after fabrication",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "light CNC, robotics, fixtures, and corrosion-sensitive designs",
+        "notes": "easy to machine and lighter than iron; increase wall thickness for stiffness",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "PA-CF / nylon carbon fiber",
+        "use_case": "functional 3D printed bearing supports",
+        "notes": "better heat and creep resistance than PLA; use generous walls and metal inserts",
+        "output_channel": "chat_after_code_only"
+      },
+      {
+        "material": "PETG or PLA prototype",
+        "use_case": "visual or light-duty validation",
+        "notes": "acceptable for fit checks; avoid sustained load or high temperature",
+        "output_channel": "chat_after_code_only"
+      }
+    ],
+    "source_references": [
+      {
+        "title": "Mounted bearing engineering practice",
+        "note": "Used for bore, bearing-seat, bolt-spacing, wall-thickness, and edge-distance rules."
+      },
+      {
+        "title": "GrabCAD Community Library and Tutorials",
+        "url": "https://grabcad.com/library",
+        "note": "External examples are referenced by URL for preview and inspiration; CAD files are not copied into this project."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Return geometry-only OpenSCAD with named parameters, modules, boolean cuts, and no prose explanation.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendations",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "non-OpenSCAD prose",
+        "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+        "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+      ]
+    },
+    "parameter_taxonomy": {
+      "main_parameters": [
+        "usage",
+        "shaft_diameter",
+        "bearing_series_or_bearing_od_width",
+        "housing_type_or_mounting_style"
+      ],
+      "derived_parameters": [
+        "shaft_bore_diameter",
+        "bearing_seat_diameter",
+        "boss_diameter",
+        "boss_width",
+        "base_length",
+        "base_width",
+        "mount_hole_spacing",
+        "edge_margin"
+      ],
+      "secondary_assumed_parameters": [
+        "wall_thickness",
+        "base_thickness",
+        "mount_hole_clearance",
+        "fillet_or_corner_radius",
+        "rib_thickness",
+        "cap_or_split_line_detail"
+      ]
+    },
+    "standard_notes": [
+      {
+        "name": "Deep groove bearing catalog dimensions",
+        "applies_to": "bearing bore, outside diameter, and width",
+        "short_explanation": "Uses standard bearing series dimensions such as 6204 = 20 mm bore, 47 mm OD, 14 mm width."
+      },
+      {
+        "name": "Mounted bearing housing practice",
+        "applies_to": "pillow block, flange, and take-up housing proportions",
+        "short_explanation": "Uses foot/base, boss, seat, ribs, and bolt spacing rules common to UCP/UCF/UCT housings."
+      },
+      {
+        "name": "ISO metric clearance-hole practice",
+        "applies_to": "mounting bolt holes",
+        "short_explanation": "Uses practical clearance holes such as M5 = 5.5 mm and M6 = 6.6 mm."
+      }
+    ]
+  },
+  "parts": [
+    {
+      "id": "bearing_housing_pillow_block_6204",
+      "family": "bearing_housing_reference",
+      "category": "pillow_block",
+      "name": "Pillow block bearing housing for 6204 bearing",
+      "aliases": [
+        "pillow block",
+        "plummer block",
+        "bearing block",
+        "shaft support block",
+        "6204 bearing housing"
+      ],
+      "standards": [
+        "Deep groove bearing 6204 dimensions",
+        "mounted bearing housing practice"
+      ],
+      "manufacturing_processes": [
+        "machined",
+        "cast then machined",
+        "3D printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "shaft_diameter": 20,
+        "bearing_od": 47,
+        "bearing_width": 14,
+        "base_length": 74,
+        "base_width": 63,
+        "base_thickness": 7,
+        "wall_thickness": 8,
+        "mount_hole_spacing": 54,
+        "mount_hole_diameter": 5.5
+      },
+      "main_features": [
+        "low footed mounting base with two raised foot pads",
+        "solid central pedestal/saddle body under the bearing",
+        "rounded horizontal bearing boss blended into the pedestal",
+        "thin subtractive cap split-line groove, no solid top slab",
+        "subtractive bearing seat",
+        "coaxial shaft through-bore",
+        "two symmetric oval foot mounting slots or holes",
+        "compact UCP-style cast housing silhouette without tall arch ribs"
+      ],
+      "constraint_parameters": {
+        "usage": {
+          "label": "How and where the part will be used",
+          "required": true,
+          "examples": [
+            "3D printer shaft support",
+            "conveyor idler",
+            "robot axle",
+            "CNC leadscrew support"
+          ]
+        },
+        "shaft_diameter": {
+          "label": "shaft outside diameter",
+          "unit": "mm",
+          "default": 20,
+          "min": 8,
+          "max": 40
+        },
+        "bearing_series": {
+          "label": "bearing designation",
+          "default": "6204",
+          "examples": [
+            "608",
+            "6001",
+            "6200",
+            "6201",
+            "6202",
+            "6203",
+            "6204",
+            "6205",
+            "6206",
+            "6208"
+          ]
+        },
+        "bearing_od": {
+          "label": "bearing outside diameter",
+          "unit": "mm",
+          "default": 47,
+          "min": 22,
+          "max": 80
+        },
+        "bearing_width": {
+          "label": "bearing width",
+          "unit": "mm",
+          "default": 14,
+          "min": 7,
+          "max": 18
+        },
+        "mounting": {
+          "label": "mounting strategy",
+          "default": "two base bolts",
+          "examples": [
+            "two base bolts",
+            "four flange bolts",
+            "slotted take-up"
+          ]
+        }
+      },
+      "derived_parameters": {
+        "shaft_clearance_bore": {
+          "formula": "shaft_diameter + 0.3 to 0.5",
+          "note": "running clearance through the housing"
+        },
+        "bearing_seat_diameter": {
+          "formula": "bearing_od + 0.0 to 0.2",
+          "note": "transition fit for printed/machined housing"
+        },
+        "boss_diameter": {
+          "formula": "bearing_od + 2 * wall_thickness",
+          "note": "keeps radial support around the bearing"
+        },
+        "edge_margin": {
+          "formula": "max(1.5 * mount_hole_diameter, 8)",
+          "note": "minimum bolt-hole center distance from free edge"
+        }
+      },
+      "fit_guidance_mm": {
+        "bearing_seat": "+0.00 to +0.20 depending on manufacturing",
+        "shaft_clearance": "+0.30 to +0.50",
+        "mounting_hole_clearance": "M5 clearance = 5.5 mm, M6 clearance = 6.6 mm"
+      },
+      "design_rules": [
+        "A true pillow block is not a hollow ring on a flat plate; it needs a compact pedestal/saddle body that supports the bearing boss from below.",
+        "Match a UCP-style pillow block: two low feet, solid center pedestal, rounded bearing body, horizontal shaft axis, and a thin subtractive cap split-line groove.",
+        "Do not generate tall external arch ribs, bridge frames, or large triangular side frames around the bearing.",
+        "Do not add a solid rectangular top slab, roof, cap block, or bridge over the bearing; the upper body should remain rounded/compact.",
+        "The bearing boss must be blended into a solid base pedestal so it reads as a cast mounted bearing housing.",
+        "The bearing seat, shaft bore, and mounting holes must be subtracted after the solid body union.",
+        "The shaft bore and bearing seat must be coaxial and horizontal for a pillow block.",
+        "The base must include two symmetric foot mounting holes or oval mounting slots with realistic edge distance.",
+        "Wall thickness around the bearing seat should be at least 4 mm, preferably 6-10 mm for printed parts.",
+        "Ask for usage before choosing material and duty class."
+      ],
+      "validation_criteria": [
+        "Defines shaft_diameter, bearing_od, bearing_width, wall_thickness, base_thickness, and mount_hole_diameter.",
+        "Uses difference() for bearing seat, shaft bore, and mounting holes.",
+        "Uses a for-loop or symmetric placements for repeated foot mounting holes or slots.",
+        "Includes low base and foot pads wider than the bearing boss.",
+        "Includes solid pedestal/saddle/body geometry below the boss.",
+        "Bearing boss is rounded and blended into the pedestal, not floating above it.",
+        "Avoids the failure mode of only a circular tube/ring sitting on a flat rectangular plate.",
+        "Avoids solid rectangular top slabs, roofs, or cap blocks above the rounded housing.",
+        "Avoids tall arch bridge frames and large external triangular ribs."
+      ],
+      "failure_modes": [
+        "Tube or hollow ring sitting on a flat plate with no pedestal support.",
+        "Tall arch or bridge frame around the bearing instead of a compact cast housing.",
+        "Massive rectangular top slab or roof over the bearing boss.",
+        "Bearing seat added as a solid cylinder instead of subtracted.",
+        "Shaft bore not aligned with bearing axis.",
+        "Single center mounting hole instead of paired foot holes or slots.",
+        "Wall thickness too thin around the bearing seat.",
+        "No usage information, leading to weak material choice."
+      ],
+      "material_suggestions": [
+        {
+          "material": "Cast iron",
+          "use_case": "industrial static mounts and damped machine supports",
+          "notes": "preferred for robust pillow blocks",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "6061-T6 aluminum",
+          "use_case": "light CNC and robotics",
+          "notes": "good machinability; increase boss wall thickness",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "PA-CF",
+          "use_case": "functional printed prototype",
+          "notes": "use heat-set inserts and generous walls",
+          "output_channel": "chat_after_code_only"
+        }
+      ],
+      "external_examples": [
+        {
+          "title": "GrabCAD UCP 208 Bearing",
+          "url": "https://grabcad.com/library/ucp-208-bearing-2",
+          "preview_type": "external_page",
+          "family_pattern": "UCP foot-mounted pillow block"
+        },
+        {
+          "title": "GrabCAD UCP Plummer Block Housing Unit Library",
+          "url": "https://grabcad.com/library/ucp-plummer-block-housing-unit-library-1",
+          "preview_type": "external_page",
+          "family_pattern": "UCP plummer block housing unit"
+        },
+        {
+          "title": "GrabCAD Tutorial on Plummer Block Assembly",
+          "url": "https://cad.grabcad.com/tutorials/tutorial-on-plummer-block-assembly",
+          "preview_type": "external_tutorial",
+          "family_pattern": "pedestal/mounting block with bearing"
+        },
+        {
+          "title": "GrabCAD KSTM-25 Pillow Block Bearing Igubal listing",
+          "url": "https://grabcad.com/igusuk-1/models?sort=most-commented",
+          "preview_type": "external_listing",
+          "family_pattern": "polymer pillow block bearing"
+        }
+      ],
+      "openscad_module": "$fn = 128;\nshaft_diameter = 20;\nbearing_od = 47;\nbearing_width = 14;\nwall_thickness = 8;\nbase_thickness = 8;\nbase_length = 92;\nbase_width = bearing_od + 2 * wall_thickness + 18;\nfoot_pad_length = 28;\nfoot_pad_width = 30;\nfoot_pad_thickness = 4;\nmount_hole_diameter = 5.5;\nmount_hole_spacing = 64;\nslot_length = 18;\nshaft_clearance = 0.4;\nbearing_fit_clearance = 0.15;\nboss_diameter = bearing_od + 2 * wall_thickness;\nboss_width = bearing_width + 2 * wall_thickness;\nboss_center_z = base_thickness + boss_diameter / 2 - 4;\npedestal_width = boss_width + 14;\npedestal_depth = base_width - 18;\npedestal_height = boss_center_z - base_thickness + 4;\ncap_groove_height = 1.2;\ncap_groove_z = boss_center_z + boss_diameter * 0.20;\n\nmodule rounded_slot(length, diameter, height) {\n  hull() {\n    translate([-length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n    translate([ length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n  }\n}\n\nmodule pillow_block_bearing_housing() {\n  difference() {\n    union() {\n      translate([0, 0, base_thickness / 2]) cube([base_length, base_width, base_thickness], center = true);\n      for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])\n        translate([x, 0, base_thickness + foot_pad_thickness / 2]) cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center = true);\n\n      translate([0, 0, base_thickness + pedestal_height / 2]) cube([pedestal_width, pedestal_depth, pedestal_height], center = true);\n      hull() {\n        translate([0, 0, base_thickness + 8]) cube([pedestal_width + 8, pedestal_depth, 10], center = true);\n        translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width, d = boss_diameter, center = true);\n      }\n      translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width, d = boss_diameter, center = true);\n    }\n\n    translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width + 4, d = bearing_od + bearing_fit_clearance, center = true);\n    translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = base_width + 8, d = shaft_diameter + shaft_clearance, center = true);\n    translate([0, 0, cap_groove_z]) cube([pedestal_width + 10, boss_width + 4, cap_groove_height], center = true);\n    for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])\n      translate([x, 0, base_thickness / 2]) rounded_slot(slot_length, mount_hole_diameter, base_thickness + foot_pad_thickness + 8);\n  }\n}\n\npillow_block_bearing_housing();",
+      "standards_used": [
+        {
+          "name": "6204 deep groove bearing catalog dimensions",
+          "applies_to": "shaft, bearing OD, and bearing width",
+          "note": "20 mm bore, 47 mm OD, 14 mm width baseline when 6204 is requested."
+        },
+        {
+          "name": "UCP/plummer block mounted-bearing practice",
+          "applies_to": "footed base, pedestal saddle, boss, ribs, and two foot bolts",
+          "note": "Prevents the ring-on-plate failure mode."
+        },
+        {
+          "name": "ISO metric clearance holes",
+          "applies_to": "mounting holes",
+          "note": "M5 clearance about 5.5 mm; M6 clearance about 6.6 mm."
+        }
+      ],
+      "generation_contract": {
+        "code_must_include": [
+          "top-level named parameters",
+          "one primary module",
+          "difference() containing union() solids first",
+          "subtractive bearing seat",
+          "subtractive shaft bore",
+          "subtractive mounting holes or slots",
+          "single module call at the end"
+        ],
+        "code_must_not_include": [
+          "material recommendation comments",
+          "standard explanation comments",
+          "markdown",
+          "non-bearing-housing part families",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ],
+        "chat_after_code_must_include": [
+          "few-word standard basis",
+          "usage-based material suggestion"
+        ]
+      },
+      "feature_library": {
+        "footed_base": {
+          "purpose": "Carries bolt loads and gives the housing stable mounting feet.",
+          "main_parameters": [
+            "base_length",
+            "base_width",
+            "base_thickness",
+            "mount_hole_spacing"
+          ],
+          "derived_from": [
+            "bearing_od",
+            "wall_thickness",
+            "mount_hole_diameter"
+          ],
+          "constraints": [
+            "base_length/2 - mount_hole_spacing/2 >= edge_margin"
+          ],
+          "openscad_snippet": "translate([0,0,base_thickness/2]) cube([base_length, base_width, base_thickness], center=true); for (x=[-mount_hole_spacing/2,mount_hole_spacing/2]) translate([x,0,base_thickness+foot_pad_thickness/2]) cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center=true);"
+        },
+        "pedestal_saddle": {
+          "purpose": "Creates the compact solid body below the bearing boss, matching a UCP-style cast pillow block.",
+          "main_parameters": [
+            "pedestal_width",
+            "base_width",
+            "boss_center_z"
+          ],
+          "derived_from": [
+            "boss_width",
+            "base_thickness",
+            "boss_diameter"
+          ],
+          "constraints": [
+            "pedestal_width >= boss_width",
+            "pedestal reaches below boss centerline"
+          ],
+          "openscad_snippet": "translate([0,0,base_thickness+pedestal_height/2]) cube([pedestal_width, pedestal_depth, pedestal_height], center=true); hull(){ translate([0,0,base_thickness+8]) cube([pedestal_width+8,pedestal_depth,10], center=true); translate([0,0,boss_center_z]) rotate([90,0,0]) cylinder(h=boss_width,d=boss_diameter,center=true); }"
+        },
+        "horizontal_bearing_boss": {
+          "purpose": "Provides radial wall around the bearing seat on a horizontal shaft axis.",
+          "main_parameters": [
+            "bearing_od",
+            "bearing_width",
+            "wall_thickness"
+          ],
+          "derived_from": [
+            "boss_diameter",
+            "boss_width"
+          ],
+          "constraints": [
+            "boss_diameter = bearing_od + 2*wall_thickness",
+            "boss_width >= bearing_width + 2*wall_thickness"
+          ],
+          "openscad_snippet": "translate([0,0,boss_center_z]) rotate([90,0,0]) cylinder(h=boss_width, d=boss_diameter, center=true);"
+        },
+        "bearing_seat_cut": {
+          "purpose": "Creates the bearing pocket as a subtraction, not a solid insert.",
+          "main_parameters": [
+            "bearing_od",
+            "bearing_width"
+          ],
+          "derived_from": [
+            "bearing_seat_diameter",
+            "bearing_fit_clearance"
+          ],
+          "constraints": [
+            "bearing_seat_diameter = bearing_od + bearing_fit_clearance"
+          ],
+          "openscad_snippet": "translate([0,0,boss_center_z]) rotate([90,0,0]) cylinder(h=boss_width+4, d=bearing_od+bearing_fit_clearance, center=true);"
+        },
+        "shaft_bore_cut": {
+          "purpose": "Creates coaxial shaft clearance through the bearing axis.",
+          "main_parameters": [
+            "shaft_diameter"
+          ],
+          "derived_from": [
+            "shaft_bore_diameter",
+            "shaft_clearance"
+          ],
+          "constraints": [
+            "shaft_bore_diameter = shaft_diameter + shaft_clearance"
+          ],
+          "openscad_snippet": "translate([0,0,boss_center_z]) rotate([90,0,0]) cylinder(h=base_width+8, d=shaft_diameter+shaft_clearance, center=true);"
+        },
+        "paired_foot_mount_holes": {
+          "purpose": "Creates two symmetric oval foot mounting slots with realistic edge distance.",
+          "main_parameters": [
+            "mount_hole_diameter",
+            "mount_hole_spacing"
+          ],
+          "derived_from": [
+            "edge_margin",
+            "base_length"
+          ],
+          "constraints": [
+            "base_length/2 - mount_hole_spacing/2 >= edge_margin"
+          ],
+          "openscad_snippet": "for (x=[-mount_hole_spacing/2, mount_hole_spacing/2]) translate([x,0,base_thickness/2]) rounded_slot(slot_length, mount_hole_diameter, base_thickness+foot_pad_thickness+8);"
+        },
+        "cap_split_or_ribs": {
+          "purpose": "Adds a thin subtractive cap split groove; never add a solid top slab, roof, or bridge block.",
+          "main_parameters": [
+            "rib_thickness",
+            "cap_groove_height"
+          ],
+          "derived_from": [
+            "pedestal_width",
+            "boss_diameter"
+          ],
+          "constraints": [
+            "include split/cap/rib/web cue for pillow block designs"
+          ],
+          "openscad_snippet": "translate([0,0,cap_groove_z]) cube([pedestal_width+10, boss_width+4, cap_groove_height], center=true);"
+        }
+      },
+      "constraint_checks": [
+        {
+          "id": "bearing_seat_subtractive",
+          "severity": "error",
+          "expression": "bearing_seat_cut appears inside difference() after union()",
+          "message": "Bearing seat must be removed from the solid housing body."
+        },
+        {
+          "id": "shaft_bore_coaxial",
+          "severity": "error",
+          "expression": "shaft bore transform equals bearing seat transform",
+          "message": "Shaft bore and bearing seat must share the same horizontal axis."
+        },
+        {
+          "id": "pedestal_required",
+          "severity": "error",
+          "expression": "pedestal_saddle or ribs/webs/cap present",
+          "message": "A true pillow block needs support below the boss, not just a ring on a plate."
+        },
+        {
+          "id": "paired_mount_holes",
+          "severity": "error",
+          "expression": "two symmetric foot holes generated from mount_hole_spacing",
+          "message": "Use two base holes for a pillow block foot."
+        },
+        {
+          "id": "edge_margin",
+          "severity": "warning",
+          "expression": "base_length/2 - mount_hole_spacing/2 >= max(1.5*mount_hole_diameter, 8)",
+          "message": "Mounting holes need enough material to the base edge."
+        }
+      ],
+      "output_policy": {
+        "openscad_code": "Return geometry-only OpenSCAD with named parameters, modules, boolean cuts, and no prose explanation.",
+        "material_suggestions": "chat_after_code_only",
+        "standards_explanation": "chat_after_code_only",
+        "forbidden_in_code": [
+          "material recommendations",
+          "standard explanation paragraphs",
+          "markdown fences",
+          "non-OpenSCAD prose",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ]
+      },
+      "main_parameters": [
+        {
+          "name": "usage",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "How and where the part will be used",
+          "examples": [
+            "3D printer shaft support",
+            "conveyor idler",
+            "robot axle",
+            "CNC leadscrew support"
+          ]
+        },
+        {
+          "name": "shaft_diameter",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "shaft outside diameter",
+          "unit": "mm",
+          "default": 20,
+          "min": 8,
+          "max": 40
+        },
+        {
+          "name": "bearing_series",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "bearing designation",
+          "default": "6204",
+          "examples": [
+            "608",
+            "6001",
+            "6200",
+            "6201",
+            "6202",
+            "6203",
+            "6204",
+            "6205",
+            "6206",
+            "6208"
+          ]
+        },
+        {
+          "name": "bearing_od",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "label": "bearing outside diameter",
+          "unit": "mm",
+          "default": 47,
+          "min": 22,
+          "max": 80
+        },
+        {
+          "name": "bearing_width",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "label": "bearing width",
+          "unit": "mm",
+          "default": 14,
+          "min": 7,
+          "max": 18
+        },
+        {
+          "name": "mounting",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "mounting strategy",
+          "default": "two base bolts",
+          "examples": [
+            "two base bolts",
+            "four flange bolts",
+            "slotted take-up"
+          ]
+        }
+      ],
+      "secondary_parameters": [
+        {
+          "name": "wall_thickness",
+          "default": 8,
+          "unit": "mm",
+          "assumption_rule": "6-10 mm typical for small bearing housings; increase for plastic or high load."
+        },
+        {
+          "name": "shaft_clearance",
+          "default": 0.4,
+          "unit": "mm",
+          "assumption_rule": "running clearance for generated OpenSCAD model."
+        },
+        {
+          "name": "bearing_fit_clearance",
+          "default": 0.15,
+          "unit": "mm",
+          "assumption_rule": "small positive clearance suitable for prototypes and generated CAD."
+        },
+        {
+          "name": "mount_hole_clearance",
+          "default": 5.5,
+          "unit": "mm",
+          "assumption_rule": "ISO-style practical clearance for selected metric bolt."
+        },
+        {
+          "name": "edge_margin",
+          "default": "max(1.5*mount_hole_diameter, 8)",
+          "unit": "mm",
+          "assumption_rule": "keeps bolt holes away from free edges."
+        }
+      ]
+    },
+    {
+      "id": "bearing_housing_square_flange_ucf204",
+      "family": "bearing_housing_reference",
+      "category": "square_flange",
+      "name": "Square flanged bearing housing UCF204 style",
+      "aliases": [
+        "UCF204",
+        "square flange bearing",
+        "four bolt flange housing",
+        "wall mounted bearing housing"
+      ],
+      "standards": [
+        "UCF-style mounted bearing practice"
+      ],
+      "manufacturing_processes": [
+        "cast then machined",
+        "machined aluminum",
+        "printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "shaft_diameter": 20,
+        "bearing_od": 47,
+        "bearing_width": 14,
+        "flange_size": 86,
+        "flange_thickness": 12,
+        "bolt_circle_square": 64,
+        "mount_hole_diameter": 10.5
+      },
+      "main_features": [
+        "square flange plate",
+        "central bearing boss",
+        "subtractive bearing seat",
+        "coaxial shaft bore",
+        "four corner mounting holes"
+      ],
+      "constraint_parameters": {
+        "usage": {
+          "label": "wall, plate, or frame mounting use case",
+          "required": true
+        },
+        "shaft_diameter": {
+          "label": "shaft outside diameter",
+          "unit": "mm",
+          "default": 20
+        },
+        "bearing_series": {
+          "label": "bearing designation",
+          "default": "UCF204 / 6204 class"
+        },
+        "flange_size": {
+          "label": "square flange outer size",
+          "unit": "mm",
+          "default": 86
+        },
+        "mount_hole_diameter": {
+          "label": "bolt clearance diameter",
+          "unit": "mm",
+          "default": 10.5
+        }
+      },
+      "derived_parameters": {
+        "corner_hole_offset": {
+          "formula": "bolt_circle_square / 2",
+          "note": "places four mounting holes symmetrically"
+        },
+        "boss_diameter": {
+          "formula": "bearing_od + 2 * wall_thickness",
+          "note": "central bearing support boss"
+        }
+      },
+      "design_rules": [
+        "Use four symmetric corner mounting holes.",
+        "Keep the shaft axis perpendicular to the mounting flange.",
+        "Use a raised boss or thickened center around the bearing seat.",
+        "Ask for usage to choose cast iron, steel, aluminum, or printed polymer."
+      ],
+      "validation_criteria": [
+        "Four mounting holes are present.",
+        "Central bore and bearing seat are coaxial.",
+        "Flange size is larger than boss diameter and hole pattern.",
+        "All holes are subtractive."
+      ],
+      "failure_modes": [
+        "Only two holes on a square flange.",
+        "Shaft axis parallel to flange when perpendicular was required.",
+        "Insufficient material between bearing seat and bolt holes."
+      ],
+      "material_suggestions": [
+        {
+          "material": "Cast iron",
+          "use_case": "standard industrial UCF-style housing",
+          "notes": "best default for machine frames",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "6061-T6 aluminum",
+          "use_case": "lightweight wall-mounted assemblies",
+          "notes": "good for robotics and test fixtures",
+          "output_channel": "chat_after_code_only"
+        }
+      ],
+      "external_examples": [
+        {
+          "title": "GrabCAD UCF 204 Pillow Block Bearing",
+          "url": "https://grabcad.com/library/ucf-204-pillow-block-bearing-1",
+          "preview_type": "external_page",
+          "family_pattern": "UCF four-bolt square flange bearing"
+        },
+        {
+          "title": "GrabCAD UCF 205 Pillow Block Bearing",
+          "url": "https://grabcad.com/library/ucf-205-pillow-block-bearing-1",
+          "preview_type": "external_page",
+          "family_pattern": "UCF four-bolt square flange bearing"
+        },
+        {
+          "title": "GrabCAD FJUM-02-20 Flange Pillow Block listing",
+          "url": "https://grabcad.com/igusuk-1/models?sort=most-commented",
+          "preview_type": "external_listing",
+          "family_pattern": "square flange pillow block"
+        }
+      ],
+      "openscad_module": "$fn = 128;\nshaft_diameter = 20;\nbearing_od = 47;\nbearing_width = 14;\nflange_size = 86;\nflange_thickness = 12;\nwall_thickness = 8;\nmount_hole_diameter = 10.5;\nbolt_square = 64;\nboss_diameter = bearing_od + 2 * wall_thickness;\n\nmodule square_flanged_bearing_housing() {\n  difference() {\n    union() {\n      cube([flange_size, flange_size, flange_thickness], center = true);\n      cylinder(h = flange_thickness + bearing_width, d = boss_diameter, center = true);\n    }\n    cylinder(h = flange_thickness + bearing_width + 4, d = bearing_od + 0.15, center = true);\n    cylinder(h = flange_thickness + bearing_width + 6, d = shaft_diameter + 0.4, center = true);\n    for (x = [-bolt_square / 2, bolt_square / 2]) for (y = [-bolt_square / 2, bolt_square / 2]) translate([x, y, 0]) cylinder(h = flange_thickness + 4, d = mount_hole_diameter, center = true);\n  }\n}\n\nsquare_flanged_bearing_housing();",
+      "standards_used": [
+        {
+          "name": "UCF square-flange mounted-bearing practice",
+          "applies_to": "square flange, central boss, and four corner bolts",
+          "note": "Shaft axis is perpendicular to the flange."
+        },
+        {
+          "name": "6204 / UCF204 bearing-size class",
+          "applies_to": "bearing seat and shaft bore defaults",
+          "note": "Uses 20 mm shaft class unless the user specifies another bearing."
+        },
+        {
+          "name": "ISO metric clearance holes",
+          "applies_to": "mounting holes",
+          "note": "Clearance diameter is larger than nominal bolt size."
+        }
+      ],
+      "generation_contract": {
+        "code_must_include": [
+          "top-level named parameters",
+          "one primary module",
+          "difference() containing union() solids first",
+          "subtractive bearing seat",
+          "subtractive shaft bore",
+          "subtractive mounting holes or slots",
+          "single module call at the end"
+        ],
+        "code_must_not_include": [
+          "material recommendation comments",
+          "standard explanation comments",
+          "markdown",
+          "non-bearing-housing part families",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ],
+        "chat_after_code_must_include": [
+          "few-word standard basis",
+          "usage-based material suggestion"
+        ]
+      },
+      "feature_library": {
+        "square_flange_plate": {
+          "purpose": "Forms the wall or plate mounting interface.",
+          "main_parameters": [
+            "flange_size",
+            "flange_thickness"
+          ],
+          "derived_from": [
+            "bearing_od",
+            "bolt_square"
+          ],
+          "constraints": [
+            "flange_size > bolt_square + 2*mount_hole_diameter"
+          ],
+          "openscad_snippet": "cube([flange_size, flange_size, flange_thickness], center=true);"
+        },
+        "central_bearing_boss": {
+          "purpose": "Thickens the center around the bearing seat.",
+          "main_parameters": [
+            "bearing_od",
+            "wall_thickness"
+          ],
+          "derived_from": [
+            "boss_diameter"
+          ],
+          "constraints": [
+            "boss_diameter = bearing_od + 2*wall_thickness"
+          ],
+          "openscad_snippet": "cylinder(h=flange_thickness + bearing_width, d=boss_diameter, center=true);"
+        },
+        "four_corner_mount_holes": {
+          "purpose": "Creates UCF-style four-bolt mounting pattern.",
+          "main_parameters": [
+            "bolt_square",
+            "mount_hole_diameter"
+          ],
+          "derived_from": [
+            "corner_hole_offset"
+          ],
+          "constraints": [
+            "four holes must be symmetric around center"
+          ],
+          "openscad_snippet": "for (x=[-bolt_square/2, bolt_square/2]) for (y=[-bolt_square/2, bolt_square/2]) translate([x,y,0]) cylinder(h=flange_thickness+4, d=mount_hole_diameter, center=true);"
+        }
+      },
+      "constraint_checks": [
+        {
+          "id": "four_corner_holes",
+          "severity": "error",
+          "expression": "nested x/y loop creates four holes",
+          "message": "UCF square flange should have four corner mounting holes."
+        },
+        {
+          "id": "perpendicular_axis",
+          "severity": "error",
+          "expression": "shaft bore axis normal to flange face",
+          "message": "Square flange bearing supports a shaft perpendicular to the flange."
+        },
+        {
+          "id": "boss_clearance",
+          "severity": "warning",
+          "expression": "boss_diameter < flange_size - 2*mount_hole_diameter",
+          "message": "Leave material between center boss and bolt holes."
+        }
+      ],
+      "output_policy": {
+        "openscad_code": "Return geometry-only OpenSCAD with named parameters, modules, boolean cuts, and no prose explanation.",
+        "material_suggestions": "chat_after_code_only",
+        "standards_explanation": "chat_after_code_only",
+        "forbidden_in_code": [
+          "material recommendations",
+          "standard explanation paragraphs",
+          "markdown fences",
+          "non-OpenSCAD prose",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ]
+      },
+      "main_parameters": [
+        {
+          "name": "usage",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "wall, plate, or frame mounting use case"
+        },
+        {
+          "name": "shaft_diameter",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "shaft outside diameter",
+          "unit": "mm",
+          "default": 20
+        },
+        {
+          "name": "bearing_series",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "bearing designation",
+          "default": "UCF204 / 6204 class"
+        },
+        {
+          "name": "bearing_od",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "default": 47,
+          "unit": "mm"
+        },
+        {
+          "name": "bearing_width",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "default": 14,
+          "unit": "mm"
+        },
+        {
+          "name": "flange_size",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "label": "square flange outer size",
+          "unit": "mm",
+          "default": 86
+        }
+      ],
+      "secondary_parameters": [
+        {
+          "name": "wall_thickness",
+          "default": 8,
+          "unit": "mm",
+          "assumption_rule": "6-10 mm typical for small bearing housings; increase for plastic or high load."
+        },
+        {
+          "name": "shaft_clearance",
+          "default": 0.4,
+          "unit": "mm",
+          "assumption_rule": "running clearance for generated OpenSCAD model."
+        },
+        {
+          "name": "bearing_fit_clearance",
+          "default": 0.15,
+          "unit": "mm",
+          "assumption_rule": "small positive clearance suitable for prototypes and generated CAD."
+        },
+        {
+          "name": "mount_hole_clearance",
+          "default": 10.5,
+          "unit": "mm",
+          "assumption_rule": "ISO-style practical clearance for selected metric bolt."
+        },
+        {
+          "name": "edge_margin",
+          "default": "max(1.5*mount_hole_diameter, 8)",
+          "unit": "mm",
+          "assumption_rule": "keeps bolt holes away from free edges."
+        }
+      ]
+    },
+    {
+      "id": "bearing_housing_take_up_slot",
+      "family": "bearing_housing_reference",
+      "category": "take_up_housing",
+      "name": "Take-up bearing housing with slotted adjustment base",
+      "aliases": [
+        "take-up bearing",
+        "slotted bearing housing",
+        "belt tension bearing block",
+        "adjustable pillow block"
+      ],
+      "standards": [
+        "belt and chain tensioning mounted bearing practice"
+      ],
+      "manufacturing_processes": [
+        "machined",
+        "fabricated steel",
+        "printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "shaft_diameter": 20,
+        "bearing_od": 47,
+        "bearing_width": 14,
+        "slot_length": 32,
+        "mount_hole_diameter": 6.6,
+        "base_length": 100,
+        "base_width": 64
+      },
+      "main_features": [
+        "bearing boss",
+        "slotted base",
+        "adjustment travel",
+        "subtractive long mounting slots"
+      ],
+      "constraint_parameters": {
+        "usage": {
+          "label": "belt, chain, or roller tensioning use case",
+          "required": true
+        },
+        "slot_length": {
+          "label": "adjustment slot length",
+          "unit": "mm",
+          "default": 32,
+          "min": 20,
+          "max": 60
+        },
+        "load_direction": {
+          "label": "expected belt/chain pull direction",
+          "default": "along slot"
+        }
+      },
+      "derived_parameters": {
+        "slot_radius": {
+          "formula": "mount_hole_diameter / 2",
+          "note": "rounded ends of the adjustment slots"
+        },
+        "minimum_slot_edge_margin": {
+          "formula": "1.5 * mount_hole_diameter",
+          "note": "keeps enough material around slots"
+        }
+      },
+      "design_rules": [
+        "Use rounded-end slots, not simple rectangular cuts.",
+        "Slot direction should match the adjustment direction.",
+        "Keep boss and shaft axis aligned while base slots are offset symmetrically."
+      ],
+      "validation_criteria": [
+        "Includes slot_length and mount_hole_diameter.",
+        "Slots are subtractive and have rounded ends.",
+        "Base length is greater than slot length plus edge margins.",
+        "Bearing seat and shaft bore remain coaxial."
+      ],
+      "failure_modes": [
+        "Slots too close to base edge.",
+        "Rectangular slots with sharp stress raisers.",
+        "Adjustment slot direction not aligned with stated usage."
+      ],
+      "material_suggestions": [
+        {
+          "material": "Steel",
+          "use_case": "belt or chain tensioner under shock load",
+          "notes": "preferred for durable tensioning assemblies",
+          "output_channel": "chat_after_code_only"
+        },
+        {
+          "material": "6061-T6 aluminum",
+          "use_case": "light-duty belt tensioner",
+          "notes": "machinable, lightweight, corrosion resistant",
+          "output_channel": "chat_after_code_only"
+        }
+      ],
+      "external_examples": [
+        {
+          "title": "GrabCAD UCT Take-up Housing Unit Library",
+          "url": "https://grabcad.com/library/uct-take-up-housing-unit-library-1",
+          "preview_type": "external_page",
+          "family_pattern": "UCT take-up/sliding bearing housing"
+        }
+      ],
+      "openscad_module": "$fn = 128;\nshaft_diameter = 20;\nbearing_od = 47;\nbearing_width = 14;\nwall_thickness = 8;\nbase_length = 100;\nbase_width = 64;\nbase_thickness = 8;\nslot_length = 32;\nmount_hole_diameter = 6.6;\nslot_spacing = 64;\nboss_diameter = bearing_od + 2 * wall_thickness;\n\nmodule rounded_slot(length, diameter, height) {\n  hull() {\n    translate([-length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n    translate([ length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n  }\n}\n\nmodule take_up_bearing_housing() {\n  difference() {\n    union() {\n      translate([0, 0, base_thickness / 2]) cube([base_length, base_width, base_thickness], center = true);\n      translate([0, 0, base_thickness + boss_diameter / 2]) rotate([90, 0, 0]) cylinder(h = bearing_width + 2 * wall_thickness, d = boss_diameter, center = true);\n    }\n    translate([0, 0, base_thickness + boss_diameter / 2]) rotate([90, 0, 0]) cylinder(h = base_width + 4, d = bearing_od + 0.15, center = true);\n    translate([0, 0, base_thickness + boss_diameter / 2]) rotate([90, 0, 0]) cylinder(h = base_width + 6, d = shaft_diameter + 0.4, center = true);\n    for (x = [-slot_spacing / 2, slot_spacing / 2]) translate([x, 0, base_thickness / 2]) rounded_slot(slot_length, mount_hole_diameter, base_thickness + 2);\n  }\n}\n\ntake_up_bearing_housing();",
+      "standards_used": [
+        {
+          "name": "UCT take-up mounted-bearing practice",
+          "applies_to": "slotted adjustment base and bearing block",
+          "note": "Slots align with belt or chain tension direction."
+        },
+        {
+          "name": "Deep groove bearing catalog dimensions",
+          "applies_to": "bearing seat and shaft bore defaults",
+          "note": "Uses catalog bearing OD and width as the seat reference."
+        },
+        {
+          "name": "ISO metric clearance holes",
+          "applies_to": "rounded slot width",
+          "note": "Slot width follows practical bolt clearance."
+        }
+      ],
+      "generation_contract": {
+        "code_must_include": [
+          "top-level named parameters",
+          "one primary module",
+          "difference() containing union() solids first",
+          "subtractive bearing seat",
+          "subtractive shaft bore",
+          "subtractive mounting holes or slots",
+          "single module call at the end"
+        ],
+        "code_must_not_include": [
+          "material recommendation comments",
+          "standard explanation comments",
+          "markdown",
+          "non-bearing-housing part families",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ],
+        "chat_after_code_must_include": [
+          "few-word standard basis",
+          "usage-based material suggestion"
+        ]
+      },
+      "feature_library": {
+        "slotted_base": {
+          "purpose": "Allows tension adjustment along the load direction.",
+          "main_parameters": [
+            "base_length",
+            "base_width",
+            "slot_length"
+          ],
+          "derived_from": [
+            "minimum_slot_edge_margin"
+          ],
+          "constraints": [
+            "base_length >= slot_spacing + slot_length + 2*minimum_slot_edge_margin"
+          ],
+          "openscad_snippet": "translate([0,0,base_thickness/2]) cube([base_length, base_width, base_thickness], center=true);"
+        },
+        "rounded_adjustment_slots": {
+          "purpose": "Creates low-stress rounded-end slots instead of sharp rectangles.",
+          "main_parameters": [
+            "slot_length",
+            "mount_hole_diameter",
+            "slot_spacing"
+          ],
+          "derived_from": [
+            "slot_radius"
+          ],
+          "constraints": [
+            "slot_length > mount_hole_diameter",
+            "slot end radius = mount_hole_diameter/2"
+          ],
+          "openscad_snippet": "for (x=[-slot_spacing/2, slot_spacing/2]) translate([x,0,base_thickness/2]) rounded_slot(slot_length, mount_hole_diameter, base_thickness+2);"
+        },
+        "bearing_boss_and_cuts": {
+          "purpose": "Keeps bearing seat and shaft bore coaxial while the base provides adjustment.",
+          "main_parameters": [
+            "bearing_od",
+            "shaft_diameter",
+            "wall_thickness"
+          ],
+          "derived_from": [
+            "boss_diameter",
+            "shaft_bore_diameter",
+            "bearing_seat_diameter"
+          ],
+          "constraints": [
+            "bearing seat and shaft bore must share the same axis"
+          ],
+          "openscad_snippet": "translate([0,0,base_thickness+boss_diameter/2]) rotate([90,0,0]) cylinder(h=bearing_width+2*wall_thickness, d=boss_diameter, center=true);"
+        }
+      },
+      "constraint_checks": [
+        {
+          "id": "rounded_slots",
+          "severity": "error",
+          "expression": "slots are generated with hull() of two cylinders",
+          "message": "Take-up slots need rounded ends to avoid sharp stress raisers."
+        },
+        {
+          "id": "slot_edge_margin",
+          "severity": "warning",
+          "expression": "base_length >= slot_spacing + slot_length + 2*minimum_slot_edge_margin",
+          "message": "Slots must not break out near the base edge."
+        },
+        {
+          "id": "slot_direction",
+          "severity": "warning",
+          "expression": "slot axis follows load_direction",
+          "message": "Adjustment travel should follow belt or chain pull direction."
+        }
+      ],
+      "output_policy": {
+        "openscad_code": "Return geometry-only OpenSCAD with named parameters, modules, boolean cuts, and no prose explanation.",
+        "material_suggestions": "chat_after_code_only",
+        "standards_explanation": "chat_after_code_only",
+        "forbidden_in_code": [
+          "material recommendations",
+          "standard explanation paragraphs",
+          "markdown fences",
+          "non-OpenSCAD prose",
+          "string metadata variables such as usage, bearing_series, material, standard_used, or notes",
+          "explanatory section comments about user parameters, catalog defaults, standards, or materials"
+        ]
+      },
+      "main_parameters": [
+        {
+          "name": "usage",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "belt, chain, or roller tensioning use case"
+        },
+        {
+          "name": "shaft_diameter",
+          "source": "user_required",
+          "required_for_generation": true,
+          "default": 20,
+          "unit": "mm"
+        },
+        {
+          "name": "bearing_od",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "default": 47,
+          "unit": "mm"
+        },
+        {
+          "name": "bearing_width",
+          "source": "catalog_default",
+          "required_for_generation": false,
+          "default": 14,
+          "unit": "mm"
+        },
+        {
+          "name": "slot_length",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "adjustment slot length",
+          "unit": "mm",
+          "default": 32,
+          "min": 20,
+          "max": 60
+        },
+        {
+          "name": "load_direction",
+          "source": "user_required",
+          "required_for_generation": true,
+          "label": "expected belt/chain pull direction",
+          "default": "along slot"
+        }
+      ],
+      "secondary_parameters": [
+        {
+          "name": "wall_thickness",
+          "default": 8,
+          "unit": "mm",
+          "assumption_rule": "6-10 mm typical for small bearing housings; increase for plastic or high load."
+        },
+        {
+          "name": "shaft_clearance",
+          "default": 0.4,
+          "unit": "mm",
+          "assumption_rule": "running clearance for generated OpenSCAD model."
+        },
+        {
+          "name": "bearing_fit_clearance",
+          "default": 0.15,
+          "unit": "mm",
+          "assumption_rule": "small positive clearance suitable for prototypes and generated CAD."
+        },
+        {
+          "name": "mount_hole_clearance",
+          "default": 6.6,
+          "unit": "mm",
+          "assumption_rule": "ISO-style practical clearance for selected metric bolt."
+        },
+        {
+          "name": "edge_margin",
+          "default": "max(1.5*mount_hole_diameter, 8)",
+          "unit": "mm",
+          "assumption_rule": "keeps bolt holes away from free edges."
+        }
+      ]
+    }
+  ]
+}

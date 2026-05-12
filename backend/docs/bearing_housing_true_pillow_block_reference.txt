@@ -1,0 +1,169 @@
+TRUE PILLOW BLOCK / PLUMMER BLOCK BEARING HOUSING REFERENCE
+
+Purpose:
+This is a high-priority RAG rulebook for generating real pillow block bearing housings.
+Use it whenever the user asks for a pillow block, plummer block, pedestal bearing,
+mounted bearing support, 6204 pillow block, CNC leadscrew support, conveyor shaft support,
+robot axle support, or 3D printer shaft support.
+
+WHAT A TRUE PILLOW BLOCK IS
+- A pillow block is a mounted bearing housing with a footed base.
+- The shaft axis is horizontal and parallel to the mounting surface.
+- The bearing is carried by a raised pedestal/saddle, not by a free ring.
+- The housing has two mounting feet or a wide base with two symmetric mounting holes.
+- The bearing boss is integrated into the body with material below it.
+- Realistic designs look like a compact UCP pillow block: low foot pads, a solid central pedestal, a rounded bearing body, a thin subtractive cap split-line groove, and two oval foot mounting slots.
+- Do not add a solid rectangular top slab, roof, cap block, or bridge over the bearing. Real pillow-block caps follow the rounded housing body and are indicated by a groove/screw details, not by a massive rectangular bar.
+- Do not make tall external arch ribs or bridge frames over the bearing. The housing body should be compact and mostly solid, like a cast pillow block.
+
+ANTI-EXAMPLE: DO NOT GENERATE THIS
+- Do not generate only a hollow circular tube/ring sitting on a flat rectangular plate.
+- Do not leave empty air below most of the bearing boss.
+- Do not make the boss look like a pipe welded to a plate.
+- Do not use one center mounting hole.
+- Do not add the bearing seat as solid material.
+
+MANDATORY SOLID FEATURES
+- base_length, base_width, base_thickness
+- foot pads or mounting feet
+- pedestal/saddle body rising from base to bearing boss
+- horizontal cylindrical bearing boss integrated with the pedestal
+- optional thin subtractive split-line groove, clamp slit, or small side cheeks
+- never add a solid top rectangular cap slab/roof/block
+- avoid tall triangular ribs or overhead arch frames; use a solid pedestal body instead
+
+MANDATORY SUBTRACTIVE FEATURES
+- bearing seat/pocket: cylinder using bearing_od + bearing_fit_clearance
+- shaft through-bore: cylinder using shaft_diameter + shaft_clearance
+- two base mounting holes: cylinders using mount_hole_diameter
+- optional cap split-line groove: thin cube subtraction
+
+PARAMETER RULES
+- Use millimeters.
+- Use $fn = 128 for the bearing boss and bores.
+- bearing_od must come from the bearing series when known.
+- 6204 bearing defaults: shaft_diameter = 20, bearing_od = 47, bearing_width = 14.
+- 608 bearing defaults: shaft_diameter = 8, bearing_od = 22, bearing_width = 7.
+- wall_thickness should normally be 6 to 10 mm for printed/aluminum light-duty housings.
+- boss_diameter = bearing_od + 2 * wall_thickness.
+- boss_width = bearing_width + 2 * wall_thickness.
+- shaft_clearance = 0.3 to 0.5 mm.
+- bearing_fit_clearance = 0.05 to 0.2 mm depending on manufacturing.
+- mount hole edge distance should be at least 1.5 * mount_hole_diameter.
+
+OPENSCAD STRUCTURE
+Use this structure:
+
+module pillow_block_bearing_housing() {
+  difference() {
+    union() {
+      // solid only:
+      // wide base / feet
+      // pedestal or saddle
+      // integrated horizontal bearing boss
+      // rounded compact body and thin subtractive cap groove
+    }
+    // removed material only:
+    // bearing pocket
+    // shaft bore
+    // mounting holes
+    // split-line groove / clamp slit if used
+  }
+}
+
+KNOWN-GOOD VANILLA OPENSCAD SKELETON
+Use this compact UCP-style skeleton as the safest starting point and adapt dimensions.
+
+$fn = 128;
+shaft_diameter = 20;
+bearing_od = 47;
+bearing_width = 14;
+wall_thickness = 8;
+base_thickness = 8;
+base_length = 92;
+base_width = bearing_od + 2 * wall_thickness + 18;
+foot_pad_length = 28;
+foot_pad_width = 30;
+foot_pad_thickness = 4;
+mount_hole_diameter = 5.5;
+mount_hole_spacing = 64;
+slot_length = 18;
+shaft_clearance = 0.4;
+bearing_fit_clearance = 0.15;
+boss_diameter = bearing_od + 2 * wall_thickness;
+boss_width = bearing_width + 2 * wall_thickness;
+boss_center_z = base_thickness + boss_diameter / 2 - 4;
+pedestal_width = boss_width + 14;
+pedestal_depth = base_width - 18;
+pedestal_height = boss_center_z - base_thickness + 4;
+cap_groove_height = 1.2;
+cap_groove_z = boss_center_z + boss_diameter * 0.20;
+
+module rounded_slot(length, diameter, height) {
+  hull() {
+    translate([-length / 2, 0, 0])
+      cylinder(h = height, d = diameter, center = true);
+    translate([ length / 2, 0, 0])
+      cylinder(h = height, d = diameter, center = true);
+  }
+}
+
+module pillow_block_bearing_housing() {
+  difference() {
+    union() {
+      translate([0, 0, base_thickness / 2])
+        cube([base_length, base_width, base_thickness], center = true);
+
+      for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
+        translate([x, 0, base_thickness + foot_pad_thickness / 2])
+          cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center = true);
+
+      translate([0, 0, base_thickness + pedestal_height / 2])
+        cube([pedestal_width, pedestal_depth, pedestal_height], center = true);
+
+      // Compact cast-body blend from pedestal to bearing boss.
+      hull() {
+        translate([0, 0, base_thickness + 8])
+          cube([pedestal_width + 8, pedestal_depth, 10], center = true);
+        translate([0, 0, boss_center_z])
+          rotate([90, 0, 0])
+            cylinder(h = boss_width, d = boss_diameter, center = true);
+      }
+
+      translate([0, 0, boss_center_z])
+        rotate([90, 0, 0])
+          cylinder(h = boss_width, d = boss_diameter, center = true);
+    }
+
+    translate([0, 0, boss_center_z])
+      rotate([90, 0, 0])
+        cylinder(h = boss_width + 4, d = bearing_od + bearing_fit_clearance, center = true);
+
+    translate([0, 0, boss_center_z])
+      rotate([90, 0, 0])
+        cylinder(h = base_width + 8, d = shaft_diameter + shaft_clearance, center = true);
+
+    // Thin subtractive cap split-line groove only; never add a solid top slab.
+    translate([0, 0, cap_groove_z])
+      cube([pedestal_width + 10, boss_width + 4, cap_groove_height], center = true);
+
+    for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
+      translate([x, 0, base_thickness / 2])
+        rounded_slot(slot_length, mount_hole_diameter, base_thickness + foot_pad_thickness + 8);
+  }
+}
+
+pillow_block_bearing_housing();
+
+VALIDATION CHECKS
+- Balanced braces and parentheses.
+- One named module and one final module call.
+- difference() wraps solid union and subtractive cuts.
+- Bearing seat uses bearing_od.
+- Shaft bore uses shaft_diameter.
+- Base or foot geometry exists.
+- Compact pedestal/saddle/cap/support geometry exists.
+- Two symmetric mounting holes exist.
+- No tall arch bridge or external triangular frame around the boss.
+- No solid rectangular top slab, roof, or cap block above the rounded housing.
+- The result does not look like a ring on a flat plate.

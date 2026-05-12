@@ -1,0 +1,178 @@
+CLAMPS, JIGS AND FIXTURES REFERENCE
+Category: Workholding / Tooling
+Verified models: GrabCAD "toggle clamp 3D", Thingiverse "parametric clamp OpenSCAD",
+  Printables "workshop clamp print", GrabCAD "V-block fixture",
+  Thingiverse "drill jig template", Cults3D "pipe clamp parametric",
+  MyMiniFactory "woodworking clamp"
+
+CLAMP TYPES
+────────────
+1. C-Clamp (G-Clamp)
+   - Threaded screw applies force; swivel shoe distributes load
+   - Throat depth: 50–150 mm; capacity: 25–200 mm opening
+
+2. Pipe / Tube Clamp (saddle clamp)
+   - Two-piece or split-band; wraps around tube/pipe
+   - Used: conduit support, tubing fixtures, motor mounts
+
+3. Toggle Clamp (De-Sta-Co style)
+   - Over-centre linkage; fast lock/release
+   - Types: horizontal, vertical, push-pull; rated in holding force (N)
+
+4. T-Slot Workholding Clamp
+   - Rides in T-slot on CNC table or fixture plate
+   - Strap clamp + step block + T-bolt
+
+5. Drill Jig / Template
+   - Locating features + drill bushings (16–25 mm OD, 6–20 mm bore)
+   - Guides drill bit for repeatable hole patterns
+
+6. V-Block
+   - 90° V-groove holds round stock; often a matched pair
+   - For shafts ø6–100 mm
+
+7. Shaft Collar Clamp (external)
+   - Split ring; clamps onto shaft as stop/locator
+   - See shaft features reference for dimensions
+
+PIPE / TUBE SADDLE CLAMP PARAMETERS
+──────────────────────────────────────
+  pipe_od              — tube outer diameter
+  clamp_width          — along tube axis (20–50 mm)
+  clamp_thickness      — wall of clamp body (3–6 mm)
+  bolt_span            — distance between two clamping bolt centres
+  bolt_hole_d          — M4 for light duty, M6 for structural
+  inner_radius         — pipe_od/2 + 0.3 mm clearance (easy slip)
+  mounting_hole_d      — M5 or M6 for surface attachment
+  mounting_pattern     — symmetric about clamp centreline
+
+  module saddle_clamp(pipe_od=25, width=30, thickness=5, bolt_span=40) {
+    r = pipe_od/2 + 0.3;
+    flange_h = 12;
+    difference() {
+      union() {
+        // curved saddle
+        translate([0, 0, 0])
+          intersection() {
+            cylinder(h=width, d=pipe_od + 2*thickness, center=true, $fn=128);
+            translate([-(pipe_od+2*thickness)/2, -(pipe_od+2*thickness)/2, 0])
+              cube([pipe_od+2*thickness, (pipe_od+2*thickness)/2+thickness, width*2],
+                   center=false);
+          }
+        // mounting flanges
+        for(s=[-1,1])
+          translate([s*bolt_span/2, -pipe_od/2-thickness, 0])
+            cube([10, flange_h, width], center=true);
+      }
+      // pipe bore
+      cylinder(h=width+2, d=pipe_od+0.6, center=true, $fn=128);
+      // bolt holes in flanges
+      for(s=[-1,1])
+        translate([s*bolt_span/2, -pipe_od/2-thickness/2, 0])
+          cylinder(h=width+2, d=5.5, center=true, $fn=32);
+    }
+  }
+
+T-SLOT STRAP CLAMP PARAMETERS
+───────────────────────────────
+  strap_length      — 80–150 mm
+  strap_width       — 25–40 mm
+  strap_thickness   — 8–12 mm
+  t_bolt_slot_w     — 14–18 mm (matches T-bolt head)
+  step_block_heights— 10, 20, 30, 40 mm standard steps
+  stud_thread       — M10 or M12 (T-bolt standard)
+
+V-BLOCK PARAMETERS
+───────────────────
+  v_angle           — 90° (standard); 60° for small stock
+  jaw_height        — stock_max_d / sqrt(2) + base_thickness
+  base_length       — jaw_height × 1.5
+  base_width        — jaw_height × 1.2
+  base_thickness    — 10–20 mm
+  v_depth           — jaw_height − base_thickness
+  clamp_hole_d      — M6 (hold-down bolt)
+  scribe_line_slot  — 1 × 1 mm V-groove at centreline for alignment
+
+  module v_block(stock_max_d=50, base_t=15) {
+    jaw_h = stock_max_d/sqrt(2) + base_t;
+    bw = jaw_h * 1.2;
+    bl = jaw_h * 1.5;
+    difference() {
+      cube([bl, bw, jaw_h], center=true);
+      // V groove (90°)
+      translate([0, 0, jaw_h/2])
+        rotate([0, 0, 45])
+          cube([stock_max_d, stock_max_d, jaw_h+2], center=true);
+      // mounting holes
+      for(x=[-bl/3, bl/3])
+        translate([x, 0, -jaw_h/2-1])
+          cylinder(h=base_t+2, d=6.6, $fn=32);
+    }
+  }
+
+DRILL BUSHING STANDARD SIZES
+──────────────────────────────
+  Press-fit (P type) — pressed into jig plate:
+  Bore ø3.0 mm: OD 8 mm, length 12 mm
+  Bore ø4.0 mm: OD 10 mm, length 15 mm
+  Bore ø5.0 mm: OD 12 mm, length 16 mm
+  Bore ø6.0 mm: OD 14 mm, length 18 mm
+  Bore ø8.0 mm: OD 18 mm, length 22 mm
+  Bore ø10.0 mm: OD 22 mm, length 28 mm
+
+TOGGLE CLAMP LINKAGE (approximate)
+────────────────────────────────────
+  pivot_to_handle      — 60–100 mm (longer = more mechanical advantage)
+  pivot_to_plunger     — 20–40 mm
+  over_centre_offset   — 2–5 mm (ensures locked position)
+  plunger_diameter     — 8–16 mm
+  holding_force        — proportional to (handle_length / plunger_arm) × applied_force
+
+DESIGN RULES
+────────────
+  - Saddle clamp: split into two halves if pipe_od > 30 mm for assembly access
+  - V-block pairs: always model as matched pair; mark with same orientation mark
+  - Drill jig: bushing plate ≥ 6 mm thick; locate with two dowel pins (ø6H7) for repeatability
+  - Strap clamp: T-bolt must not reach bottom of T-slot; add spacer if needed
+  - Toggle clamp: print pivot pins as M5/M6 bolts; use self-locking nut at pivot
+  - All clamping surfaces: add 0.5 mm pad or soft jaw feature to protect workpiece finish
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- Fixture bodies, jaws, pads, guide blocks, and screw bosses are solid material in union().
+- Workpiece pockets, jaw openings, screw holes, guide holes, and relief slots are removed material in difference().
+- A clamp gap is a subtracted rectangular void that creates room for the workpiece or flexure.
+- A screw path is a cylindrical void along the clamping direction, not necessarily vertical.
+- A soft jaw pad is added solid material near the contact face, often replaceable or slightly raised.
+- Locating pins are cylinders added as solids; locating holes are cylinders subtracted from the fixture.
+- Use named parameters for workpiece_width, jaw_gap, screw_d, pad_thickness, and base_thickness.
+- Make holes longer than the body they cut through so OpenSCAD subtraction is complete.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn clamp, jig, and fixture rules into OpenSCAD.
+
+Rule: fixture base is a rigid solid body.
+OpenSCAD action:
+  cube([fixture_length, fixture_width, fixture_height], center=true);
+
+Rule: workpiece pocket or jaw opening is removed material.
+OpenSCAD action:
+  translate([0,0,pocket_z])
+    cube([workpiece_length+clearance, workpiece_width+clearance, pocket_depth], center=true);
+
+Rule: clamping screw hole points toward the clamping face.
+OpenSCAD action:
+  translate([0,fixture_width/2,screw_z])
+    rotate([90,0,0])
+      cylinder(h=fixture_width+4, d=screw_clearance_diameter, center=true, $fn=48);
+
+Rule: locating pin holes repeat on a datum line.
+OpenSCAD action:
+  for (x=[-pin_spacing/2, pin_spacing/2])
+    translate([x, datum_y, 0])
+      cylinder(h=fixture_height+2, d=pin_hole_diameter, center=true, $fn=48);
+
+Rule: soft jaw pad is added as replaceable contact material.
+OpenSCAD action:
+  translate([0,-fixture_width/2-pad_thickness/2,pad_z])
+    cube([pad_length, pad_thickness, pad_height], center=true);

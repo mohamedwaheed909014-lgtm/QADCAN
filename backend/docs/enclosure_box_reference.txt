@@ -1,0 +1,170 @@
+ENCLOSURES AND ELECTRONICS BOXES REFERENCE
+Category: Enclosures / Housings
+Verified models: Thingiverse "parametric electronics box" (hundreds of results),
+  Printables "parametric enclosure OpenSCAD" multiple models,
+  GrabCAD "electronics enclosure", Cults3D "project box parametric",
+  MyMiniFactory "enclosure snap fit"
+
+ENCLOSURE TYPES
+───────────────
+1. Snap-Fit Box (top+bottom halves)
+   - Two-piece; lid snaps onto base via flexible tabs
+   - Used for Arduino/Raspberry Pi enclosures, sensor housings
+
+2. Screw-Lid Box
+   - Lid secured with M2/M3 screws into boss pillars
+   - More robust than snap-fit; good seal
+
+3. Hinged Lid Box
+   - Integrated print-in-place or pin hinge
+   - One-piece open; convenient access
+
+4. DIN Rail Enclosure
+   - Clips onto standard DIN rail (35 mm rail, TS35)
+   - Used in electrical cabinets
+
+5. PCB Mount Tray
+   - Open tray with PCB standoff pillars
+   - Used when separate lid not needed
+
+6. Panel-Mount Box
+   - Cutouts for connectors, displays, switches on front/side panels
+   - Wall-mount brackets often included
+
+STANDARD PCB SIZES (for standoff placement)
+────────────────────────────────────────────
+  Arduino Uno        : 68.6 × 53.3 mm, 4× ø3.2 mm holes on 63.9×52.0 mm corners + extra holes
+  Arduino Mega       : 101.5 × 53.3 mm
+  Arduino Nano       : 43.2 × 18.0 mm
+  Raspberry Pi 4     : 85.0 × 56.0 mm, 4× ø2.75 mm holes on 58×49 mm pattern
+  Raspberry Pi Zero  : 65.0 × 30.0 mm, 4× ø2.75 mm holes on 58×23 mm
+  ESP32 DevKit       : 51.4 × 28.3 mm
+  ESP8266 NodeMCU    : 48.5 × 25.0 mm
+  Generic Breadboard : 165 × 54 mm (full size)
+
+KEY PARAMETERS
+──────────────
+  inner_length          — PCB/content length + clearance (+ 4–6 mm each side)
+  inner_width           — PCB/content width  + clearance
+  inner_height          — content height + bottom_wall + lid_overlap
+  wall_thickness        — 2.0–3.0 mm FDM minimum; 3–4 mm for strength
+  bottom_wall           — ≥ wall_thickness (2–3 mm)
+  lid_thickness         — 1.5–3.0 mm
+  lid_overlap           — lip depth lid slips into base: 2–4 mm
+  lid_clearance         — fit gap: 0.2–0.3 mm on each side
+  standoff_height       — PCB clearance below: 3–5 mm
+  standoff_od           — ≥ pcb_hole_d + 4 mm
+  standoff_hole_d       — pcb_hole_d + 0.2 mm (e.g. 3.4 for M3)
+  snap_tab_width        — 4–6 mm
+  snap_tab_length       — 8–12 mm
+  snap_tab_overhang     — 0.6–1.0 mm (deflection to engage)
+  snap_tab_gap          — 0.4–0.6 mm between tab and mating slot
+  corner_radius         — 2–5 mm for aesthetics and print quality
+
+COMMON CUTOUTS
+──────────────
+  USB-A           : 12.0 × 4.5 mm rectangular slot
+  USB-B           : 8.0  × 7.5 mm
+  micro-USB       : 8.0  × 3.5 mm
+  USB-C           : 9.0  × 3.5 mm
+  HDMI full       : 15.0 × 6.5 mm
+  micro-HDMI      : 7.5  × 3.5 mm
+  3.5 mm jack     : ø6.5 mm hole (round)
+  M2.5 screw      : ø2.8 mm (for antenna mount)
+  RJ45            : 16.0 × 13.5 mm
+  DB9             : 17.0 × 11.0 mm (trapezoid)
+  OLED 0.96"      : 27.0 × 19.0 mm cutout window
+  Toggle switch   : ø6.5 or ø12.0 mm round hole
+
+OPENSCAD STRUCTURE (two-piece box with lid)
+────────────────────────────────────────────
+  inner_l = 80;  inner_w = 60;  inner_h = 30;
+  wall    = 3;   lid_t   = 2;   overlap = 3;   gap = 0.25;
+
+  outer_l = inner_l + 2*wall;
+  outer_w = inner_w + 2*wall;
+  outer_h = inner_h + wall;
+
+  module box_body() {
+    difference() {
+      cube([outer_l, outer_w, outer_h]);
+      translate([wall, wall, wall])
+        cube([inner_l, inner_w, outer_h]);  // hollow interior
+    }
+  }
+
+  module box_lid() {
+    union() {
+      cube([outer_l, outer_w, lid_t]);      // top plate
+      translate([gap, gap, -overlap])
+        cube([outer_l - 2*gap, outer_w - 2*gap, overlap]); // inner lip
+    }
+  }
+
+PCB STANDOFF
+─────────────
+  module standoff(h=4, od=6, hole_d=3.4) {
+    difference() {
+      cylinder(h=h, d=od, $fn=32);
+      cylinder(h=h+1, d=hole_d, $fn=32);
+    }
+  }
+
+DIN RAIL CLIP PARAMETERS
+─────────────────────────
+  DIN rail width      = 35 mm
+  DIN rail thickness  = 1.0 mm (standard) or 1.5 mm (heavy)
+  clip_slot_width     = 1.2 mm (slightly over rail thickness)
+  clip_slot_length    = 35 mm
+  clip_body_height    = 50–80 mm typical
+  snap_hook_gap       = 0.5 mm (squeeze to release)
+
+DESIGN RULES
+────────────
+  - Minimum wall 2 mm for FDM; 1.5 mm if printing with high infill
+  - Lid lip tolerance: 0.2–0.25 mm each side (0.4–0.5 total) for smooth fit
+  - Standoff holes: self-tapping M3 → ø2.8 mm; heat insert M3 → ø4.0–4.5 mm
+  - For ventilation: add ø3–4 mm holes or 1.5 mm slots in array pattern
+  - Cable entry glands: ø7–10 mm holes with optional strain relief tab
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- An enclosure is an outer solid shell minus an inner cavity.
+- Outer box, lid lip, bosses, tabs, hinges, and mounting feet are solid material in union().
+- Inner cavity, screw holes, cable cutouts, connector openings, vents, and display windows are removed material in difference().
+- Wall thickness is created by subtracting an inner cube from a larger outer cube.
+- Screw bosses are cylinders added inside the box, with pilot holes subtracted.
+- Vent arrays are repeated thin rectangular slots or circular holes subtracted from the wall.
+- Connector cutouts should be placed on the correct wall using translate() and cube().
+- Lid clearance and lip dimensions should be parameters, not fixed hidden values.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn enclosure rules into OpenSCAD.
+
+Rule: shell is outer box minus inner cavity.
+OpenSCAD action:
+  difference() {
+    cube([outer_length, outer_width, outer_height], center=true);
+    translate([0,0,wall_thickness])
+      cube([outer_length-2*wall_thickness, outer_width-2*wall_thickness, outer_height], center=true);
+  }
+
+Rule: screw bosses are posts with pilot holes.
+OpenSCAD action:
+  for (x=[-boss_spacing_x/2, boss_spacing_x/2])
+    for (y=[-boss_spacing_y/2, boss_spacing_y/2])
+      translate([x,y,boss_height/2]) cylinder(h=boss_height, d=boss_outer_diameter, center=true, $fn=48);
+  for (x=[-boss_spacing_x/2, boss_spacing_x/2])
+    for (y=[-boss_spacing_y/2, boss_spacing_y/2])
+      translate([x,y,boss_height/2]) cylinder(h=boss_height+2, d=pilot_hole_diameter, center=true, $fn=32);
+
+Rule: ventilation slots are repeated rectangular cutouts.
+OpenSCAD action:
+  for (i=[0:vent_count-1])
+    translate([(i-(vent_count-1)/2)*vent_pitch, wall_y, vent_z])
+      cube([vent_width, wall_thickness+2, vent_height], center=true);
+
+Rule: connector window is cut through one wall.
+OpenSCAD action:
+  translate([connector_x, outer_width/2, connector_z])
+    cube([connector_width, wall_thickness+2, connector_height], center=true);

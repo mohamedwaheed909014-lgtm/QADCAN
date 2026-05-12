@@ -1,0 +1,146 @@
+PULLEYS AND BELT DRIVE REFERENCE
+Category: Power Transmission / Belt Drive
+Verified models: Thingiverse thing:3296969 (parametric toothed belt pulley OpenSCAD, remixed),
+  Thingiverse thing:7316286 (scottneumann configurable gears and pulleys),
+  Thingiverse thing:7317413 (pulley belt design companion),
+  GrabCAD "GT2 pulley 20 teeth", Printables "parametric pulley" tag
+
+BELT PROFILE STANDARDS
+──────────────────────
+  GT2 (Gates Tooth):  pitch 2.0 mm, tooth radius 0.555 mm  — most common in 3D printers
+  GT3:                pitch 3.0 mm, higher torque variant of GT2
+  HTD 3M:             pitch 3.0 mm, rounded tooth, higher load
+  HTD 5M:             pitch 5.0 mm, heavy-duty CNC
+  HTD 8M:             pitch 8.0 mm, industrial
+  T2.5:               pitch 2.5 mm, trapezoidal tooth, older CNC systems
+  T5:                 pitch 5.0 mm, trapezoidal, common servo drives
+  T10:                pitch 10.0 mm, heavy industrial
+  MXL:                pitch 2.032 mm, imperial standard
+  XL:                 pitch 5.08 mm (1/5"), light duty
+  V-Belt (A/B/C/D):   trapezoidal cross-section, friction drive, not toothed
+
+STANDARD GT2 PULLEY DIMENSIONS (real parts)
+────────────────────────────────────────────
+  16T GT2: pitch_d = 10.19 mm, OD ≈ 12.2 mm, bore common 5 mm (NEMA17)
+  20T GT2: pitch_d = 12.73 mm, OD ≈ 14.8 mm, bore common 5 mm
+  30T GT2: pitch_d = 19.10 mm, OD ≈ 21.1 mm
+  36T GT2: pitch_d = 22.92 mm, OD ≈ 24.9 mm
+  40T GT2: pitch_d = 25.46 mm, OD ≈ 27.5 mm
+  60T GT2: pitch_d = 38.20 mm, OD ≈ 40.2 mm
+  pitch_diameter = teeth × pitch / PI  for GT2
+
+STANDARD BELT WIDTHS: GT2/GT3 — 6 mm, 9 mm, 15 mm
+
+KEY PARAMETERS
+──────────────
+  belt_pitch            — tooth pitch in mm (2.0 for GT2)
+  num_teeth             — number of pulley teeth (16–60 typical)
+  pitch_diameter        — num_teeth × belt_pitch / PI
+  pulley_od             — pitch_diameter + 2 × tooth_height (≈ pitch_d + 1–2 mm)
+  belt_width            — 6 mm standard for desktop CNC/printer
+  pulley_height         — belt_width + 2 × flange_height (typically belt_width + 3–6 mm)
+  flange_diameter       — pulley_od + 2 × flange_height
+  flange_height         — 1.0–1.5 mm per side; keeps belt on track
+  flange_thickness      — 1.0–1.5 mm
+  bore_diameter         — shaft bore; motor shaft + 0.1–0.2 mm for press
+  hub_diameter          — ≥ bore_d + 6 mm wall
+  hub_length            — ≥ belt_width
+  set_screw_d           — M3 for bore ≤10 mm, M4 for ≤20 mm
+  set_screw_hole_depth  — hub_diameter / 2
+
+IDLER PULLEY (smooth, no teeth)
+────────────────────────────────
+  - OD ≈ same as toothed pulley OD (so belt wraps cleanly)
+  - Uses 623zz (OD 10 mm, bore 3 mm) or 624zz (OD 13 mm, bore 4 mm) or 625zz (OD 16 mm, bore 5 mm)
+  - Typically a shoulder bolt or M3/M5 screw through bearing bore
+  - Add 0.5–1.0 mm raised rim to retain belt
+
+TIMING BELT LENGTH FORMULA
+────────────────────────────
+  For two pulleys:
+  belt_length = 2 × centre_distance
+              + PI/2 × (pitch_d1 + pitch_d2)
+              + (pitch_d1 - pitch_d2)² / (4 × centre_distance)
+
+OPENSCAD STRUCTURE (simplified toothed pulley)
+────────────────────────────────────────────────
+  belt_pitch   = 2.0;
+  num_teeth    = 20;
+  belt_width   = 6;
+  bore_d       = 5;
+  flange_h     = 1.5;
+
+  pitch_d      = num_teeth * belt_pitch / PI;
+  pulley_od    = pitch_d + 1.5;            // approximate
+  total_h      = belt_width + 2*flange_h;
+
+  module toothed_pulley() {
+    difference() {
+      union() {
+        // flanges
+        cylinder(h=total_h, d=pulley_od + 2*flange_h, center=true, $fn=128);
+        // pulley body (cut down to expose "teeth" via difference below)
+      }
+      // belt groove (remove material between flanges)
+      cylinder(h=belt_width, d=pulley_od, center=true, $fn=128);
+      // bore
+      cylinder(h=total_h+2, d=bore_d+0.15, center=true, $fn=64);
+      // set-screw hole
+      translate([0, 0, 0]) rotate([90,0,0])
+        cylinder(h=pulley_od, d=3.2, center=true, $fn=32);
+      // teeth (approximate as small cylinders around pitch circle)
+      for(i=[0:num_teeth-1])
+        rotate([0,0,360*i/num_teeth])
+          translate([pitch_d/2, 0, 0])
+            cylinder(h=belt_width+2, r=belt_pitch*0.3, center=true, $fn=16);
+    }
+  }
+
+DESIGN RULES
+────────────
+  - Minimum tooth engagement: wrap arc ≥ 6 teeth on driving pulley
+  - Centre distance: ≥ (D_large - D_small)/2 + 25 mm; keep < 10× larger pulley OD
+  - Belt sag for horizontal runs: pre-tension so belt deflects ≈ 1.5% of span under light push
+  - Pulley alignment: flanges must be within ±0.5 mm axial alignment to prevent belt walking
+  - Set screw position: 90° offset from keyway or D-flat; not on tooth root
+  - For 3D printed pulleys: $fn ≥ 4 × num_teeth for smooth tooth profile
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A pulley is a rotating wheel with an outer belt surface and a central shaft bore.
+- Rim, hub, belt flanges, and timing teeth/ridges are solid material in union().
+- Shaft bore, set-screw hole, keyway, and optional lightening holes are removed material in difference().
+- The pulley axis is Z; bore is a cylinder along Z at the origin.
+- Flanges are thin larger-diameter cylinders at both ends of belt width.
+- Timing features are repeated around the circumference using tooth_count angular repetition.
+- A set-screw hole is a transverse cylinder aimed radially at the bore.
+- Do not use bore radius to size belt teeth; use tooth_count, pitch, and pitch diameter.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn pulley and belt-drive rules into OpenSCAD.
+
+Rule: pulley rim and hub are coaxial solids.
+OpenSCAD action:
+  union() {
+    cylinder(h=belt_width, d=pulley_outer_diameter, center=true, $fn=tooth_count*6);
+    cylinder(h=hub_width, d=hub_diameter, center=true, $fn=96);
+  }
+
+Rule: shaft bore removes material along pulley axis.
+OpenSCAD action:
+  cylinder(h=hub_width+2, d=bore_diameter+clearance, center=true, $fn=96);
+
+Rule: flanges prevent belt walking.
+OpenSCAD action:
+  for (z=[-belt_width/2-flange_thickness/2, belt_width/2+flange_thickness/2])
+    translate([0,0,z]) cylinder(h=flange_thickness, d=flange_diameter, center=true, $fn=96);
+
+Rule: timing tooth features repeat around circumference.
+OpenSCAD action:
+  for (i=[0:tooth_count-1])
+    rotate([0,0,360*i/tooth_count])
+      translate([pitch_diameter/2,0,0]) cube([tooth_depth, tooth_width, belt_width], center=true);
+
+Rule: radial set screw points toward the bore.
+OpenSCAD action:
+  translate([pulley_outer_diameter/2,0,0]) rotate([0,90,0]) cylinder(h=pulley_outer_diameter+2, d=set_screw_diameter, center=true, $fn=48);

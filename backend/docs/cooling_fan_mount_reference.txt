@@ -1,0 +1,165 @@
+COOLING HARDWARE AND FAN MOUNTS REFERENCE
+Category: Thermal Management / Cooling
+Verified models: Thingiverse "parametric fan mount OpenSCAD", Printables "40mm fan guard parametric",
+  GrabCAD "heatsink aluminium extrusion", Thingiverse "fan duct 3D printer",
+  Printables "fan grille OpenSCAD", Cults3D "60mm fan bracket"
+
+FAN SIZES AND MOUNTING STANDARDS
+──────────────────────────────────
+  All dimensions: width × depth × thickness, bolt pattern, bolt size
+
+  25×25×10 mm : bolt ø20 mm, 4×M3, no standard
+  30×30×10 mm : bolt ø24 mm, 4×M3
+  40×40×10 mm : bolt ø32 mm, 4×M3  ← common small electronics
+  40×40×20 mm : bolt ø32 mm, 4×M3  (high-flow double-width)
+  50×50×10 mm : bolt ø40 mm, 4×M4
+  60×60×15 mm : bolt ø50 mm, 4×M4
+  60×60×25 mm : bolt ø50 mm, 4×M4
+  70×70×15 mm : bolt ø61 mm, 4×M4
+  80×80×25 mm : bolt ø71 mm, 4×M4  ← most common PC fan
+  92×92×25 mm : bolt ø82.5 mm, 4×M4
+  120×120×25 mm: bolt ø105 mm, 4×M4 ← standard ATX case fan
+  140×140×25 mm: bolt ø124.5 mm, 4×M4
+  200×200×30 mm: bolt ø154 mm, 4×M4
+
+  Mounting hole tolerance: M3 → ø3.5 mm; M4 → ø4.5 mm
+
+NOCTUA FAN MOUNTING (anti-vibration)
+──────────────────────────────────────
+  Anti-vibration mounts: rubber pad through ø6 mm hole
+  Screw: M3 × 30 mm with rubber washer
+
+KEY PARAMETERS
+──────────────
+  fan_size              — fan body width/depth (square: 40, 60, 80, 120 mm)
+  fan_thickness         — 10, 15, 20, 25, 30 mm
+  fan_bolt_circle       — from table above
+  fan_hole_d            — M3 clearance = 3.5 mm; M4 = 4.5 mm
+  guard_od              — fan_size − 4 mm (fits just inside frame)
+  guard_wire_d          — 2.5–4.0 mm wire/spoke diameter
+  guard_spoke_count     — 6, 8, or 12 spokes
+  duct_inlet_d          — fan_size − 2 mm (slight undersize for flush)
+  duct_outlet_d         — target nozzle diameter
+  duct_length           — 30–80 mm for 3D printer part cooling duct
+  mount_plate_t         — 3–5 mm
+  standoff_height       — 0 mm (flush) or 5–10 mm spacer for airflow
+  vibration_pad_d       — 6 mm (Noctua standard) or use M3 rubber grommet
+
+FAN GUARD OPENSCAD STRUCTURE
+──────────────────────────────
+  fan_s    = 80;
+  wire_d   = 3;
+  n_spokes = 8;
+  ring_t   = 3;
+
+  module fan_guard() {
+    difference() {
+      // outer frame ring
+      linear_extrude(height=ring_t)
+        difference() {
+          square([fan_s, fan_s], center=true);
+          square([fan_s-ring_t*2, fan_s-ring_t*2], center=true);
+        }
+      // mounting holes at bolt circle corners
+    }
+    // hub ring
+    linear_extrude(height=ring_t)
+      difference() {
+        circle(d=fan_s*0.35, $fn=64);
+        circle(d=fan_s*0.35-wire_d*2, $fn=64);
+      }
+    // spokes
+    for(i=[0:n_spokes-1])
+      rotate([0, 0, 360*i/n_spokes])
+        translate([fan_s*0.35/2, 0, ring_t/2])
+          cube([fan_s/2-fan_s*0.35/2-ring_t, wire_d, ring_t], center=true);
+  }
+
+FAN DUCT (3D PRINTER PART COOLING)
+────────────────────────────────────
+  inlet_size       = 40;      // 40mm fan
+  outlet_w         = 3;       // slit nozzle width
+  outlet_l         = 30;      // nozzle length (spans print width)
+  duct_length      = 50;
+  wall_t           = 1.5;
+
+  // Model as hull between inlet square cross-section and outlet slit cross-section
+  module fan_duct() {
+    hull() {
+      // inlet face (square, fan_size × fan_thickness)
+      cube([inlet_size, inlet_size, 1], center=true);
+      // outlet nozzle (thin slit)
+      translate([0, -duct_length, 0])
+        cube([outlet_l, outlet_w, 1], center=true);
+    }
+  }
+
+HEATSINK PARAMETERS
+────────────────────
+  base_length          — matches component footprint
+  base_width           — matches component footprint
+  base_thickness       — 3–6 mm (thermal mass and spreading)
+  fin_height           — 15–40 mm (more = better cooling but needs airflow)
+  fin_thickness        — 1.5–3 mm (thinner = more fins = more surface area)
+  fin_spacing          — 2–4 mm (must match fan airflow; too tight = no airflow)
+  fin_count            — floor((base_width − fin_thickness) / (fin_thickness + fin_spacing)) + 1
+  mounting_hole_d      — M3 or M4; bolt pattern matches component (e.g. TO-220: 3.5 mm hole, 2.54 mm offset)
+
+  module heatsink(base_l=50, base_w=40, base_t=4, fin_h=25, fin_t=2, fin_sp=3) {
+    n_fins = floor((base_w - fin_t)/(fin_t + fin_sp)) + 1;
+    cube([base_l, base_w, base_t]);   // base plate
+    for(i=[0:n_fins-1])
+      translate([0, i*(fin_t+fin_sp), base_t])
+        cube([base_l, fin_t, fin_h]);  // fins
+  }
+
+DESIGN RULES
+────────────
+  - Fan guards: spoke width ≥ 2 mm for rigidity; avoid resonant frequencies (n_spokes ≠ n_blades)
+  - Duct pressure drop: avoid sharp bends; use ≥ 1 × fan_diameter radius on curves
+  - Inlet/outlet ratio: outlet area ≥ 70% of inlet area to maintain flow velocity
+  - Fan-to-heatsink gap: 5–10 mm for best static pressure performance
+  - Printed heatsinks: aluminium-filled PLA filament increases conductivity 3–4×
+  - For 3D printer hotend duct: outlet should point at layer being deposited (Z−1)
+  - Fan mounting with standoffs: 5 mm standoff gives better airflow under fan than flush mount
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A fan mount is a plate or duct that holds a fan and guides airflow.
+- The frame, standoffs, duct walls, and mounting ears are solid material in union().
+- Fan opening, airflow duct path, screw holes, and cable relief are removed material in difference().
+- Fan bolt holes are placed on a square pattern around the fan center.
+- The fan opening is usually a circular or square cutout centered in the mount plate.
+- Standoffs are cylinders or posts placed at the bolt positions with holes subtracted through them.
+- A duct can be approximated by hull() between inlet and outlet profiles or by tapered cubes/cylinders.
+- Keep airflow path clear; do not fill the center opening with solid geometry.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn fan-mount and duct rules into OpenSCAD.
+
+Rule: fan plate holds the fan frame.
+OpenSCAD action:
+  cube([fan_size+frame_margin*2, fan_size+frame_margin*2, plate_thickness], center=true);
+
+Rule: airflow opening is removed from the center.
+OpenSCAD action:
+  cylinder(h=plate_thickness+2, d=air_opening_diameter, center=true, $fn=96);
+
+Rule: fan screw holes use a square pattern.
+OpenSCAD action:
+  for (x=[-fan_hole_spacing/2, fan_hole_spacing/2])
+    for (y=[-fan_hole_spacing/2, fan_hole_spacing/2])
+      translate([x,y,0]) cylinder(h=plate_thickness+2, d=screw_diameter, center=true, $fn=48);
+
+Rule: standoffs lift fan away from plate.
+OpenSCAD action:
+  for (x=[-fan_hole_spacing/2, fan_hole_spacing/2])
+    for (y=[-fan_hole_spacing/2, fan_hole_spacing/2])
+      translate([x,y,standoff_height/2]) cylinder(h=standoff_height, d=standoff_diameter, center=true, $fn=48);
+
+Rule: rectangular duct outlet is a guided airflow tunnel.
+OpenSCAD action:
+  hull() {
+    translate([0,0,0]) cube([inlet_width, inlet_height, 1], center=true);
+    translate([0,duct_length,outlet_z]) cube([outlet_width, outlet_height, 1], center=true);
+  }

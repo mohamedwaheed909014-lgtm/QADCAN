@@ -1,0 +1,157 @@
+CAMS, CRANKS AND LINKAGES REFERENCE
+Category: Mechanism Design
+Verified models: GrabCAD "cam mechanism assembly", Thingiverse "four-bar linkage OpenSCAD",
+  Printables "crank slider mechanism", GrabCAD "eccentric cam",
+  Thingiverse "scotch yoke mechanism", Cults3D "Geneva mechanism"
+
+CAM TYPES
+──────────
+1. Eccentric Disc Cam
+   - Circle with off-centre bore; produces simple harmonic motion
+   - Stroke = 2 × eccentricity
+   - Simple to model: two cylinders, offset bores
+
+2. Plate Cam with Translating Follower
+   - Flat cam profile against roller follower; arbitrary motion law
+   - Follower types: knife-edge, roller, flat-face, spherical
+
+3. Barrel/Cylindrical Cam
+   - Groove cut into cylinder surface; used in indexing, printing mechanisms
+
+4. Conjugate Cam (twin cams)
+   - Two cam lobes keep follower in positive contact both directions
+
+ECCENTRIC CAM PARAMETERS
+──────────────────────────
+  cam_diameter          — overall disc diameter
+  eccentricity          — offset of bore from disc centre (stroke/2)
+  cam_thickness         — axial depth
+  bore_diameter         — shaft bore
+  stroke                — = 2 × eccentricity
+  follower_roller_d     — 8–20 mm typical; roller OD + 0.5 mm clearance in groove
+  strap_width           — follower connecting rod width (≥ follower_roller_d + 6 mm)
+
+  module eccentric_cam(cam_d=60, eccen=10, thickness=12, bore_d=8) {
+    difference() {
+      cylinder(h=thickness, d=cam_d, center=true, $fn=128);
+      // offset bore
+      translate([eccen, 0, 0])
+        cylinder(h=thickness+2, d=bore_d+0.2, center=true, $fn=64);
+      // set screw
+      translate([eccen + bore_d/2 + 4, 0, 0])
+        rotate([90,0,0])
+          cylinder(h=cam_d, d=4, center=true, $fn=32);
+    }
+  }
+
+FOUR-BAR LINKAGE
+─────────────────
+  Grashof condition: s + l < p + q  (at least one full rotation possible)
+  s = shortest link, l = longest link, p and q = other two
+
+  link_ground_length    — fixed frame (l1)
+  link_crank_length     — input (l2); must be shortest for full crank rotation
+  link_coupler_length   — connecting rod (l3)
+  link_output_length    — output rocker/crank (l4)
+  pin_diameter          — 4–8 mm; clearance +0.2 mm in hole
+  link_width            — 10–20 mm
+  link_thickness        — 3–5 mm
+
+  Crank-rocker: s=crank (short), l=coupler or output (long); Grashof satisfied
+  Double-crank: ground is longest; both cranks rotate fully
+  Double-rocker: coupler is shortest; neither crank rotates fully
+
+SLIDER-CRANK MECHANISM
+───────────────────────
+  crank_radius          — r; slider stroke ≈ 2r for short connecting rod
+  connecting_rod_length — l; ratio l/r = 3–5 for near-sinusoidal motion
+  slider_bore_d         — pin_d + 0.3 mm running clearance
+  guide_bore_d          — slider OD + 0.4 mm
+
+  Slider stroke (exact): = r(1-cosθ) + r²sin²θ/(2l) ≈ 2r for l >> r
+
+SCOTCH YOKE
+────────────
+  crank_radius          — r; gives pure sinusoidal output (stroke = 2r)
+  yoke_slot_width       — crank_pin_d + 0.4 mm
+  yoke_slot_height      — ≥ 2 × crank_radius + crank_pin_d + 4 mm
+  yoke_thickness        — 8–15 mm
+
+GENEVA MECHANISM (intermittent)
+────────────────────────────────
+  num_slots             — N (3–8 slots); 4 and 6 most common
+  driver_radius         — R
+  slot_spacing_angle    — 360° / N
+  driver_pin_angle      — asin(1 / sqrt(1 + 1/sin²(180/N)))
+  centre_distance       — R × sqrt(2) / sin(180/N)
+  wheel_radius          — centre_distance × cos(180/N)
+  pin_diameter          — 4–8 mm
+  locking_arc_radius    — R × cos(180/N)
+
+LINKAGE JOINT (printed pin joint)
+────────────────────────────────────
+  pin_diameter          — M4 shoulder bolt (4 mm precision) recommended
+  hole_diameter         — pin_d + 0.2 mm (easy rotation)
+  eye_thickness         — link_thickness (same as parent link)
+  boss_diameter         — hole_d + 2 × wall (≥ 5 mm wall each side)
+  bearing_option        — 623zz (ø10×3 mm bore) for low-friction high-speed joints
+
+OPENSCAD LINK BODY
+───────────────────
+  module link_body(length, width, thickness, pin_d) {
+    hull() {
+      cylinder(h=thickness, d=width, center=true, $fn=64);
+      translate([length, 0, 0])
+        cylinder(h=thickness, d=width, center=true, $fn=64);
+    }
+    // subtract pin holes after hull in parent module
+  }
+
+DESIGN RULES
+────────────
+  - All rotating joints: pin_bore = pin_d + 0.2–0.3 mm for smooth motion
+  - Crank arms: print flat (xy plane) with pin holes through Z axis for best layer bonding
+  - Grashof check before modelling: verify s + l < p + q or crank will be a rocker
+  - Geneva wheel: lock arc MUST engage before pin disengages or wheel freewheels
+  - Eccentric cam stroke: keep eccentricity ≤ cam_radius × 0.4 (to maintain material around bore)
+  - Cam follower: roller follower always preferred over flat; reduces contact stress and wear
+  - For printed mechanisms: add slight draft (0.5°) to all cam surfaces for smooth release
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A crank is a rotating disk or arm with an off-center pin hole; the eccentric distance defines stroke.
+- A cam is a rotating profile; for simple OpenSCAD use a disk plus eccentric lobe, or a hull of circles, then subtract shaft bore.
+- Linkage arms are solid bars with pivot holes subtracted at both ends.
+- Pivot holes are through cylinders perpendicular to the arm plate thickness.
+- Use hull() between two end circles/cylinders to create rounded link arms.
+- Clearance around pivots is represented by hole_d = pin_d + clearance.
+- Do not place pivots randomly; derive their center distance from link_length.
+- For assemblies, place modules with translate()/rotate() to show relative motion positions.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn cam, crank, and linkage rules into OpenSCAD.
+
+Rule: linkage arm is rounded bar between two pivots.
+OpenSCAD action:
+  module link_arm() {
+    difference() {
+      hull() {
+        translate([-center_distance/2,0,0]) cylinder(h=arm_thickness, d=end_diameter, center=true, $fn=64);
+        translate([ center_distance/2,0,0]) cylinder(h=arm_thickness, d=end_diameter, center=true, $fn=64);
+      }
+      for (x=[-center_distance/2, center_distance/2])
+        translate([x,0,0]) cylinder(h=arm_thickness+2, d=pivot_diameter+clearance, center=true, $fn=48);
+    }
+  }
+
+Rule: crank pin is offset from shaft center by eccentricity.
+OpenSCAD action:
+  translate([eccentricity,0,0])
+    cylinder(h=crank_thickness+2, d=pin_hole_diameter, center=true, $fn=48);
+
+Rule: simple cam lobe is hull of base circle and offset nose circle.
+OpenSCAD action:
+  hull() {
+    cylinder(h=cam_thickness, d=base_diameter, center=true, $fn=96);
+    translate([lobe_offset,0,0]) cylinder(h=cam_thickness, d=nose_diameter, center=true, $fn=64);
+  }

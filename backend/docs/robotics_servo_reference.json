@@ -1,0 +1,161 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "robotics_servo_reference",
+    "family_label": "Robotics and Servo Parts",
+    "units": "millimeters",
+    "scope": "Servo brackets, servo horns, robot arm links, wheel hubs, gripper fingers, chassis plates.",
+    "retrieval": {
+      "primary_keywords": [
+        "servo",
+        "mg996r",
+        "sg90",
+        "servo bracket",
+        "servo mount",
+        "servo horn",
+        "robot arm",
+        "robot chassis",
+        "gripper",
+        "nema17 robot",
+        "servo link"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "gearbox housing",
+        "fan mount",
+        "enclosure",
+        "flange pipe"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "PA12-CF",
+        "use_case": "functional servo brackets and arm links",
+        "notes": "Best printed option; resists flex fatigue better than PETG."
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined servo brackets and chassis",
+        "notes": "Rigid; light; anodise for appearance."
+      },
+      {
+        "material": "PETG",
+        "use_case": "prototype servo brackets and covers",
+        "notes": "Easy to print; use metal inserts for servo mounting holes."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "MG996R servo body dimensions",
+        "applies_to": "body clearance pocket and mounting holes",
+        "note": "Body 40×20×43.5 mm; tabs span 49 mm apart; M3 mounting holes."
+      },
+      {
+        "name": "SG90 micro servo",
+        "applies_to": "small servo bracket sizing",
+        "note": "Body 22.5×12×29 mm; tab span 28 mm; M2 mounting holes."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "mg996r_servo_bracket",
+      "category": "servo_bracket",
+      "name": "MG996R servo bracket (U-bracket)",
+      "aliases": [
+        "servo bracket",
+        "mg996r bracket",
+        "standard servo mount",
+        "servo holder"
+      ],
+      "standards": [
+        "MG996R servo body dimensions"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "CNC machined"
+      ],
+      "family": "robotics_servo_reference",
+      "standard_dimensions_mm": {
+        "servo_body_l": 40.5,
+        "servo_body_w": 20.5,
+        "servo_body_h": 44,
+        "tab_span": 49,
+        "hole_d": 3.4,
+        "bracket_t": 4
+      },
+      "fit_guidance_mm": {
+        "servo_pocket": "servo body + 0.5 mm clearance each side"
+      },
+      "constraint_parameters": {
+        "servo_body_l": {
+          "default": 40.5
+        },
+        "tab_span": {
+          "default": 49
+        },
+        "bracket_t": {
+          "default": 4,
+          "min": 3
+        }
+      },
+      "derived_parameters": {
+        "plate_l": {
+          "formula": "tab_span + 10",
+          "note": "extends 5 mm past each tab"
+        }
+      },
+      "main_features": [
+        "base mounting plate",
+        "two side walls with servo body clearance pocket",
+        "servo mounting tab holes through side walls",
+        "cable relief hole"
+      ],
+      "design_rules": [
+        "servo body pocket is rectangular cutout in side walls",
+        "mounting tab holes align with tab_span distance",
+        "side walls thick enough for M3 bolt: ≥4 mm",
+        "plate extends past tabs for rigidity"
+      ],
+      "validation_criteria": [
+        "servo body pocket subtracted from side walls",
+        "two tab holes subtracted through side walls",
+        "plate is solid base"
+      ],
+      "failure_modes": [
+        "pocket too tight — servo does not fit",
+        "holes missing — servo not retained",
+        "single flat plate without walls — no pocket"
+      ],
+      "constraint_checks": [
+        {
+          "id": "servo_pocket",
+          "severity": "error",
+          "expression": "servo body cutout cube in difference",
+          "message": "Servo bracket must have a rectangular servo body pocket."
+        },
+        {
+          "id": "tab_holes",
+          "severity": "error",
+          "expression": "two tab mounting holes present",
+          "message": "Servo bracket needs two mounting holes matching tab span."
+        }
+      ],
+      "openscad_module": "$fn = 64;\n\nservo_l    = 40.5;\nservo_w    = 20.5;\nservo_h    = 44;\ntab_span   = 49;\nhole_d     = 3.4;\nbracket_t  = 4;\nclearance  = 0.5;\n\nplate_l    = tab_span + 10;\n\nmodule mg996r_bracket() {\n  difference() {\n    union() {\n      cube([plate_l, servo_w + 2*bracket_t, bracket_t], center = true);\n      for (s = [-1, 1])\n        translate([0, s * (servo_w/2 + bracket_t/2), servo_h/2])\n          cube([plate_l, bracket_t, servo_h], center = true);\n    }\n    cube([servo_l + clearance, servo_w + clearance + 2, servo_h + clearance], center = true);\n    for (x = [-tab_span/2, tab_span/2])\n      translate([x, 0, 0])\n        rotate([90, 0, 0])\n          cylinder(h = servo_w + 2*bracket_t + 2, d = hole_d, center = true, $fn = 32);\n  }\n}\n\nmg996r_bracket();"
+    }
+  ]
+}

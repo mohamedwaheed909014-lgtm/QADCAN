@@ -1,0 +1,158 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "fastener_nut_trap_reference",
+    "family_label": "Fasteners, Nut Traps and Heat Inserts",
+    "units": "millimeters",
+    "scope": "Hex nut traps, square nut traps, heat-set brass inserts, counterbores, countersinks, bolt clearance holes.",
+    "retrieval": {
+      "primary_keywords": [
+        "nut trap",
+        "heat insert",
+        "brass insert",
+        "counterbore",
+        "countersink",
+        "hex nut",
+        "m3 trap",
+        "m4 trap",
+        "fastener hole",
+        "clearance hole",
+        "self-tapping",
+        "bolt pattern"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "fan mount",
+        "flange pipe",
+        "bracket motor",
+        "enclosure"
+      ],
+      "min_score_threshold": 0.1
+    },
+    "material_suggestions": [
+      {
+        "material": "Brass inserts (M2–M8)",
+        "use_case": "heat-set threaded inserts in printed parts",
+        "notes": "Press in with soldering iron; pull-out strength ×5 vs self-tap in PLA."
+      },
+      {
+        "material": "Stainless A2-70 (ISO 3506)",
+        "use_case": "bolts and nuts for corrosion-sensitive assemblies",
+        "notes": "Good in wet environments; lower strength than 8.8 carbon steel."
+      },
+      {
+        "material": "Grade 8.8 carbon steel",
+        "use_case": "structural bolts in metal assemblies",
+        "notes": "Yield 640 MPa; coat or plate for corrosion resistance."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ISO 4762 socket cap screws",
+        "applies_to": "head dimensions for counterbore sizing",
+        "note": "M3 head OD 5.5 mm, height 3 mm; M4 head OD 7 mm, height 4 mm."
+      },
+      {
+        "name": "ISO 4032 hexagon nuts",
+        "applies_to": "hex nut trap dimensions",
+        "note": "M3 nut: F-F 5.5 mm, height 2.4 mm; M4: F-F 7.0 mm, height 3.2 mm."
+      },
+      {
+        "name": "ISO 965 metric thread tolerances",
+        "applies_to": "tapped hole sizing",
+        "note": "6H tolerance; print at minor diameter for self-tap; add 0.1–0.15 mm for ease."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "hex_nut_trap_m3",
+      "category": "nut_trap",
+      "name": "M3 hexagonal nut trap pocket",
+      "aliases": [
+        "nut trap m3",
+        "m3 hex pocket",
+        "captured nut",
+        "hexnut pocket"
+      ],
+      "standards": [
+        "ISO 4032"
+      ],
+      "manufacturing_processes": [
+        "3D printed FDM"
+      ],
+      "family": "fastener_nut_trap_reference",
+      "standard_dimensions_mm": {
+        "flat_to_flat": 5.7,
+        "nut_height": 2.6,
+        "bolt_clearance": 3.4
+      },
+      "fit_guidance_mm": {
+        "hex_pocket": "ISO 4032 F-F + 0.2 mm = 5.7 mm; depth = nut height + 0.2 mm"
+      },
+      "constraint_parameters": {
+        "bolt_size": {
+          "default": "M3",
+          "options": [
+            "M3",
+            "M4",
+            "M5",
+            "M6",
+            "M8"
+          ]
+        }
+      },
+      "derived_parameters": {
+        "hex_outer_circle": {
+          "formula": "flat_to_flat / cos(30)",
+          "note": "≈ 6.58 mm for M3; use $fn=6 cylinder"
+        },
+        "trap_depth": {
+          "formula": "nut_height + 0.2",
+          "note": "extra 0.2 mm for imperfect layers"
+        }
+      },
+      "main_features": [
+        "hexagonal pocket for nut (cylinder with $fn=6)",
+        "coaxial bolt clearance through-hole extending past pocket"
+      ],
+      "design_rules": [
+        "hex pocket is cylinder with $fn=6 sized by outer-circle diameter",
+        "bolt clearance extends further than hex pocket",
+        "pocket rotated 30° so flat faces align with print orientation if needed"
+      ],
+      "validation_criteria": [
+        "hex pocket uses $fn=6 cylinder",
+        "bolt clearance coaxial with pocket",
+        "both inside difference()"
+      ],
+      "failure_modes": [
+        "square pocket instead of hex",
+        "bolt clearance not coaxial",
+        "pocket too shallow — nut falls out"
+      ],
+      "constraint_checks": [
+        {
+          "id": "hex_fn6",
+          "severity": "error",
+          "expression": "$fn=6 cylinder used for hex pocket",
+          "message": "Hex nut trap must use cylinder with $fn=6 for correct hex profile."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\nbolt_d        = 3.4;\nm3_flat_flat  = 5.7;\nm3_nut_height = 2.6;\nm3_outer_d    = m3_flat_flat / cos(30);\nwall_example  = 10;\n\nmodule m3_nut_trap_host() {\n  difference() {\n    cube([wall_example, wall_example, wall_example], center = true);\n    rotate([0, 0, 30])\n      cylinder(h = m3_nut_height + 0.2, d = m3_outer_d, center = true, $fn = 6);\n    cylinder(h = wall_example + 2, d = bolt_d, center = true, $fn = 32);\n  }\n}\n\nm3_nut_trap_host();"
+    }
+  ]
+}

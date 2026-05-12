@@ -1,0 +1,178 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "enclosure_box_reference",
+    "family_label": "Enclosures and Electronics Boxes",
+    "units": "millimeters",
+    "scope": "Two-piece snap-fit and screw-lid electronics enclosures, DIN rail boxes, PCB trays.",
+    "retrieval": {
+      "primary_keywords": [
+        "enclosure",
+        "electronics box",
+        "project box",
+        "lid",
+        "screw posts",
+        "din rail",
+        "snap fit box",
+        "raspberry pi case",
+        "arduino box",
+        "pcb tray",
+        "standoff",
+        "wall thickness enclosure"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "bracket motor",
+        "fan duct",
+        "pipe flange",
+        "pillow block"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "PETG",
+        "use_case": "functional printed electronics enclosures",
+        "notes": "Good layer adhesion; printable with tight tolerances; up to 70 °C."
+      },
+      {
+        "material": "ABS",
+        "use_case": "enclosures needing post-processing (sanding, acetone smoothing)",
+        "notes": "Can warp; use enclosure printer. Good impact resistance."
+      },
+      {
+        "material": "PA12 / Nylon",
+        "use_case": "ruggedised or outdoor enclosures",
+        "notes": "Chemical resistance; moisture uptake causes dimensional change."
+      },
+      {
+        "material": "6061-T6 aluminum sheet",
+        "use_case": "machined or laser-cut enclosure panels",
+        "notes": "Lightweight; anodise for appearance and corrosion protection."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "IP54 / IEC 60529",
+        "applies_to": "dust and splash protection for electronics boxes",
+        "note": "IP54 = dust-protected + splash-resistant; requires sealed lid and cable glands."
+      },
+      {
+        "name": "DIN rail TS35",
+        "applies_to": "DIN rail clip geometry",
+        "note": "35 mm rail width; 7.5 mm rail height for standard TS35."
+      },
+      {
+        "name": "PCB mounting (Raspberry Pi 4)",
+        "applies_to": "standoff positions for PCB",
+        "note": "Pi 4: 85×56 mm, 4× holes on 58×49 mm pattern, ø2.75 mm."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "electronics_box_basic",
+      "category": "screw_lid_box",
+      "name": "Two-piece electronics enclosure with screw lid",
+      "aliases": [
+        "project box",
+        "electronics enclosure",
+        "arduino box",
+        "pi case",
+        "electronic housing",
+        "pcb box"
+      ],
+      "standards": [
+        "IEC 60529"
+      ],
+      "manufacturing_processes": [
+        "3D printed"
+      ],
+      "family": "enclosure_box_reference",
+      "standard_dimensions_mm": {
+        "inner_length": 80,
+        "inner_width": 60,
+        "inner_height": 30,
+        "wall_thickness": 3,
+        "lid_thickness": 2
+      },
+      "fit_guidance_mm": {
+        "lid_lip": "outer_dims - 2*clearance gap 0.25 mm each side",
+        "standoff_hole": "M3 self-tap at 2.8 mm or heat-insert at 4.2 mm"
+      },
+      "constraint_parameters": {
+        "inner_length": {
+          "default": 80
+        },
+        "inner_width": {
+          "default": 60
+        },
+        "inner_height": {
+          "default": 30
+        },
+        "wall_thickness": {
+          "default": 3,
+          "min": 2
+        }
+      },
+      "derived_parameters": {
+        "outer_length": {
+          "formula": "inner_length + 2*wall_thickness"
+        },
+        "outer_width": {
+          "formula": "inner_width + 2*wall_thickness"
+        }
+      },
+      "main_features": [
+        "hollow shell (outer box minus inner cavity)",
+        "four corner screw-boss standoffs",
+        "lid with inner lip",
+        "optional connector cutouts"
+      ],
+      "design_rules": [
+        "shell = difference of outer cube minus inner cube",
+        "inner cavity offset by wall_thickness in X/Y and bottom_wall in Z",
+        "standoffs are cylinders added in union with pilot holes subtracted",
+        "lid lip = outer dims minus 2×gap on each side"
+      ],
+      "validation_criteria": [
+        "inner cavity subtracted from outer shell",
+        "4 standoffs present",
+        "lid lip present as smaller cube inside lid"
+      ],
+      "failure_modes": [
+        "solid block instead of hollow shell",
+        "missing standoffs — no way to mount lid",
+        "lid lip wrong size — does not fit"
+      ],
+      "constraint_checks": [
+        {
+          "id": "hollow_shell",
+          "severity": "error",
+          "expression": "difference has inner cavity cube",
+          "message": "Enclosure must be hollow: outer cube minus inner cavity."
+        },
+        {
+          "id": "standoffs",
+          "severity": "warning",
+          "expression": "boss cylinders present",
+          "message": "Enclosure should have screw boss standoffs."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\ninner_length     = 80;\ninner_width      = 60;\ninner_height     = 30;\nwall_thickness   = 3;\nbottom_wall      = 3;\nlid_thickness    = 2;\nlid_clearance    = 0.25;\nlid_overlap      = 3;\nstandoff_h       = 4;\nstandoff_od      = 6;\npilot_hole_d     = 2.8;\nboss_margin      = 6;\n\nouter_length = inner_length + 2 * wall_thickness;\nouter_width  = inner_width  + 2 * wall_thickness;\nouter_height = inner_height + bottom_wall;\n\nmodule enclosure_body() {\n  difference() {\n    cube([outer_length, outer_width, outer_height], center = true);\n    translate([0, 0, bottom_wall/2])\n      cube([inner_length, inner_width, outer_height], center = true);\n    for (x = [-inner_length/2 + boss_margin, inner_length/2 - boss_margin])\n      for (y = [-inner_width/2 + boss_margin, inner_width/2 - boss_margin])\n        translate([x, y, -outer_height/2 + bottom_wall + standoff_h/2])\n          cylinder(h = standoff_h + 2, d = pilot_hole_d, center = true, $fn = 32);\n  }\n  for (x = [-inner_length/2 + boss_margin, inner_length/2 - boss_margin])\n    for (y = [-inner_width/2 + boss_margin, inner_width/2 - boss_margin])\n      translate([x, y, -outer_height/2 + bottom_wall + standoff_h/2])\n        cylinder(h = standoff_h, d = standoff_od, center = true, $fn = 32);\n}\n\nmodule enclosure_lid() {\n  union() {\n    cube([outer_length, outer_width, lid_thickness], center = true);\n    translate([0, 0, -lid_overlap/2])\n      cube([outer_length - 2*lid_clearance, outer_width - 2*lid_clearance, lid_overlap], center = true);\n  }\n}\n\nenclosure_body();"
+    }
+  ]
+}

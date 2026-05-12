@@ -1,0 +1,148 @@
+ROBOTICS PARTS REFERENCE
+Category: Robotics / Mechatronics
+Verified models: Thingiverse "servo bracket parametric" (hundreds), GrabCAD "MG996R servo mount",
+  Printables "robot arm joint OpenSCAD", Cults3D "servo horn bracket",
+  MyMiniFactory "robot chassis", Thingiverse "NEMA17 robot joint"
+
+SERVO MOTOR FAMILIES
+─────────────────────
+1. Micro Servo (SG90, MG90S)
+   - Body: 22.5×12×29 mm, mounting tabs 32.2×12 mm with M2 holes 28 mm apart
+   - Output spline: ø4.8 mm, 25T, shaft protrudes 12 mm
+
+2. Standard Servo (MG996R, MG995, DS3218)
+   - Body: 40×20×43.5 mm, mounting tabs 54×20 mm with M3 holes 49 mm apart
+   - Output spline: ø6.0 mm, 25T, shaft protrudes 15 mm
+   - Torque: 9.4–10 kg·cm (MG996R at 4.8V)
+
+3. Large Servo (DS3120, Hitec HS-755HB)
+   - Body: 66×30×56 mm, mounting tab span ≈ 75 mm, M4 mounting
+   - High torque: 15–20 kg·cm
+
+4. Digital Servo / Robot Servo (Dynamixel XL-430)
+   - Body: 28×46×34 mm, ø4 mm through-shaft, daisy-chainable
+   - Serial bus (TTL/RS485); position feedback
+
+SERVO HORN / DISK DIMENSIONS
+──────────────────────────────
+  SG90 horn       : arm length 14 mm, hole ø1.5 mm centres 11 mm; disk OD 22 mm
+  MG996R disk     : OD 30 mm, 6× M3 holes on ø20 mm circle; centre hub ø6.1 mm
+  Futaba 25T      : spline ø4.8 mm, 25 teeth, 0.8 mm module
+  JR/Hitec 25T    : same 25T spec
+  Spline press fit: +0.05/−0 on horn bore for light press
+
+KEY PARAMETERS
+──────────────
+  servo_body_length      — e.g. 22.5 mm SG90, 40 mm MG996R
+  servo_body_width       — e.g. 12 mm, 20 mm
+  servo_body_height      — e.g. 29 mm, 43.5 mm
+  servo_tab_span         — distance between mounting hole centres (28 mm SG90, 49 mm MG996R)
+  servo_tab_width        — overall tab width including body
+  servo_mount_hole_d     — M2 for SG90, M3 for MG996R
+  servo_shaft_od         — ø4.8 mm SG90, ø6.0 mm MG996R
+  servo_shaft_height     — distance from mounting face to shaft tip
+  servo_flange_clearance — 0.5–1.0 mm gap around servo body
+  horn_od                — output horn outer diameter
+  horn_arm_length        — lever arm length for force calculation
+  bracket_thickness      — 3–4 mm FDM for standard servos
+  pivot_clearance        — 0.3–0.5 mm between rotating and static parts
+
+MOBILE ROBOT WHEEL PARAMETERS
+───────────────────────────────
+  wheel_diameter        — 40–100 mm common for indoor robots
+  wheel_width           — 10–30 mm
+  hub_bore              — matches motor shaft (D-cut or round)
+  hub_d                 — bore_d + 8 mm minimum wall
+  spoke_count           — 3–6; or solid disc for simplicity
+  tyre_groove_depth     — 1–2 mm V-groove or flat; for o-ring tyre: groove = o_ring_d × 0.9
+  o_ring_sizes          : ø3 mm cord common; outer track = wheel_d − 2×1.5 mm recess
+
+ROBOT ARM JOINT
+────────────────
+  module servo_bracket(body_l, body_w, tab_span, hole_d, thickness) {
+    plate_l = tab_span + 10;    // extend past mounting holes
+    difference() {
+      union() {
+        cube([plate_l, body_w + 2*thickness, thickness]);
+        // side walls
+        for(side=[-1, 1])
+          translate([(plate_l-body_l)/2, side*(body_w/2+thickness/2), 0])
+            cube([body_l, thickness, body_l*0.5]);
+      }
+      // servo body cutout
+      translate([(plate_l-body_l)/2, thickness, -1])
+        cube([body_l+0.5, body_w+0.5, thickness+2]);
+      // mounting holes
+      for(x=[(plate_l-tab_span)/2, (plate_l+tab_span)/2])
+        translate([x, thickness/2, -1])
+          cylinder(h=thickness+2, d=hole_d+0.2, $fn=32);
+    }
+  }
+
+ROBOT CHASSIS KEY DIMENSIONS
+──────────────────────────────
+  Differential drive (2-wheel + caster):
+    wheelbase           — 100–200 mm
+    wheel_track         — wheelbase × 0.8–1.2
+    ground_clearance    — 5–15 mm
+    caster_offset       — rear; ø25–40 mm ball caster
+
+  Tank drive (4-wheel or tracked):
+    track_width         — wheel_track + 2 × wheel_width
+    chassis_plate_t     — 3–5 mm
+
+GRIPPER PARAMETERS
+───────────────────
+  finger_length         — 30–80 mm
+  finger_width          — 8–15 mm
+  finger_thickness      — 3–5 mm
+  jaw_travel            — max open width − min closed width; 20–60 mm
+  servo_rack_module     — 1.0–1.5 mm module rack for servo-driven gripper
+  parallel_linkage_pin  — M3 shoulder bolt ø3 mm; pin hole = 3.1 mm
+
+DESIGN RULES
+────────────
+  - Servo mounting tabs: print holes 0.1 mm undersized and drill/tap to thread M2/M3
+  - Rotating joint: shaft bore + 0.3–0.5 mm for loose rotation; bushing bore + 0.1 mm
+  - Horn screw: always use the supplied servo screw through centre hole into spline shaft
+  - Servo saver: spring-loaded horn absorbs shock; use for direct-drive steering
+  - For arms: print links flat (layers perpendicular to bending moment) for max strength
+  - Cable routing: add ø5 mm holes along arm length to route servo wires cleanly
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- Servo parts include horn, bracket, arm, linkage point, cable relief, and mounting ears.
+- Arms, horn disks, ribs, and brackets are solid material in union().
+- Servo spline/bore, mounting holes, linkage holes, and wire channels are removed material in difference().
+- Servo horns are radial arms or disks centered on the servo output axis.
+- Linkage holes repeat along an arm at known radius positions.
+- Servo brackets need rectangular servo body clearance and side mounting holes.
+- Cable routing is a small channel or hole subtracted from the arm/bracket.
+- Keep arm thickness and rib height as parameters for strength tuning.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn robotics-servo rules into OpenSCAD.
+
+Rule: servo horn center attaches to spline/output shaft.
+OpenSCAD action:
+  difference() {
+    cylinder(h=horn_thickness, d=hub_diameter, center=true, $fn=96);
+    cylinder(h=horn_thickness+2, d=spline_bore_diameter, center=true, $fn=64);
+  }
+
+Rule: servo arm is a radial beam from the hub.
+OpenSCAD action:
+  translate([arm_length/2,0,0]) cube([arm_length, arm_width, horn_thickness], center=true);
+
+Rule: linkage holes repeat along arm radius.
+OpenSCAD action:
+  for (r=[hole_pitch:hole_pitch:arm_length])
+    translate([r,0,0]) cylinder(h=horn_thickness+2, d=linkage_hole_diameter, center=true, $fn=32);
+
+Rule: servo bracket pocket removes the rectangular servo body.
+OpenSCAD action:
+  cube([servo_body_length+clearance, servo_body_width+clearance, servo_body_height+clearance], center=true);
+
+Rule: cable relief is a small channel through bracket wall.
+OpenSCAD action:
+  translate([cable_x, bracket_wall_y, cable_z]) cube([cable_width, wall_thickness+2, cable_height], center=true);

@@ -1,0 +1,165 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "gearbox_housing_reference",
+    "family_label": "Gearbox Housings",
+    "units": "millimeters",
+    "scope": "Inline spur gearbox housings, worm gearbox bodies, planetary carrier housings.",
+    "retrieval": {
+      "primary_keywords": [
+        "gearbox",
+        "gear housing",
+        "gearbox housing",
+        "two-piece gearbox",
+        "gear cover",
+        "gearbox half",
+        "planetary housing",
+        "worm gearbox body"
+      ],
+      "negative_keywords": [
+        "pillow block",
+        "bearing housing pillow",
+        "fan mount",
+        "bracket",
+        "enclosure box",
+        "flange pipe",
+        "clamp"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "Cast aluminum (A380 / AlSi9Cu3)",
+        "use_case": "die-cast gearbox housings for production",
+        "notes": "Good castability; machines well; lightweight.",
+        "standards": [
+          "EN 1706 AC-46000"
+        ]
+      },
+      {
+        "material": "Cast iron EN-GJL-250",
+        "use_case": "heavy-duty spur and worm gearbox bodies",
+        "notes": "Good damping; rigid; heavier than aluminum."
+      },
+      {
+        "material": "6061-T6 aluminum billet",
+        "use_case": "machined prototype or small-batch gearbox housings",
+        "notes": "CNC-machine from billet; no casting required."
+      },
+      {
+        "material": "PETG / PA12-CF",
+        "use_case": "3D-printed lightweight gearbox housings",
+        "notes": "PA12-CF for structural rigidity; use metal inserts for shaft bores."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ISO 286-1 H7",
+        "applies_to": "bearing seat bores in gearbox housing walls",
+        "note": "H7 bore tolerance for bearing outer race press fit."
+      },
+      {
+        "name": "ISO 4762",
+        "applies_to": "lid bolt holes around housing perimeter",
+        "note": "M5 bolts for housings up to 150 mm; M6 for larger."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "spur_gearbox_2shaft",
+      "category": "inline_gearbox",
+      "name": "Two-shaft inline spur gearbox housing (lower half)",
+      "aliases": [
+        "gearbox housing",
+        "gear case",
+        "gearbox body",
+        "gear housing"
+      ],
+      "standards": [
+        "ISO 286-1 H7",
+        "ISO 4762"
+      ],
+      "manufacturing_processes": [
+        "machined",
+        "3D printed",
+        "cast"
+      ],
+      "family": "gearbox_housing_reference",
+      "standard_dimensions_mm": {
+        "housing_length": 100,
+        "housing_width": 50,
+        "housing_height": 60,
+        "wall_thickness": 8,
+        "centre_distance": 40
+      },
+      "fit_guidance_mm": {
+        "bearing_seat": "H7 (+0.000/+0.025 for 47 mm OD bearing)"
+      },
+      "constraint_parameters": {
+        "centre_distance": {
+          "default": 40,
+          "note": "= gear_module*(teeth1+teeth2)/2"
+        },
+        "wall_thickness": {
+          "default": 8,
+          "min": 6
+        }
+      },
+      "derived_parameters": {
+        "housing_length": {
+          "formula": "centre_distance + gear_r_large + 2*wall_thickness"
+        }
+      },
+      "main_features": [
+        "hollow rectangular shell (outer minus inner cavity)",
+        "two shaft bore holes through side walls",
+        "bearing seat recesses coaxial with shaft bores",
+        "lid bolt holes around top perimeter flange"
+      ],
+      "design_rules": [
+        "inner cavity subtracted keeping wall_thickness on all sides",
+        "shaft bores on correct horizontal axis through side walls",
+        "bearing seats larger-diameter recesses around shaft bores from outside walls",
+        "lid bolt holes are vertical cylinders on top flange perimeter"
+      ],
+      "validation_criteria": [
+        "inner cavity subtracted",
+        "two shaft bores through side walls",
+        "bearing seats present around shaft bores"
+      ],
+      "failure_modes": [
+        "solid block instead of hollow housing",
+        "shaft bores placed at wrong Z height",
+        "bearing seats missing"
+      ],
+      "constraint_checks": [
+        {
+          "id": "hollow",
+          "severity": "error",
+          "expression": "inner cavity cube subtracted",
+          "message": "Gearbox housing must be hollow."
+        },
+        {
+          "id": "shaft_bores",
+          "severity": "error",
+          "expression": "two shaft bore cylinders through walls",
+          "message": "Gearbox housing needs two coaxial shaft bore holes."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\nwall          = 8;\nhousing_l     = 100;\nhousing_w     = 50;\nhousing_h     = 60;\nshaft_bore_d  = 22;\nbearing_seat_d = 47.025;\nbearing_depth  = 14;\nshaft_z        = housing_h / 2 - 10;\nbolt_hole_d   = 5.5;\n\nmodule gearbox_lower_half() {\n  difference() {\n    cube([housing_l, housing_w, housing_h/2], center = true);\n    translate([0, 0, wall/2])\n      cube([housing_l - 2*wall, housing_w - 2*wall, housing_h/2], center = true);\n    for (x = [-housing_l/4, housing_l/4])\n      translate([x, 0, shaft_z - housing_h/4])\n        rotate([90, 0, 0])\n          cylinder(h = housing_w + 2, d = shaft_bore_d, center = true, $fn = 64);\n    for (x = [-housing_l/4, housing_l/4])\n      translate([x, housing_w/2 - bearing_depth/2, shaft_z - housing_h/4])\n        rotate([90, 0, 0])\n          cylinder(h = bearing_depth + 0.1, d = bearing_seat_d, center = true, $fn = 96);\n    for (x = [-housing_l/2 + wall, housing_l/2 - wall])\n      for (y = [-housing_w/2 + wall, housing_w/2 - wall])\n        translate([x, y, housing_h/4 - wall/2])\n          cylinder(h = wall + 2, d = bolt_hole_d, center = true, $fn = 32);\n  }\n}\n\ngearbox_lower_half();"
+    }
+  ]
+}

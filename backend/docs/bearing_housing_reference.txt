@@ -1,0 +1,328 @@
+BEARING HOUSING REFERENCE
+Category: Power Transmission / Shaft Support
+Verified models: Printables #832922 (Pillow Block Bearing Holder), Printables #472502 (608 Drop-In Pillow Block),
+  Thingiverse thing:3858045 (EasyMcguire parametric collection), GrabCAD "Bearing Housing UCFL205"
+
+PART FAMILIES
+─────────────
+1. Pillow Block (Plummer Block)
+   - Flat base with two bolt holes, cylindrical boss on top holding bearing
+   - Shaft axis is PARALLEL to mounting surface
+   - Used: conveyor shafts, CNC leadscrews, 3D printer Z-axis
+
+2. Flanged Bearing Housing (UCF / UCFL type)
+   - Circular or square flange, shaft axis PERPENDICULAR to mounting surface
+   - Four bolt holes on flange corners
+   - Used: wall-mounted shafts, fan assemblies
+
+3. Take-Up Bearing Housing
+   - Slotted base allowing linear adjustment for belt tension
+   - Slot length typically 20–40 mm
+
+4. Simple Bore Block (end support)
+   - Minimal block with single bore, used as end support for rods/shafts
+
+STANDARD BEARING SERIES (ISO) — use these for bore and OD parameters
+──────────────────────────────────────────────────────────────────────
+  608zz  : bore  8 mm, OD  22 mm, width  7 mm  (most common in 3D printing)
+  6001zz : bore 12 mm, OD  28 mm, width  8 mm
+  6200zz : bore 10 mm, OD  30 mm, width  9 mm
+  6201zz : bore 12 mm, OD  32 mm, width 10 mm
+  6202zz : bore 15 mm, OD  35 mm, width 11 mm
+  6203zz : bore 17 mm, OD  40 mm, width 12 mm
+  6204zz : bore 20 mm, OD  47 mm, width 14 mm
+  6205zz : bore 25 mm, OD  52 mm, width 15 mm
+  6206zz : bore 30 mm, OD  62 mm, width 16 mm
+  6207zz : bore 35 mm, OD  72 mm, width 17 mm
+  6208zz : bore 40 mm, OD  80 mm, width 18 mm
+  6305zz : bore 25 mm, OD  62 mm, width 17 mm  (heavy series)
+
+KEY PARAMETERS
+──────────────
+  shaft_diameter          — shaft OD; housing bore = shaft_d + 0.3–0.5 mm clearance
+  bearing_od              — from table above (e.g. 47 mm for 6204)
+  bearing_width           — from table above (e.g. 14 mm for 6204)
+  bearing_seat_depth      — = bearing_width + 0.2 mm (light press fit on housing)
+  housing_length          — ≥ bearing_width + 2 × wall_thickness
+  housing_width           — ≥ bearing_od + 2 × wall_thickness
+  housing_height          — boss height above base; typically bearing_od/2 + wall_thickness
+  base_thickness          — 5–8 mm for printable; 10–15 mm for cast iron equivalent
+  wall_thickness          — 6–10 mm typical for FDM structural parts
+  hole_spacing            — bolt hole centre-to-centre; = housing_length − 2 × edge_margin
+  bolt_hole_diameter      — M4=4.5, M5=5.5, M6=6.6, M8=8.8 (clearance drill)
+  edge_margin             — ≥ 1.5 × bolt_hole_diameter from hole centre to part edge
+  counterbore_diameter    — bolt head OD + 1 mm
+  counterbore_depth       — bolt head height + 0.5 mm
+
+OPENSCAD STRUCTURE
+──────────────────
+  shaft_diameter = 20;
+  bearing_od = 47;
+  bearing_width = 14;
+  wall_thickness = 8;
+  base_thickness = 6;
+  housing_length = 70;
+  housing_width = bearing_od + 2*wall_thickness;
+  housing_height = bearing_od/2 + wall_thickness;
+  hole_spacing = housing_length - 2*edge_margin;
+  edge_margin = 10;
+  bolt_hole_d = 5.5;
+
+  module pillow_block() {
+    difference() {
+      union() {
+        // base plate
+        cube([housing_length, housing_width, base_thickness], center=true);
+        // bearing boss
+        translate([0, 0, base_thickness/2 + housing_height/2])
+          cube([bearing_width + 2*wall_thickness, bearing_od + 2*wall_thickness,
+                housing_height], center=true);
+      }
+      // bearing seat
+      translate([0, 0, base_thickness/2])
+        rotate([0,90,0])
+          cylinder(h=bearing_width+1, d=bearing_od+0.2, center=true, $fn=96);
+      // shaft through bore
+      rotate([0,90,0])
+        cylinder(h=housing_length+2, d=shaft_diameter+0.5, center=true, $fn=96);
+      // mounting holes
+      for(x=[-hole_spacing/2, hole_spacing/2])
+        translate([x, 0, 0])
+          cylinder(h=base_thickness+2, d=bolt_hole_d, center=true, $fn=32);
+    }
+  }
+
+DESIGN RULES
+────────────
+  - Bearing seat is a HOUSING bore: bearing_od + 0.0 to +0.05 mm (transition/press fit)
+  - Shaft bore: shaft_d + 0.3–0.5 mm (running clearance)
+  - Minimum wall between bearing seat and exterior: ≥ 4 mm
+  - For split/clamp housing (printable): add 1.0–1.5 mm clamp gap, two M3/M4 clamping screws
+  - Mounting bolt edge distance: centre of hole ≥ 1.5 × bolt_diameter from any free edge
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- The housing body and mounting base are solid support material, so create them in union().
+- The bearing seat, shaft clearance, clamp split, and mounting holes are removed material, so subtract them in difference().
+- If the bearing axis is horizontal, rotate the bearing-seat cylinder by 90 degrees so its axis passes through the boss.
+- Bearing bore diameter represents the bearing outside diameter plus fit clearance; shaft bore represents shaft clearance through the bearing path.
+- Add a raised boss around the bearing seat because it represents radial support and wall thickness.
+- Mounting holes pass vertically through the base and must be longer than base_thickness.
+- A pillow block should be base cube + circular bearing boss + subtracted bearing bore + subtracted base holes.
+- A split bearing clamp should add a slit through the boss and cross screws perpendicular to the slit.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn bearing-housing rules into OpenSCAD.
+
+Mandatory assembly structure:
+  module pillow_block_bearing_housing() {
+    difference() {
+      union() {
+        // ONLY solid material here: base block, raised bearing boss, ribs.
+      }
+      // ONLY removed material here: bearing seat, shaft bore, mounting holes, clamp slits.
+      // Do not place holes or shaft clearance inside union().
+    }
+  }
+
+Rule: base block supports the bearing housing.
+OpenSCAD action:
+  cube([base_length, base_width, base_thickness], center=true);
+
+Rule: raised bearing boss carries radial bearing load.
+OpenSCAD action:
+  translate([0,0,base_thickness/2 + boss_diameter/2])
+    rotate([90,0,0])
+      cylinder(h=boss_width, d=boss_diameter, center=true, $fn=96);
+
+Rule: bearing seat is a precise cylindrical recess through the boss.
+OpenSCAD action:
+  // Put this after the union() block, inside difference().
+  translate([0,0,base_thickness/2 + boss_diameter/2])
+    rotate([90,0,0])
+      cylinder(h=boss_width+2, d=bearing_outer_diameter+fit_clearance, center=true, $fn=96);
+
+Rule: shaft clearance follows the bearing axis.
+OpenSCAD action:
+  // Put this after the union() block, inside difference().
+  translate([0,0,base_thickness/2 + boss_diameter/2])
+    rotate([90,0,0])
+      cylinder(h=boss_width+4, d=shaft_diameter+shaft_clearance, center=true, $fn=96);
+
+Rule: mounting bolts pass through base with edge margin.
+OpenSCAD action:
+  // Put this after the union() block, inside difference().
+  for (x=[-mount_hole_spacing/2, mount_hole_spacing/2])
+    translate([x,0,0])
+      cylinder(h=base_thickness+2, d=mount_hole_diameter, center=true, $fn=48);
+
+REAL-WORLD PILLOW BLOCK EXAMPLES
+──────────────────────────────────────────────────────────────────────
+These 10 examples are based on real pillow block bearing housings used in
+FDM printing, light CNC, conveyor systems, and robotics. All use the
+pillow block (Plummer block) family: flat base, cylindrical boss, shaft
+axis PARALLEL to mounting surface.
+
+EXAMPLE 1 — 3D Printer Z-axis (608zz, Printables #472502)
+  Part name  : 608 Drop-In Pillow Block
+  Bearing    : 608zz  (bore 8 mm, OD 22 mm, width 7 mm)
+  shaft_diameter     = 8;    // 8 mm smooth rod
+  bearing_od         = 22;
+  bearing_width      = 7;
+  wall_thickness     = 5;
+  base_thickness     = 4;
+  housing_length     = 36;
+  housing_width      = 32;   // bearing_od + 2*wall_thickness
+  housing_height     = 16;   // bearing_od/2 + wall_thickness
+  hole_spacing       = 24;   // housing_length - 2*edge_margin (edge_margin=6)
+  bolt_hole_d        = 3.4;  // M3 clearance
+  Use: Z-axis upper/lower bearing support in cartesian 3D printers.
+
+EXAMPLE 2 — Desktop CNC Leadscrew (6001zz)
+  Part name  : SFU1204 leadscrew end support
+  Bearing    : 6001zz  (bore 12 mm, OD 28 mm, width 8 mm)
+  shaft_diameter     = 12;
+  bearing_od         = 28;
+  bearing_width      = 8;
+  wall_thickness     = 6;
+  base_thickness     = 5;
+  housing_length     = 48;
+  housing_width      = 40;
+  housing_height     = 20;
+  hole_spacing       = 32;
+  bolt_hole_d        = 4.5;  // M4 clearance
+  Use: Leadscrew end bearing on desktop CNC X/Y axis.
+
+EXAMPLE 3 — Light Conveyor Idler (6200zz)
+  Part name  : 10 mm idler shaft block
+  Bearing    : 6200zz  (bore 10 mm, OD 30 mm, width 9 mm)
+  shaft_diameter     = 10;
+  bearing_od         = 30;
+  bearing_width      = 9;
+  wall_thickness     = 7;
+  base_thickness     = 6;
+  housing_length     = 55;
+  housing_width      = 44;
+  housing_height     = 22;
+  hole_spacing       = 38;
+  bolt_hole_d        = 5.5;  // M5 clearance
+  Use: Idler shaft support on small belt conveyors.
+
+EXAMPLE 4 — Hobby Robotics Drive Axle (6201zz)
+  Part name  : 12 mm drive axle pillow block
+  Bearing    : 6201zz  (bore 12 mm, OD 32 mm, width 10 mm)
+  shaft_diameter     = 12;
+  bearing_od         = 32;
+  bearing_width      = 10;
+  wall_thickness     = 7;
+  base_thickness     = 6;
+  housing_length     = 58;
+  housing_width      = 46;
+  housing_height     = 23;
+  hole_spacing       = 40;
+  bolt_hole_d        = 4.5;  // M4 clearance
+  Use: Wheel/drive axle support on differential-drive robots.
+
+EXAMPLE 5 — RC Car Rear Axle (6202zz)
+  Part name  : 15 mm axle pillow block
+  Bearing    : 6202zz  (bore 15 mm, OD 35 mm, width 11 mm)
+  shaft_diameter     = 15;
+  bearing_od         = 35;
+  bearing_width      = 11;
+  wall_thickness     = 7;
+  base_thickness     = 6;
+  housing_length     = 62;
+  housing_width      = 49;
+  housing_height     = 25;
+  hole_spacing       = 44;
+  bolt_hole_d        = 4.5;  // M4 clearance
+  Use: Rear axle shaft support on 1:8 scale RC vehicles.
+
+EXAMPLE 6 — NEMA23 Motor Output Shaft (6203zz)
+  Part name  : NEMA23 shaft support block
+  Bearing    : 6203zz  (bore 17 mm, OD 40 mm, width 12 mm)
+  shaft_diameter     = 17;
+  bearing_od         = 40;
+  bearing_width      = 12;
+  wall_thickness     = 8;
+  base_thickness     = 7;
+  housing_length     = 70;
+  housing_width      = 56;
+  housing_height     = 28;
+  hole_spacing       = 50;
+  bolt_hole_d        = 5.5;  // M5 clearance
+  Use: Far-end shaft support for NEMA23 driven shafts on CNC routers.
+
+EXAMPLE 7 — General Purpose 20 mm Shaft (6204zz, Printables #832922)
+  Part name  : Pillow Block Bearing Holder 6204
+  Bearing    : 6204zz  (bore 20 mm, OD 47 mm, width 14 mm)
+  shaft_diameter     = 20;
+  bearing_od         = 47;
+  bearing_width      = 14;
+  wall_thickness     = 8;
+  base_thickness     = 7;
+  housing_length     = 74;
+  housing_width      = 63;
+  housing_height     = 31;
+  hole_spacing       = 54;
+  bolt_hole_d        = 5.5;  // M5 clearance
+  Use: General-purpose 20 mm shaft support; verified Printables model.
+
+EXAMPLE 8 — Mid-Size Conveyor Drive Shaft (6205zz)
+  Part name  : 25 mm conveyor drive shaft block
+  Bearing    : 6205zz  (bore 25 mm, OD 52 mm, width 15 mm)
+  shaft_diameter     = 25;
+  bearing_od         = 52;
+  bearing_width      = 15;
+  wall_thickness     = 9;
+  base_thickness     = 8;
+  housing_length     = 82;
+  housing_width      = 70;
+  housing_height     = 35;
+  hole_spacing       = 60;
+  bolt_hole_d        = 6.6;  // M6 clearance
+  Use: Drive-shaft bearing support on medium-duty conveyor frames.
+
+EXAMPLE 9 — Power Transmission 30 mm Shaft (6206zz)
+  Part name  : 30 mm shaft pillow block
+  Bearing    : 6206zz  (bore 30 mm, OD 62 mm, width 16 mm)
+  shaft_diameter     = 30;
+  bearing_od         = 62;
+  bearing_width      = 16;
+  wall_thickness     = 10;
+  base_thickness     = 9;
+  housing_length     = 96;
+  housing_width      = 82;
+  housing_height     = 41;
+  hole_spacing       = 74;
+  bolt_hole_d        = 6.6;  // M6 clearance
+  Use: Heavy-duty shaft support for power take-off and drive shafts.
+
+EXAMPLE 10 — Industrial Roller Drive (6208zz)
+  Part name  : 40 mm industrial roller shaft block
+  Bearing    : 6208zz  (bore 40 mm, OD 80 mm, width 18 mm)
+  shaft_diameter     = 40;
+  bearing_od         = 80;
+  bearing_width      = 18;
+  wall_thickness     = 12;
+  base_thickness     = 10;
+  housing_length     = 120;
+  housing_width      = 104;
+  housing_height     = 52;
+  hole_spacing       = 96;
+  bolt_hole_d        = 8.8;  // M8 clearance
+  Use: Industrial roller conveyor drive shaft — heaviest printable class.
+
+PARAMETER LOOKUP TABLE (all 10 examples, pillow block type only)
+───────────────────────────────────────────────────────────────────────
+  Ex  Bearing   bore  OD   width  L    W    H    hole_sp  bolt
+  1   608zz      8    22    7    36   32   16    24      M3
+  2   6001zz    12    28    8    48   40   20    32      M4
+  3   6200zz    10    30    9    55   44   22    38      M5
+  4   6201zz    12    32   10    58   46   23    40      M4
+  5   6202zz    15    35   11    62   49   25    44      M4
+  6   6203zz    17    40   12    70   56   28    50      M5
+  7   6204zz    20    47   14    74   63   31    54      M5
+  8   6205zz    25    52   15    82   70   35    60      M6
+  9   6206zz    30    62   16    96   82   41    74      M6
+  10  6208zz    40    80   18   120  104   52    96      M8

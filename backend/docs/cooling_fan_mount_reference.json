@@ -1,0 +1,171 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "cooling_fan_mount_reference",
+    "family_label": "Cooling Hardware and Fan Mounts",
+    "units": "millimeters",
+    "scope": "Fan mount plates, fan guards, heatsinks, duct shrouds for 25–200 mm fans.",
+    "retrieval": {
+      "primary_keywords": [
+        "fan mount",
+        "cooling fan",
+        "fan bracket",
+        "fan guard",
+        "fan duct",
+        "heatsink",
+        "40mm fan",
+        "80mm fan",
+        "120mm fan",
+        "airflow",
+        "fan screw",
+        "duct nozzle"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "bracket nema",
+        "sprocket",
+        "flange pipe",
+        "linear rail"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined fan brackets and heatsink bases",
+        "notes": "Good thermal conductivity for heatsinks; light for fan mounts."
+      },
+      {
+        "material": "PETG",
+        "use_case": "3D-printed fan ducts and mounts",
+        "notes": "Better temperature resistance than PLA; suitable up to 70 °C near fan exhaust."
+      },
+      {
+        "material": "PA12",
+        "use_case": "functional printed fan shrouds",
+        "notes": "Use for hot-end ducts; withstands higher temps than PETG."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "IEC 60297 fan bolt patterns",
+        "applies_to": "fan bolt circle for 40–200 mm fans",
+        "note": "80 mm fan: 71 mm bolt circle, 4×M4; 120 mm fan: 105 mm bolt circle, 4×M4."
+      },
+      {
+        "name": "ISO 4762",
+        "applies_to": "fan bolt hole clearances",
+        "note": "M3 = 3.5 mm hole; M4 = 4.5 mm hole."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "fan_mount_80mm",
+      "category": "fan_mount",
+      "name": "80 mm fan mount plate",
+      "aliases": [
+        "80mm fan bracket",
+        "fan plate",
+        "computer fan mount",
+        "case fan mount"
+      ],
+      "standards": [
+        "IEC 60297",
+        "ISO 4762"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "laser cut",
+        "machined"
+      ],
+      "family": "cooling_fan_mount_reference",
+      "standard_dimensions_mm": {
+        "fan_size": 80,
+        "bolt_circle": 71,
+        "hole_d": 4.5,
+        "plate_thickness": 4,
+        "air_opening_d": 76
+      },
+      "fit_guidance_mm": {
+        "bolt_hole": "M4 clearance 4.5 mm"
+      },
+      "constraint_parameters": {
+        "fan_size": {
+          "default": 80,
+          "options": [
+            40,
+            60,
+            80,
+            92,
+            120,
+            140
+          ]
+        },
+        "plate_thickness": {
+          "default": 4,
+          "min": 3
+        }
+      },
+      "derived_parameters": {
+        "air_opening_d": {
+          "formula": "fan_size - 4",
+          "note": "slightly under fan frame size"
+        },
+        "frame_margin": {
+          "formula": "(plate_size - fan_size)/2",
+          "note": "≥4 mm each side"
+        }
+      },
+      "main_features": [
+        "square mount plate",
+        "central circular air opening",
+        "4-bolt square pattern at bolt circle corners",
+        "optional standoff cylinders"
+      ],
+      "design_rules": [
+        "air opening is circular cutout centered in plate",
+        "bolt holes at ±bolt_circle/2 in X and Y",
+        "plate must be larger than fan_size"
+      ],
+      "validation_criteria": [
+        "4 bolt holes subtracted",
+        "air opening cylinder subtracted",
+        "plate solid cube in union"
+      ],
+      "failure_modes": [
+        "square air opening instead of circular",
+        "2 bolt holes instead of 4",
+        "no air opening — fan cannot push air"
+      ],
+      "constraint_checks": [
+        {
+          "id": "air_opening",
+          "severity": "error",
+          "expression": "air opening cylinder in difference",
+          "message": "Fan mount must have a circular air opening."
+        },
+        {
+          "id": "4bolts",
+          "severity": "warning",
+          "expression": "4 bolt holes present",
+          "message": "Fan mount should have 4 mounting holes."
+        }
+      ],
+      "openscad_module": "$fn = 96;\n\nfan_size          = 80;\nfan_bolt_circle   = 71;\nfan_hole_d        = 4.5;\nplate_size        = 92;\nplate_thickness   = 4;\nair_opening_d     = fan_size - 4;\n\nmodule fan_mount_80mm() {\n  difference() {\n    cube([plate_size, plate_size, plate_thickness], center = true);\n    cylinder(h = plate_thickness + 2, d = air_opening_d, center = true, $fn = 96);\n    for (x = [-fan_bolt_circle/2, fan_bolt_circle/2])\n      for (y = [-fan_bolt_circle/2, fan_bolt_circle/2])\n        translate([x, y, 0])\n          cylinder(h = plate_thickness + 2, d = fan_hole_d, center = true, $fn = 32);\n  }\n}\n\nfan_mount_80mm();"
+    }
+  ]
+}

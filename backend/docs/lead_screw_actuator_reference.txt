@@ -1,0 +1,145 @@
+LEAD SCREWS AND LINEAR ACTUATORS REFERENCE
+Category: Linear Motion / Actuation
+Verified models: Thingiverse thing:3858045 (EasyMcguire collection includes coupler/leadscrew),
+  Printables #832922 (pillow block for leadscrew support), GrabCAD "T8 lead screw assembly",
+  Cults3D "anti-backlash nut holder", Printables "T8 nut block parametric"
+
+LEAD SCREW TYPES AND STANDARDS
+────────────────────────────────
+  T8   : diameter 8 mm, pitch 2 mm, lead 8 mm (4-start), brass nut
+           most common in desktop 3D printers (Z axis)
+  T10  : diameter 10 mm, pitch 2 mm, lead 2 mm (1-start) or 4 mm (2-start)
+  T12  : diameter 12 mm, pitch 2 mm, lead 4 mm (2-start) or 8 mm (4-start)
+  ACME : imperial trapezoidal; 1/4"-16, 3/8"-12, 1/2"-10 (TPI)
+  Tr8  : ISO trapezoidal 8 mm, similar to T8 but DIN standard
+
+BALL SCREW STANDARDS (higher precision, lower friction)
+─────────────────────────────────────────────────────────
+  SFU1204 : diameter 12 mm, pitch 4 mm, end machined to ø10 mm, flanged nut
+  SFU1605 : diameter 16 mm, pitch 5 mm, end machined to ø12 mm
+  SFU2005 : diameter 20 mm, pitch 5 mm, end machined to ø15 mm
+  SFU2510 : diameter 25 mm, pitch 10 mm
+
+ANTI-BACKLASH NUT DIMENSIONS (T8 brass — most common)
+───────────────────────────────────────────────────────
+  T8 standard nut : OD 22 mm, height 10 mm, 4×M3 holes on ø16 mm bolt circle
+  T8 anti-backlash: OD 22 mm, total height 34 mm (spring loaded), same bolt circle
+  POM nut         : OD ~15 mm, friction nut, no flange — use round pocket
+
+END SUPPORT BEARING OPTIONS
+────────────────────────────
+  KFL08 (fixed end):   F688ZZ flanged bearing, 8 mm bore, supports axial + radial load
+  FK08 / FK10 / FK12:  fixed end machined unit, includes locking collar
+  FF08 / FF12:         floating end (radial only, no axial constraint)
+  Simple pillow block: 608zz/6201zz bearing in printed housing (see bearing reference)
+
+STEPPER MOTOR TORQUE / LEADSCREW PAIRING
+──────────────────────────────────────────
+  NEMA17 (40 Ncm)  + T8 8mm lead    → vertical Z axis, slow traverse
+  NEMA17 (59 Ncm)  + T8 8mm lead    → vertical fast; or small horizontal
+  NEMA23 (1.26 Nm) + T12 / SFU1605  → CNC Z axis, medium load
+  NEMA34 (4.0 Nm)  + SFU2005        → heavy CNC Z, router table
+
+KEY PARAMETERS
+──────────────
+  screw_diameter        — 8, 10, 12, 16, 20 mm
+  lead                  — linear advance per revolution (mm)
+  nut_od                — from table above (T8: 22 mm)
+  nut_height            — from table above (T8: 10 mm)
+  nut_bolt_circle       — from table above (T8: 16 mm)
+  nut_bolt_count        — 4 standard
+  nut_bolt_diameter     — M3 for T8, M4 for T12
+  nut_pocket_depth      — nut_height + 0.5 mm
+  coupler_shaft_a       — stepper shaft diameter (5 mm NEMA17)
+  coupler_shaft_b       — screw diameter (8 mm T8)
+  coupler_od            — ≥ max(shaft_a, shaft_b) + 10 mm
+  coupler_length        — 25–35 mm
+  end_bearing_bore      — screw_diameter (e.g. 8 mm for T8)
+  anti_rotation_slot    — for floating end: 1–2 mm slot to absorb thermal growth
+
+COMPLETE T8 Z-AXIS MODULE PARAMETERS
+──────────────────────────────────────
+  rod_diameter       = 8;      // smooth rod
+  rod_spacing        = 40;     // centre-to-centre
+  screw_diameter     = 8;      // T8 leadscrew
+  screw_offset       = 0;      // screw centre from rod centreline midpoint
+  carriage_length    = 40;
+  carriage_width     = rod_spacing + 30;
+  carriage_height    = 30;
+  nut_od             = 22;
+  nut_height         = 10;
+  nut_bolt_circle    = 16;
+
+OPENSCAD STRUCTURE
+───────────────────
+  module leadscrew_nut_carriage() {
+    difference() {
+      cube([carriage_length, carriage_width, carriage_height], center=true);
+      // two rod bores (LM8UU: OD 15 mm)
+      for(y=[-rod_spacing/2, rod_spacing/2])
+        translate([0, y, 0])
+          rotate([0,90,0])
+            cylinder(h=carriage_length+2, d=15.1, center=true, $fn=64);
+      // T8 nut pocket
+      translate([0, 0, carriage_height/2 - nut_height])
+        cylinder(h=nut_height+0.5, d=nut_od+0.4, $fn=64);
+      // nut bolt holes
+      for(a=[0,90,180,270])
+        rotate([0,0,a])
+          translate([nut_bolt_circle/2, 0, carriage_height/2-nut_height-3])
+            cylinder(h=nut_height+8, d=3.3, $fn=32);
+      // leadscrew through bore
+      cylinder(h=carriage_height+2, d=screw_diameter+1.0, center=true, $fn=64);
+    }
+  }
+
+DESIGN RULES
+────────────
+  - T8 through-bore in carriage: ≥ screw_diameter + 1.5 mm clearance (not a nut — just clearance)
+  - Nut pocket: tight fit OD (nut_od + 0.2–0.4 mm) plus precise depth so nut seats flat
+  - Anti-backlash nut: allow 2 mm axial float in pocket; spring does the work
+  - For vertical Z axis: no anti-rotation rod needed (motor prevents rotation via coupler)
+  - For horizontal axis: add two smooth rods or MGN rail to prevent nut rotation
+  - Floating end support: bearing + spring or loose collar; only radial constraint
+  - Critical alignment: screw must be coaxial with motor shaft within ±0.5 mm radially
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A lead screw actuator combines motor mount, screw axis, nut carriage, guide support, and end bearings.
+- Brackets, carriage block, nut holder, bearing blocks, and rail supports are solid material in union().
+- Screw clearance, nut pocket, bearing bores, rail holes, and mounting holes are removed material in difference().
+- The screw axis should be straight and coaxial through motor coupler, nut, and end bearing.
+- A nut pocket is a larger recess shaped to hold the lead nut, with screw clearance passing through.
+- Guide rods or rails are represented by parallel holes or rail mounting slots.
+- Coupler clearance should be centered between motor shaft and screw axis.
+- Avoid blocking the moving carriage path with solid geometry.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn lead-screw actuator rules into OpenSCAD.
+
+Rule: nut carriage is a block with screw clearance through it.
+OpenSCAD action:
+  difference() {
+    cube([carriage_length, carriage_width, carriage_height], center=true);
+    rotate([90,0,0]) cylinder(h=carriage_width+2, d=screw_clearance_diameter, center=true, $fn=64);
+  }
+
+Rule: lead nut pocket is a larger recess around screw axis.
+OpenSCAD action:
+  rotate([90,0,0]) cylinder(h=nut_pocket_depth, d=lead_nut_outer_diameter+clearance, center=true, $fn=6);
+
+Rule: guide rod holes are parallel to screw axis.
+OpenSCAD action:
+  for (x=[-guide_spacing/2, guide_spacing/2])
+    translate([x,0,0]) rotate([90,0,0]) cylinder(h=carriage_width+2, d=guide_rod_diameter+clearance, center=true, $fn=64);
+
+Rule: motor mount has shaft opening plus bolt pattern.
+OpenSCAD action:
+  cylinder(h=motor_plate_thickness+2, d=motor_shaft_clearance, center=true, $fn=96);
+  for (x=[-motor_bolt_spacing/2,motor_bolt_spacing/2])
+    for (z=[-motor_bolt_spacing/2,motor_bolt_spacing/2])
+      translate([x,0,z]) rotate([90,0,0]) cylinder(h=motor_plate_thickness+2, d=motor_bolt_diameter, center=true, $fn=48);
+
+Rule: end bearing support has coaxial bearing seat and screw clearance.
+OpenSCAD action:
+  rotate([90,0,0]) cylinder(h=support_width+2, d=bearing_outer_diameter, center=true, $fn=96);

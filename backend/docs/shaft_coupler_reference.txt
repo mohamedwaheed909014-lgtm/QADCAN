@@ -1,0 +1,159 @@
+SHAFT COUPLER REFERENCE
+Category: Power Transmission / Shaft Connection
+Verified models: Thingiverse thing:81342 (Revar parametric flexible coupler, heterogeneous shaft sizes),
+  Thingiverse thing:3858045 (EasyMcguire coupler+angular coupler), GrabCAD "Rigid Shaft Coupler 5mm to 8mm",
+  Printables "parametric shaft coupler" search — multiple rigid and flexible variants
+
+COUPLER TYPES
+─────────────
+1. Rigid Clamp Coupler (split collar)
+   - Cylinder body, slit along one radial plane, two clamping screws
+   - Zero backlash, transmits torque and axial load
+   - Best for well-aligned shafts; any misalignment causes bearing load
+
+2. Flexible / Helical Coupler (spider coupler)
+   - Cylinder with helical cut slots; accommodates angular + parallel misalignment
+   - Common on 3D printer Z-axis (leadscrew to stepper motor)
+   - Typical misalignment tolerance: ±1° angular, ±0.5 mm parallel
+
+3. Oldham Coupler
+   - Three discs: two hubs + central floating disc with orthogonal tongues
+   - Handles significant parallel misalignment (up to 1–3 mm offset)
+   - Zero backlash; discs can be printed in different materials
+
+4. Jaw / Spider Coupler (lovejoy style)
+   - Two hubs with interleaved jaws, elastomer spider insert
+   - Vibration damping, tolerates misalignment; requires gap for spider
+
+5. Beam / Bellows Coupler
+   - Single piece with wavy cuts; high torsional stiffness + misalignment tolerance
+   - Suited for encoders and precision motion
+
+6. Disc Coupler
+   - Multiple thin disc rings between hub flanges; used in servo/motor shafts
+
+KEY PARAMETERS
+──────────────
+  shaft_a_diameter      — bore A (e.g. motor shaft, typically 5 mm NEMA17)
+  shaft_b_diameter      — bore B (e.g. leadscrew, typically 8 mm T8)
+  outer_diameter        — overall OD; must be ≥ max(shaft_a_d, shaft_b_d) + 8 mm wall
+  coupler_length        — overall length; typically 25–40 mm
+  clamp_gap             — slit width: 1.0–1.5 mm for printed, 0.5–1.0 mm machined
+  screw_diameter        — M3 for OD ≤ 20 mm; M4 for OD 20–35 mm
+  screw_hole_offset     — measured from slit; typically outer_diameter/4 from slit plane
+  bore_a_depth          — ≥ 10 mm engagement; = coupler_length/2 for symmetric
+  bore_b_depth          — coupler_length − bore_a_depth
+  set_screw_thread      — M3 or M4; grub screw location at bore midpoint
+  helical_cut_width     — for flexible: 1.5–2.5 mm
+  helical_pitch         — for flexible: 3–5 mm per turn
+  num_helical_turns     — 2–5 turns
+
+STANDARD SHAFT DIAMETERS (real coupler inventory)
+──────────────────────────────────────────────────
+  NEMA 17 stepper   — 5 mm output shaft (D-cut flat available)
+  NEMA 23 stepper   — 6.35 mm (1/4") or 8 mm
+  NEMA 34 stepper   — 12.7 mm (1/2") or 14 mm
+  T8 leadscrew      — 8 mm shaft
+  T12 leadscrew     — 12 mm shaft
+  SFU1204 ballscrew — 12 mm
+  SFU1605 ballscrew — 16 mm
+  Hobby servo       — 4–6 mm splined (25-tooth standard)
+
+OPENSCAD STRUCTURE (rigid clamp coupler)
+─────────────────────────────────────────
+  shaft_a_d = 5;
+  shaft_b_d = 8;
+  outer_d   = 20;
+  length    = 30;
+  gap       = 1.2;
+  screw_d   = 3.2;   // M3 clearance
+
+  module rigid_coupler() {
+    difference() {
+      cylinder(h=length, d=outer_d, center=true, $fn=96);
+      // bore A
+      translate([0, 0,  length/4])
+        cylinder(h=length/2+1, d=shaft_a_d+0.2, center=true, $fn=64);
+      // bore B
+      translate([0, 0, -length/4])
+        cylinder(h=length/2+1, d=shaft_b_d+0.2, center=true, $fn=64);
+      // clamp slit
+      cube([outer_d+2, gap, length/2], center=true);
+      // clamping screw holes (one per bore side)
+      for(z=[length/4, -length/4])
+        translate([0, 0, z])
+          rotate([90,0,0])
+            cylinder(h=outer_d+2, d=screw_d, center=true, $fn=32);
+    }
+  }
+
+OLDHAM COUPLER STRUCTURE
+─────────────────────────
+  module oldham_hub(bore_d, outer_d, hub_length, tongue_w, tongue_h) {
+    difference() {
+      cylinder(h=hub_length, d=outer_d, center=true, $fn=64);
+      cylinder(h=hub_length+2, d=bore_d+0.2, center=true, $fn=64);   // bore
+    }
+    // tongue (protruding ridge)
+    translate([0, 0, hub_length/2 - tongue_h/2])
+      cube([outer_d, tongue_w, tongue_h], center=true);
+  }
+
+DESIGN RULES
+────────────
+  - Minimum wall between bore and outer surface: ≥ 3 mm
+  - Clamp slit should reach at least 1 mm past bore centre on each side
+  - Clamping screw should be ≥ 2 mm from slit plane and ≥ 3 mm from bore edge
+  - For flexible couplers: leave 1–2 mm axial gap between shaft ends inside coupler
+- Set screws should bear on flat (D-cut) of shaft when possible; prevents rotation
+- For 3D printing: orient coupler with axis vertical for best layer bonding in torsion
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these code patterns to implement the rules above. They are not complete final answers by themselves; combine them according to the user request.
+
+Rule: two different shaft diameters must be coaxial and enter from opposite ends.
+OpenSCAD action:
+  difference() {
+    cylinder(h=coupler_length, d=outer_diameter, center=true, $fn=96);
+    translate([0,0,-coupler_length/4])
+      cylinder(h=coupler_length/2+1, d=shaft_a_diameter+clearance, center=true, $fn=96);
+    translate([0,0, coupler_length/4])
+      cylinder(h=coupler_length/2+1, d=shaft_b_diameter+clearance, center=true, $fn=96);
+  }
+
+Rule: clamp slit must reach the bore so the collar can flex.
+OpenSCAD action:
+  translate([outer_diameter/4, -clamp_gap/2, 0])
+    cube([outer_diameter, clamp_gap, coupler_length+2], center=true);
+
+Rule: clamping screws must cross the split line.
+OpenSCAD action:
+  for (z=[-coupler_length/4, coupler_length/4])
+    translate([0, outer_diameter/4, z])
+      rotate([90,0,0])
+        cylinder(h=outer_diameter+4, d=clamp_screw_diameter, center=true, $fn=48);
+
+Rule: set screw holes are radial holes aimed at the bore.
+OpenSCAD action:
+  for (z=[-coupler_length/4, coupler_length/4])
+    translate([outer_diameter/2,0,z])
+      rotate([0,90,0])
+        cylinder(h=outer_diameter+4, d=set_screw_diameter, center=true, $fn=48);
+
+Rule: flexible coupler slots remove material but leave torsion bridges.
+OpenSCAD action:
+  for (i=[0:flex_slot_count-1])
+    rotate([0,0,360*i/flex_slot_count])
+      translate([outer_diameter/4,0,0])
+        cube([slot_length, slot_width, coupler_length*0.75], center=true);
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A coupler joins two coaxial shafts, so both bores must share the same central Z axis.
+- Coupler body, clamp ears, hubs, and flexible beams are solid material in union().
+- Shaft bores, clamp slit, cross screw holes, set-screw holes, and flex slots are removed material in difference().
+- Different shaft diameters mean two axial bores from opposite ends, not side-by-side holes.
+- A clamping mechanism requires a radial slit that reaches the bore plus transverse screw holes that close the slit.
+- Set screw holes are radial cross holes aimed at the bore and can be placed at different Z positions.
+- Flexible couplers use repeated slots or helical-like cuts while preserving material bridges.
+- Keep enough wall thickness around the largest bore; outer_d must exceed largest bore plus two walls.

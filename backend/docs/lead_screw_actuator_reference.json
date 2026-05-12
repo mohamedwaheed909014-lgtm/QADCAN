@@ -1,0 +1,165 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "lead_screw_actuator_reference",
+    "family_label": "Lead Screws and Linear Actuators",
+    "units": "millimeters",
+    "scope": "T8/T12/ACME lead screw nut carriages, end support blocks, coupler housings, anti-backlash nut holders.",
+    "retrieval": {
+      "primary_keywords": [
+        "lead screw",
+        "actuator",
+        "nut carriage",
+        "t8",
+        "t8 carriage",
+        "acme screw",
+        "anti backlash",
+        "carriage block",
+        "z axis",
+        "linear actuator",
+        "t8 nut",
+        "leadscrew carriage"
+      ],
+      "negative_keywords": [
+        "bearing housing pillow",
+        "gear",
+        "fan mount",
+        "enclosure",
+        "hinge",
+        "sprocket"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "PA12-CF",
+        "use_case": "functional T8 nut carriages",
+        "notes": "Low creep; use metal inserts for nut pocket if anti-backlash spring present."
+      },
+      {
+        "material": "PETG",
+        "use_case": "light-duty carriage blocks and end supports",
+        "notes": "Acceptable; add steel rods or rails to prevent flex under load."
+      },
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined carriage plates for CNC Z-axis",
+        "notes": "Rigid; machine rod bores to H7 tolerance for LM8UU press fit."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "T8 lead screw standard",
+        "applies_to": "screw diameter, pitch, and nut OD",
+        "note": "T8: OD 8 mm, pitch 2 mm, 4-start, lead 8 mm; nut OD 22 mm, height 10 mm, 4×M3 on ø16 bolt circle."
+      },
+      {
+        "name": "LM8UU linear bearing",
+        "applies_to": "rod bore and carriage length",
+        "note": "LM8UU: OD 15 mm, length 24 mm; bore = 15.1 mm H7 in printed carriage."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "t8_nut_carriage",
+      "category": "nut_carriage",
+      "name": "T8 leadscrew nut carriage with LM8UU guide rods",
+      "aliases": [
+        "t8 carriage",
+        "leadscrew carriage",
+        "z carriage",
+        "nut block",
+        "anti-backlash carriage"
+      ],
+      "standards": [
+        "T8 lead screw standard",
+        "LM8UU"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined aluminum"
+      ],
+      "family": "lead_screw_actuator_reference",
+      "standard_dimensions_mm": {
+        "carriage_length": 40,
+        "carriage_width": 70,
+        "carriage_height": 30,
+        "rod_spacing": 40,
+        "nut_od": 22,
+        "nut_height": 10,
+        "nut_bolt_circle": 16
+      },
+      "fit_guidance_mm": {
+        "rod_bore": "LM8UU OD + 0.1 mm = 15.1 mm",
+        "nut_pocket": "nut_od + 0.4 mm clearance",
+        "screw_bore": "screw_d + 1.5 mm = 9.5 mm (clearance only)"
+      },
+      "constraint_parameters": {
+        "rod_spacing": {
+          "default": 40
+        },
+        "screw_offset": {
+          "default": 0,
+          "note": "screw on centreline between rods"
+        }
+      },
+      "derived_parameters": {
+        "carriage_width": {
+          "formula": "rod_spacing + lm_od + 2*side_wall"
+        }
+      },
+      "main_features": [
+        "rectangular carriage block",
+        "two rod bores parallel to travel axis",
+        "T8 nut pocket with 4-bolt circle",
+        "screw clearance through-bore",
+        "4 mounting holes on top face"
+      ],
+      "design_rules": [
+        "rod bores are horizontal cylinders parallel to each other at rod_spacing",
+        "nut pocket is cylinder nut_od+clearance at correct depth",
+        "screw clearance is separate larger bore through full height",
+        "mounting holes on top face for payload attachment"
+      ],
+      "validation_criteria": [
+        "two rod bore cylinders in difference",
+        "nut pocket cylinder subtracted",
+        "screw clearance bore subtracted",
+        "for-loop or explicit 4 nut bolt holes"
+      ],
+      "failure_modes": [
+        "nut pocket same size as screw — nut cannot fit",
+        "rod bores missing — no linear guidance",
+        "nut bolt holes missing — nut not retained"
+      ],
+      "constraint_checks": [
+        {
+          "id": "rod_bores",
+          "severity": "error",
+          "expression": "two rod bore cylinders present",
+          "message": "T8 carriage needs two linear bearing rod bores."
+        },
+        {
+          "id": "nut_pocket",
+          "severity": "error",
+          "expression": "nut pocket cylinder diameter > screw_d",
+          "message": "Nut pocket must be sized for the T8 nut OD, not the screw."
+        }
+      ],
+      "openscad_module": "$fn = 64;\n\nrod_diameter     = 8;\nlm_od            = 15.1;\nrod_spacing      = 40;\nscrew_diameter   = 8;\nnut_od           = 22;\nnut_height       = 10;\nnut_bolt_circle  = 16;\nside_wall        = 5;\ntop_wall         = 4;\nend_wall         = 6;\n\ncar_l = 24 + 2*end_wall;\ncar_w = rod_spacing + lm_od + 2*side_wall;\ncar_h = lm_od + top_wall;\n\nmodule t8_nut_carriage() {\n  difference() {\n    cube([car_l, car_w, car_h], center = true);\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, -top_wall/2])\n        rotate([0, 90, 0])\n          cylinder(h = car_l + 2, d = lm_od, center = true, $fn = 64);\n    cylinder(h = car_h + 2, d = screw_diameter + 1.5, center = true, $fn = 48);\n    translate([0, 0, car_h/2 - nut_height/2])\n      cylinder(h = nut_height + 0.5, d = nut_od + 0.4, center = true, $fn = 64);\n    for (a = [0, 90, 180, 270])\n      rotate([0, 0, a])\n        translate([nut_bolt_circle/2, 0, car_h/2 - nut_height/2])\n          cylinder(h = nut_height + 6, d = 3.4, center = true, $fn = 32);\n  }\n}\n\nt8_nut_carriage();"
+    }
+  ]
+}

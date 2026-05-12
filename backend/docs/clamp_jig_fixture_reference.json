@@ -1,0 +1,151 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "clamp_jig_fixture_reference",
+    "family_label": "Clamps, Jigs and Fixtures",
+    "units": "millimeters",
+    "scope": "Saddle clamps, pipe clamps, V-blocks, T-slot strap clamps, drill jigs, toggle clamp bases.",
+    "retrieval": {
+      "primary_keywords": [
+        "clamp",
+        "jig",
+        "fixture",
+        "v-block",
+        "saddle clamp",
+        "pipe clamp",
+        "strap clamp",
+        "drill jig",
+        "toggle clamp",
+        "workholding",
+        "t-slot clamp"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "bracket motor mount",
+        "fan mount",
+        "enclosure"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined V-blocks, jig plates, and clamp bodies",
+        "notes": "Easy to machine; hard-anodise working faces for wear.",
+        "standards": [
+          "ISO 209"
+        ]
+      },
+      {
+        "material": "1045 steel",
+        "use_case": "strap clamps and toggle clamp frames",
+        "notes": "Through-harden working jaws to HRC 45 for long life."
+      },
+      {
+        "material": "PETG / PA12",
+        "use_case": "3D-printed prototype jigs and fixtures",
+        "notes": "PA12 for functional; add brass inserts for clamping screws."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "ISO 286-1",
+        "applies_to": "locating pin and dowel hole fits",
+        "note": "H7/p6 press fit for fixed pins; H7/g6 for sliding pins."
+      },
+      {
+        "name": "DIN 6321 T-slot dimensions",
+        "applies_to": "T-slot widths for workholding bolts",
+        "note": "T-slot 12 mm and 14 mm most common on CNC tables."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "pipe_saddle_clamp",
+      "category": "saddle_clamp",
+      "name": "Pipe saddle clamp (split-band)",
+      "aliases": [
+        "pipe clamp",
+        "tube clamp",
+        "saddle clamp",
+        "conduit clamp"
+      ],
+      "standards": [
+        "ISO 286-1"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined"
+      ],
+      "family": "clamp_jig_fixture_reference",
+      "standard_dimensions_mm": {
+        "pipe_od": 25,
+        "clamp_width": 30,
+        "wall_thickness": 5,
+        "bolt_span": 40
+      },
+      "fit_guidance_mm": {
+        "pipe_bore": "pipe_od + 0.6 mm clearance"
+      },
+      "constraint_parameters": {
+        "pipe_od": {
+          "default": 25,
+          "min": 10,
+          "max": 150
+        },
+        "clamp_width": {
+          "default": 30
+        }
+      },
+      "derived_parameters": {
+        "inner_radius": {
+          "formula": "pipe_od/2 + 0.3",
+          "note": "clearance for easy assembly"
+        }
+      },
+      "main_features": [
+        "curved saddle wrapping half the pipe circumference",
+        "two mounting flanges with bolt holes",
+        "central pipe bore clearance"
+      ],
+      "design_rules": [
+        "saddle covers top 180° of pipe only — use intersection with half-cylinder",
+        "flanges extend below saddle at bolt_span/2",
+        "pipe bore is subtractive full cylinder"
+      ],
+      "validation_criteria": [
+        "pipe bore subtracted",
+        "flanges in union",
+        "bolt holes subtracted through flanges"
+      ],
+      "failure_modes": [
+        "solid block instead of curved saddle",
+        "bore not through full width",
+        "flanges on wrong side"
+      ],
+      "constraint_checks": [
+        {
+          "id": "pipe_bore",
+          "severity": "error",
+          "expression": "pipe bore cylinder present in difference",
+          "message": "Pipe saddle clamp must have a subtractive pipe bore."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\npipe_od        = 25;\nclamp_width    = 30;\nwall_thickness = 5;\nbolt_span      = 40;\nflange_height  = 12;\n\nmodule pipe_saddle_clamp() {\n  difference() {\n    union() {\n      intersection() {\n        cylinder(h = clamp_width, d = pipe_od + 2*wall_thickness, center = true);\n        translate([0, (pipe_od/2 + wall_thickness)/2, 0])\n          cube([pipe_od + 2*wall_thickness, pipe_od + 2*wall_thickness, clamp_width + 2], center = true);\n      }\n      for (s = [-1, 1])\n        translate([s * bolt_span/2, -(pipe_od/2 + wall_thickness/2), 0])\n          cube([10, flange_height, clamp_width], center = true);\n    }\n    cylinder(h = clamp_width + 2, d = pipe_od + 0.6, center = true);\n    for (s = [-1, 1])\n      translate([s * bolt_span/2, -(pipe_od/2), 0])\n        cylinder(h = clamp_width + 2, d = 5.5, center = true, $fn = 32);\n  }\n}\n\npipe_saddle_clamp();"
+    }
+  ]
+}

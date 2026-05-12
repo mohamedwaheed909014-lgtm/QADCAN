@@ -1,0 +1,161 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "threads_knobs_shaft_features_reference",
+    "family_label": "Threads, Knobs, Standoffs and Shaft Features",
+    "units": "millimeters",
+    "scope": "Knurled knobs, hex standoffs, D-flat shafts, keyways, DIN 471 circlip grooves.",
+    "retrieval": {
+      "primary_keywords": [
+        "knob",
+        "thumb knob",
+        "standoff",
+        "hex standoff",
+        "shaft feature",
+        "d-shaft",
+        "keyway",
+        "circlip groove",
+        "spacer",
+        "threaded boss",
+        "set screw boss",
+        "knurled",
+        "grip"
+      ],
+      "negative_keywords": [
+        "bearing housing",
+        "gear",
+        "gearbox",
+        "fan mount",
+        "enclosure",
+        "flange",
+        "sprocket"
+      ],
+      "min_score_threshold": 0.1
+    },
+    "material_suggestions": [
+      {
+        "material": "Aluminum 6061-T6 / 7075-T6",
+        "use_case": "machined knobs, standoffs, and shaft collars",
+        "notes": "Knurl with carbide knurling wheel at 0.8 mm pitch."
+      },
+      {
+        "material": "POM (Delrin)",
+        "use_case": "printed or machined knobs and spacers",
+        "notes": "Good surface feel; machines cleanly for knurl pattern."
+      },
+      {
+        "material": "PETG / PA12",
+        "use_case": "3D-printed grip knobs and spacers",
+        "notes": "Use grip_ridge approximation with $fn=24 or fewer for texture."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "DIN 6885A keyway",
+        "applies_to": "keyway width and depth in hub or shaft",
+        "note": "ø20 mm shaft: key 6×6 mm, shaft depth 3 mm, hub depth 3.3 mm."
+      },
+      {
+        "name": "DIN 471 circlip groove",
+        "applies_to": "snap ring groove dimensions",
+        "note": "ø20 shaft: groove ø19.0 mm, width 1.2 mm, depth 0.5 mm."
+      },
+      {
+        "name": "ISO metric minor diameters",
+        "applies_to": "self-tapping printed bore sizing",
+        "note": "M3 self-tap bore: 2.5 mm print; M4: 3.3 mm; M5: 4.1 mm."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "knurled_knob",
+      "category": "knob",
+      "name": "Knurled adjustment knob",
+      "aliases": [
+        "knob",
+        "thumb knob",
+        "adjustment knob",
+        "grip knob",
+        "control knob"
+      ],
+      "standards": [
+        "DIN 6885A"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "machined"
+      ],
+      "family": "threads_knobs_shaft_features_reference",
+      "standard_dimensions_mm": {
+        "knob_d": 30,
+        "knob_h": 15,
+        "grip_count": 30,
+        "grip_d": 2.5,
+        "bore_d": 3.2
+      },
+      "fit_guidance_mm": {
+        "bore": "insert bore for M3 heat set = 4.2 mm; self-tap = 2.8 mm"
+      },
+      "constraint_parameters": {
+        "knob_d": {
+          "default": 30,
+          "min": 20
+        },
+        "knob_h": {
+          "default": 15
+        },
+        "grip_count": {
+          "default": 30
+        }
+      },
+      "derived_parameters": {
+        "grip_radius": {
+          "formula": "knob_d/2"
+        }
+      },
+      "main_features": [
+        "main knob cylinder on Z",
+        "repeated grip ridges around circumference",
+        "central through-bore or threaded pocket",
+        "top chamfer or dome optional"
+      ],
+      "design_rules": [
+        "grip ridges are small cylinders or cubes added around knob circumference in for-loop",
+        "bore is subtractive cylinder through full height",
+        "grip radius ≈ knob_d/2 so ridges just protrude from surface"
+      ],
+      "validation_criteria": [
+        "grip ridge for-loop present",
+        "bore subtracted",
+        "knob body cylinder in union"
+      ],
+      "failure_modes": [
+        "no grips — smooth cylinder, not a knob",
+        "bore missing — cannot mount on shaft",
+        "grip ridges inside bore — geometry error"
+      ],
+      "constraint_checks": [
+        {
+          "id": "grip_loop",
+          "severity": "warning",
+          "expression": "for-loop for grip ridges",
+          "message": "Knob should have repeated grip features for ergonomic gripping."
+        }
+      ],
+      "openscad_module": "$fn = 128;\n\nknob_d       = 30;\nknob_h       = 15;\ngrip_count   = 30;\ngrip_d       = 2.5;\nbore_d       = 3.2;\n\nmodule knurled_knob() {\n  difference() {\n    union() {\n      cylinder(h = knob_h, d = knob_d, center = true);\n      for (i = [0 : grip_count - 1])\n        rotate([0, 0, 360 * i / grip_count])\n          translate([knob_d/2, 0, 0])\n            cylinder(h = knob_h * 0.8, d = grip_d, center = true, $fn = 12);\n    }\n    cylinder(h = knob_h + 2, d = bore_d, center = true, $fn = 32);\n  }\n}\n\nknurled_knob();"
+    }
+  ]
+}

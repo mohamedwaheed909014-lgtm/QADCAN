@@ -1,0 +1,255 @@
+RESEARCH PAPER MODELING GAP CORRECTIONS
+Source baseline: Bachelor thesis, "3D Model Generation of Material Handling Equipment using OpenSCAD"
+Purpose: Provide curated, mechanically meaningful OpenSCAD corrections for models that failed or were weak in the research evaluation.
+Status: These are not random synthetic examples. They are targeted correction patterns for real modeling gaps identified in the thesis.
+
+GAP 1 - I-BEAM GENERATED AS A PLAIN RECTANGULAR BEAM
+Problem observed in the research:
+- When prompted for an I-beam, the model generated a normal rectangular beam.
+- This fails the functional geometry requirement because an I-beam is defined by flanges and a web.
+
+Real mechanical interpretation:
+- An I-beam has two horizontal flanges and one vertical web.
+- The flanges resist bending stress far from the neutral axis.
+- The web carries shear and separates the flanges.
+- It should not be modeled as one solid rectangular bar.
+
+Correct OpenSCAD strategy:
+- Use three cuboids in union().
+- Top flange: long horizontal cuboid at +height/2.
+- Bottom flange: long horizontal cuboid at -height/2.
+- Web: central vertical cuboid connecting the two flanges.
+- Optional bolt holes or lightening holes should be subtracted after union().
+
+I-BEAM BASELINE IMPLEMENTATION
+```scad
+$fn = 96;
+
+beam_length = 180;
+beam_height = 60;
+flange_width = 36;
+flange_thickness = 8;
+web_thickness = 7;
+
+module i_beam_profile() {
+  union() {
+    translate([0, 0, beam_height/2 - flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+
+    translate([0, 0, -beam_height/2 + flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+
+    cube([beam_length, web_thickness, beam_height - 2*flange_thickness], center=true);
+  }
+}
+
+i_beam_profile();
+```
+
+I-BEAM WITH MOUNTING HOLES
+```scad
+$fn = 96;
+
+beam_length = 180;
+beam_height = 60;
+flange_width = 36;
+flange_thickness = 8;
+web_thickness = 7;
+hole_diameter = 8;
+hole_spacing = 120;
+
+module i_beam_with_web_holes() {
+  difference() {
+    union() {
+      translate([0, 0, beam_height/2 - flange_thickness/2])
+        cube([beam_length, flange_width, flange_thickness], center=true);
+      translate([0, 0, -beam_height/2 + flange_thickness/2])
+        cube([beam_length, flange_width, flange_thickness], center=true);
+      cube([beam_length, web_thickness, beam_height - 2*flange_thickness], center=true);
+    }
+
+    for (x=[-hole_spacing/2, 0, hole_spacing/2])
+      translate([x, 0, 0])
+        rotate([90, 0, 0])
+          cylinder(h=web_thickness+2, d=hole_diameter, center=true);
+  }
+}
+
+i_beam_with_web_holes();
+```
+
+Do not do this:
+```scad
+// Wrong: this is a rectangular beam, not an I-beam.
+cube([beam_length, flange_width, beam_height], center=true);
+```
+
+GAP 2 - QUEEN POST TRUSS MODULES POSITIONED INCORRECTLY
+Problem observed in the research:
+- The model could generate beam modules but could not place and align them into a correct queen post truss.
+- This is a spatial reasoning failure: modules exist, but the assembly does not represent the requested structure.
+
+Real mechanical interpretation:
+- A queen post truss is a triangular roof truss with:
+  - bottom tie beam / bottom chord
+  - two sloped rafters / top chords
+  - two vertical queen posts
+  - a horizontal straining beam between the queen posts
+  - optional diagonal struts from lower chord to rafters
+- Members should connect endpoint-to-endpoint.
+
+Correct OpenSCAD strategy:
+- Use a beam_between(p1, p2) module.
+- Compute length from endpoints.
+- Compute rotation from endpoint vector.
+- Place the beam at midpoint between p1 and p2.
+- This avoids manual misalignment.
+
+QUEEN POST TRUSS BASELINE IMPLEMENTATION
+```scad
+$fn = 48;
+
+span = 160;
+rise = 55;
+queen_spacing = 60;
+beam_width = 6;
+beam_thickness = 6;
+
+module beam_between(p1, p2) {
+  dx = p2[0] - p1[0];
+  dz = p2[2] - p1[2];
+  length = sqrt(dx*dx + dz*dz);
+  angle = atan2(dz, dx);
+
+  translate([(p1[0]+p2[0])/2, 0, (p1[2]+p2[2])/2])
+    rotate([0, -angle, 0])
+      cube([length, beam_width, beam_thickness], center=true);
+}
+
+module queen_post_truss() {
+  left_support = [-span/2, 0, 0];
+  right_support = [span/2, 0, 0];
+  apex = [0, 0, rise];
+  left_queen_bottom = [-queen_spacing/2, 0, 0];
+  right_queen_bottom = [queen_spacing/2, 0, 0];
+  left_queen_top = [-queen_spacing/2, 0, rise*0.62];
+  right_queen_top = [queen_spacing/2, 0, rise*0.62];
+
+  beam_between(left_support, right_support);
+  beam_between(left_support, apex);
+  beam_between(apex, right_support);
+  beam_between(left_queen_bottom, left_queen_top);
+  beam_between(right_queen_bottom, right_queen_top);
+  beam_between(left_queen_top, right_queen_top);
+  beam_between(left_support, left_queen_top);
+  beam_between(right_support, right_queen_top);
+}
+
+queen_post_truss();
+```
+
+Do not do this:
+```scad
+// Wrong: beams are created but not endpoint-aligned.
+translate([20,0,0]) cube([100,6,6], center=true);
+rotate([0,25,0]) cube([100,6,6], center=true);
+```
+
+GAP 3 - COMPLEX ASSEMBLIES WITH MODULES BUT WRONG ALIGNMENT
+Problem observed in the research:
+- Complex designs may be broken into reasonable modules but assembled with wrong placement.
+
+Correct modeling rule:
+- For any beam, link, brace, truss, or frame, prefer endpoint-based placement instead of hand-tuned translate/rotate values.
+- For any circular repeated assembly, prefer angular loops using cos() and sin().
+- For any coaxial mechanical part, share one centerline and do not translate related bores off-axis.
+
+Endpoint beam rule:
+```scad
+module beam_between(p1, p2, width=6, thickness=6) {
+  dx = p2[0] - p1[0];
+  dz = p2[2] - p1[2];
+  length = sqrt(dx*dx + dz*dz);
+  angle = atan2(dz, dx);
+  translate([(p1[0]+p2[0])/2, 0, (p1[2]+p2[2])/2])
+    rotate([0, -angle, 0])
+      cube([length, width, thickness], center=true);
+}
+```
+
+Circular repetition rule:
+```scad
+for (i=[0:count-1]) {
+  angle = 360*i/count;
+  translate([cos(angle)*radius, sin(angle)*radius, 0])
+    child_feature();
+}
+```
+
+Coaxial bore rule:
+```scad
+translate([0,0,axis_z])
+  rotate([90,0,0])
+    cylinder(h=cut_length, d=bore_diameter, center=true);
+```
+
+GAP 4 - FINAL DRIVE / GEAR ASSEMBLY ACCURACY
+Real mechanical interpretation:
+- A final drive gear model should clearly separate gear, hub, bore, keyway, and mounting holes.
+- Tooth count and module define pitch diameter.
+- Bore is not pitch diameter.
+- Mounting holes should be repeated on a bolt circle.
+
+Final drive gear baseline:
+```scad
+$fn = 96;
+
+module_size = 2;
+teeth = 36;
+gear_thickness = 10;
+bore_diameter = 12;
+hub_diameter = 32;
+hub_width = 18;
+bolt_count = 6;
+bolt_circle_diameter = 46;
+bolt_hole_diameter = 5.5;
+pitch_diameter = module_size * teeth;
+pitch_radius = pitch_diameter / 2;
+tooth_depth = module_size * 1.6;
+tooth_width = module_size * 1.1;
+
+module final_drive_gear() {
+  difference() {
+    union() {
+      cylinder(h=gear_thickness, d=pitch_diameter, center=true);
+      cylinder(h=hub_width, d=hub_diameter, center=true);
+      for (i=[0:teeth-1])
+        rotate([0,0,360*i/teeth])
+          translate([pitch_radius,0,0])
+            cube([tooth_depth, tooth_width, gear_thickness], center=true);
+    }
+
+    cylinder(h=hub_width+2, d=bore_diameter+0.3, center=true);
+    translate([0,bore_diameter/2,0])
+      cube([4,3,hub_width+2], center=true);
+
+    for (i=[0:bolt_count-1]) {
+      angle = 360*i/bolt_count;
+      translate([cos(angle)*bolt_circle_diameter/2, sin(angle)*bolt_circle_diameter/2, 0])
+        cylinder(h=gear_thickness+2, d=bolt_hole_diameter, center=true);
+    }
+  }
+}
+
+final_drive_gear();
+```
+
+GAP 5 - REAL-LIFE EXAMPLE REQUIREMENTS
+Every real-life mechanical example should include:
+- A clear function: support, transmit torque, guide motion, fasten, enclose, or align.
+- Editable parameters tied to real mechanical dimensions.
+- CSG separation: solid material in union(); removed material after union() in difference().
+- Correct axes: rotating parts use a shared centerline; frames use endpoint alignment.
+- Clearances: bores and seats use named clearance parameters.
+- Final module call exactly once.
+

@@ -1,0 +1,224 @@
+STRUCTURAL PROFILES AND ALUMINIUM EXTRUSION REFERENCE
+Category: Structural Framing
+Verified models: MyMiniFactory #148563 (2020 extrusion cable bracket), MyMiniFactory #157533 (NEMA23 2020 bridge),
+  Thingiverse "2020 extrusion corner bracket", Printables "v-slot 2040 end cap",
+  GrabCAD "aluminium extrusion 2020 3030 4040"
+
+OPENBUILDS / MISUMI V-SLOT AND T-SLOT PROFILES
+────────────────────────────────────────────────
+  2020 : 20×20 mm cross section, 6 mm slot, M5 hardware
+  2040 : 20×40 mm, two parallel 6 mm slots on 40 mm face
+  2060 : 20×60 mm, three slots
+  2080 : 20×80 mm, four slots
+  4040 : 40×40 mm, four slots (one each face)
+  4080 : 40×80 mm, heavy duty
+  V-slot  : V-groove on slot edge for V-wheel carriage
+  T-slot  : straight slot for standard T-nuts
+
+SLOT DIMENSIONS (standard 6 mm slot, M5)
+──────────────────────────────────────────
+  slot_opening   = 6.0 mm (opening width)
+  slot_width     = 6.0 mm
+  slot_depth     = 5.7 mm
+  t_nut_head_w   = 5.85 mm (slides in, then rotates)
+  t_nut_head_h   = 2.75 mm
+  t_nut_thread   = M5
+  corner_radius  = 1.5 mm (inner slot corners)
+
+CORNER BRACKET TYPES
+─────────────────────
+  1. Inside corner bracket (L-plate) — 20×20 mm flat L with 4× M5 holes
+  2. Inside hidden bracket (T-nut insert) — slides into both slots, no gap
+  3. Angle bracket 90° with gusset — printed triangle reinforcement
+  4. 3-way corner connector — cube corner for XYZ frame joint
+
+PROFILE END HARDWARE
+─────────────────────
+  End cap 2020   : 19.5×19.5 mm plug; 4 arm + center boss
+  End cap 2040   : 19.5×39.5 mm
+  Foot/leveller  : M6 or M8 screw-in foot; base plate ø25–40 mm
+
+PRINTED BRACKET FOR 2020
+─────────────────────────
+  slot_w        = 6.2;    // slot opening + 0.2 clearance
+  t_head_w      = 5.85;   // T-nut head width
+  t_head_h      = 2.75;   // T-nut head height
+  profile_w     = 20;     // extrusion face width
+
+  module extrusion_slot_nut(depth=10) {
+    // negative shape to slide over T-nut / into slot
+    translate([0, 0, -depth/2])
+      union() {
+        cube([slot_w, t_head_h, depth], center=true);      // slot entry
+        cube([t_head_w, t_head_h+1, depth], center=true);  // T-nut head clearance
+      }
+  }
+
+STANDARD STRUCTURAL STEEL SECTIONS (for reference, modelled in OpenSCAD)
+──────────────────────────────────────────────────────────────────────────
+  Angle (L-section): leg × leg × thickness; common: 25×25×3, 40×40×4, 50×50×5 mm
+  Channel (U):       width × height × flange × web; e.g. C50×25×3
+  I-beam (HEA/IPE):  web height × flange width; HEA100, HEA120, IPE80, IPE100
+  Square hollow (RHS): 20×20×2, 40×40×3, 50×50×4 mm
+  Round hollow (CHS): OD × wall; ø20×2, ø25×2, ø32×3, ø48×3 mm
+  Flat bar:           width × thickness; 20×3, 25×4, 40×5, 50×6 mm
+
+I / H / WIDE-FLANGE BEAM FAMILY DIFFERENCES
+───────────────────────────────────────────
+Do not treat every I-shaped section as one generic profile. Pick the variant
+from the user wording and preserve its proportions.
+
+1. Standard I-beam / American S-shape / classic I-section
+   - Keywords: standard I-beam, S-beam, classic I beam, tapered flange.
+   - Flanges are relatively narrow and have a visible inward taper/slope.
+   - Typical proportion: flange_width is about 0.45 to 0.65 * beam_height.
+   - Model with top and bottom flanges plus web; if possible use tapered
+     flange polygons or hull() blocks so the flange is thicker near the web.
+   - This is not a wide H beam.
+
+2. Narrow-flange I-beam / narrow I-section / IPE-like beam
+   - Keywords: narrow flange, narrow I beam, IPE beam, slim I section.
+   - Flanges are flat/parallel, not tapered, and narrower than the height.
+   - Typical proportion: flange_width is about 0.40 to 0.60 * beam_height.
+   - Web is tall and slender; flange_thickness and web_thickness are modest.
+   - Model as three rectangular prisms: top flange, bottom flange, web.
+
+3. Wide-flange H-beam / W-beam / HEA / HEB
+   - Keywords: wide flange, H-beam, H beam, W beam, HEA, HEB, universal column.
+   - Flanges are flat/parallel and wide; section visually reads as H.
+   - Typical proportion: flange_width is about 0.80 to 1.20 * beam_height.
+   - Use wider/thicker flanges and a central web; H-beams often have flange
+     width close to beam depth.
+   - Model as three rectangular prisms with flange_width much larger than the
+     narrow-flange/IPE case.
+
+Variant selection rules:
+- If user says "standard I-beam", "classic I-beam", or "S beam", use tapered flanges.
+- If user says "narrow flange", "IPE", or "slim I beam", use narrow flat flanges.
+- If user says "wide flange", "H beam", "W beam", "HEA", or "HEB", use wide flat flanges.
+- Always expose beam_height, flange_width, flange_thickness, web_thickness, and beam_length as parameters.
+- Never output a single rectangular bar for any of these variants.
+
+OPENSCAD EXTRUSION PROFILES (linear_extrude from 2D cross-section)
+────────────────────────────────────────────────────────────────────
+  module angle_section(leg, thickness, length) {
+    linear_extrude(height=length)
+      difference() {
+        square([leg, leg]);
+        translate([thickness, thickness]) square([leg, leg]);
+      }
+  }
+
+  module rhs_section(width, height, wall, length) {
+    linear_extrude(height=length)
+      difference() {
+        square([width, height], center=true);
+        square([width-2*wall, height-2*wall], center=true);
+      }
+  }
+
+  module chs_section(od, wall, length) {
+    linear_extrude(height=length)
+      difference() {
+        circle(d=od, $fn=64);
+        circle(d=od - 2*wall, $fn=64);
+      }
+  }
+
+KEY PARAMETERS FOR FRAME DESIGN
+────────────────────────────────
+  profile_size          — 2020, 2040, 4040 etc.
+  frame_length_x        — overall X dimension of frame
+  frame_length_y        — overall Y dimension
+  frame_height          — Z dimension
+  cross_member_spacing  — spacing of intermediate cross-members
+  bolt_circle_d         — for end-tap connection: M5 on 2020 → ø10 mm bolt circle
+  end_tap_depth         — tapped hole in profile end: M5×10 mm standard on 2020
+
+DESIGN RULES
+────────────
+  - Always model with extrusion OD dimensions + 0.1–0.2 mm clearance for slide-fit brackets
+  - T-slot hardware: 2020 → M5, 2040 → M5, 4040 → M8 (check manufacturer spec)
+  - Corner brackets should engage ≥ 2 T-nuts per rail for rigid connection
+  - Pre-assembly: loose brackets, align square with machinist square, tighten in sequence
+  - Torsional stiffness: add diagonal braces or gusset plates for large frames
+  - Printed end caps: 0.2 mm undersize on each inserted dimension for press fit
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- Structural profiles are beams with constant cross-sections extruded along length.
+- Beam solids, brackets, gussets, plates, and end caps are solid material in union().
+- Slots, bolt holes, T-slots, lightening holes, and end bores are removed material in difference().
+- Use cube() for rectangular extrusions and subtract long slot cubes/cylinders to represent T-slots.
+- Gusset plates are triangular or rectangular supports between beams.
+- Bolt holes through brackets should align with profile slots or known hole spacing.
+- Frames are assemblies of translated/rotated profile modules.
+- Keep beam length, profile_size, slot_width, and wall_thickness as parameters.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn structural-profile rules into OpenSCAD.
+
+Rule: profile beam is a long rectangular extrusion.
+OpenSCAD action:
+  cube([profile_length, profile_size, profile_size], center=true);
+
+Rule: T-slot is a long subtracted channel.
+OpenSCAD action:
+  translate([0,profile_size/2,0]) cube([profile_length+2, slot_width, slot_depth], center=true);
+
+Rule: hollow extrusion removes inner core.
+OpenSCAD action:
+  cube([profile_length+2, profile_size-2*wall_thickness, profile_size-2*wall_thickness], center=true);
+
+Rule: corner bracket plate uses holes matching slot spacing.
+OpenSCAD action:
+  for (x=[-hole_spacing/2,hole_spacing/2])
+    translate([x,0,0]) cylinder(h=plate_thickness+2, d=bolt_hole_diameter, center=true, $fn=48);
+
+Rule: diagonal brace is a rotated beam between frame members.
+OpenSCAD action:
+  rotate([0,0,brace_angle]) cube([brace_length, brace_width, brace_thickness], center=true);
+
+CURATED MODELING-GAP CORRECTION: I-BEAM MUST NOT BE A RECTANGULAR BAR
+Source baseline: research paper failure case where an I-beam prompt was answered with a plain rectangular beam.
+Use this whenever the prompt mentions I-beam, I section, H-beam, steel beam, flange, web, IPE, or HEA profile.
+
+Real mechanical interpretation:
+- An I-beam has two horizontal flanges and one vertical web.
+- The flanges resist bending because they are far from the neutral axis.
+- The web carries shear and spaces the flanges apart.
+- A single cube with full beam height and flange width is a rectangular bar, not an I-beam.
+
+OpenSCAD action:
+```scad
+$fn = 96;
+
+beam_length = 180;
+beam_height = 60;
+flange_width = 36;
+flange_thickness = 8;
+web_thickness = 7;
+
+module i_beam_profile() {
+  union() {
+    translate([0, 0, beam_height/2 - flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+    translate([0, 0, -beam_height/2 + flange_thickness/2])
+      cube([beam_length, flange_width, flange_thickness], center=true);
+    cube([beam_length, web_thickness, beam_height - 2*flange_thickness], center=true);
+  }
+}
+
+i_beam_profile();
+```
+
+If holes are requested, subtract them after the flange/web union:
+```scad
+difference() {
+  i_beam_profile();
+  for (x=[-60,0,60])
+    translate([x,0,0])
+      rotate([90,0,0])
+        cylinder(h=web_thickness+2, d=8, center=true, $fn=48);
+}
+```

@@ -1,0 +1,151 @@
+GEARBOX HOUSING REFERENCE
+Category: Power Transmission / Enclosed Gearing
+Verified models: GrabCAD "spur gearbox housing 2-stage", GrabCAD "worm gearbox",
+  Thingiverse thing:4194148 (OpenSCAD gear library with housing intent),
+  Printables "planetary gearbox printed", GrabCAD "helical gearbox housing"
+
+GEARBOX TYPES
+──────────────
+1. Inline Spur Gearbox (parallel shafts)
+   - Input and output shafts parallel; can be coplanar or offset
+   - Stages: 1-stage (ratio 2–6:1), 2-stage (6–36:1), 3-stage (up to 216:1)
+
+2. Right-Angle Worm Gearbox
+   - Worm (input, high speed) drives worm wheel (output, low speed, 90°)
+   - Ratios: 5:1 to 100:1 per stage; self-locking below ~10° lead angle
+   - Centre distance = (worm_pitch_d + worm_wheel_pitch_d) / 2
+
+3. Planetary Gearbox (epicyclic)
+   - Sun + planets + ring (annulus); coaxial input/output
+   - Single stage: 3:1 to 10:1; high torque density; compact
+
+4. Bevel Gearbox (intersecting shafts, 90°)
+   - Two mating bevel gears; shafts at 90° (or other angle)
+   - Ratio 1:1 to 5:1 typical
+
+5. Cycloidal Gearbox
+   - High reduction (up to 119:1 single stage); high torque; low backlash
+   - Complex profile; suited for OpenSCAD parametric generation
+
+HOUSING ARCHITECTURE
+─────────────────────
+  - Split line: horizontal through shaft centrelines for easy assembly
+  - Top half (cover) + bottom half (base) secured with bolts around perimeter
+  - Bearing bores: bored in assembled halves for concentricity (align bore operation)
+  - Internal ribs: for stiffness; rib thickness ≈ wall_thickness × 0.6
+  - Rib spacing: ≤ 3 × wall_thickness
+  - Oil fill port: top; drain port: bottom; level indicator: mid-height
+  - Shaft seals: lip seal or O-ring groove at shaft exit
+
+TWO-SHAFT SPUR GEARBOX PARAMETERS
+────────────────────────────────────
+  gear_module           — tooth module (e.g. 2.0 mm)
+  teeth_input           — small gear (pinion) tooth count (e.g. 15)
+  teeth_output          — large gear tooth count (e.g. 45); ratio = teeth_out/teeth_in
+  gear_face_width       — gear width (e.g. 20 mm); = 8–12 × module
+  centre_distance       — gear_module × (teeth_in + teeth_out) / 2
+  input_shaft_d         — motor shaft OD (e.g. 8 mm)
+  output_shaft_d        — output shaft OD (e.g. 12 mm)
+  bearing_bore_input    — = input shaft + clearance (bearing inner ring OD)
+  bearing_bore_output   — = output shaft + clearance
+  wall_thickness        — ≥ 6 mm for structural integrity
+  housing_length        — centre_distance + gear_r_large + wall_thickness × 2
+  housing_width         — gear_face_width + 2 × bearing_width + 2 × wall_thickness
+  housing_height        — gear_r_large + gear_r_small + centre_distance + 2 × wall_thickness
+  split_plane_z         — z coordinate of split line (= centre of gear mesh height)
+  bolt_count            — 4–8 around perimeter; M5 or M6
+  dowel_pin_d           — 4–6 mm; 2 pins for alignment between halves
+  shaft_seal_groove_d   — shaft_d + 1 mm; O-ring groove: 2 mm wide, 1.5 mm deep
+  vent_plug_d           — M12 or M14 breather port on top
+
+PLANETARY GEARBOX PARAMETERS
+──────────────────────────────
+  sun_teeth             — N_s; minimum 12
+  planet_teeth          — N_p = (N_r − N_s) / 2; integer required
+  ring_teeth            — N_r = N_s + 2 × N_p; must be integer
+  num_planets           — 3 (standard) or 4–6 for high torque
+  gear_module           — same for all gears in set
+  reduction_ratio       — 1 + N_r/N_s  (ring fixed, sun input, carrier output)
+  planet_centre_dist    — (N_s + N_p) × module / 2
+  ring_inner_d          — N_r × module
+  ring_outer_d          — ring_inner_d + 2 × ring_wall (≥ 6 mm)
+  carrier_od            — planet_centre_dist × 2 + planet_pitch_d + 4 mm wall
+  planet_pin_d          — 4–8 mm (bearing or bushing for planet)
+
+OPENSCAD GEARBOX HOUSING STRUCTURE
+─────────────────────────────────────
+  module gearbox_half(housing_l, housing_w, housing_h, wall, split_z) {
+    difference() {
+      cube([housing_l, housing_w, split_z + wall], center=true);
+      // hollow interior
+      translate([0, 0, wall/2])
+        cube([housing_l-2*wall, housing_w-2*wall, split_z], center=true);
+      // input bearing bore (left wall)
+      translate([-housing_l/2, 0, 0])
+        rotate([0,90,0])
+          cylinder(h=wall+2, d=bearing_bore_input+0.05, $fn=96);
+      // output bearing bore (right wall)
+      translate([housing_l/2-wall, 0, -centre_distance/2])
+        rotate([0,90,0])
+          cylinder(h=wall+2, d=bearing_bore_output+0.05, $fn=96);
+      // perimeter bolt holes
+      for(x=[-housing_l/2+wall, housing_l/2-wall])
+        for(y=[-housing_w/2+wall, housing_w/2-wall])
+          translate([x, y, 0])
+            cylinder(h=split_z+wall+2, d=5.5, center=true, $fn=32);
+    }
+  }
+
+DESIGN RULES
+────────────
+  - Bearing bores: H7 tolerance (housing bore); use interference fit or retaining compound
+  - Split-line bolt spacing: ≤ 60 mm for oil-tight joint; use gasket or RTV sealant
+  - Shaft-to-housing wall distance: ≥ bearing_OD/2 + 4 mm wall
+  - Internal rib height: 60–75% of internal cavity height (don't touch opposite wall)
+  - Gear-to-housing wall clearance: ≥ 3 mm all around rotating gears
+  - Oil fill level: covers lower gear partially; worm wheel: submerged lower third
+  - For printed gearboxes: use PETG or ABS; PLA creeps under sustained load
+  - Output shaft seal groove: place outside bearing on output side; O-ring ø = shaft_d
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A gearbox housing is a protective shell with bearing seats and shaft openings aligned to gear axes.
+- Housing walls, bearing bosses, ribs, feet, and lid flanges are solid material in union().
+- Internal cavity, shaft holes, bearing seats, screw holes, oil ports, and inspection windows are removed material in difference().
+- Input and output shaft bores must align with their intended axes and gear center distance.
+- Bearing seats are larger coaxial recesses around shaft holes.
+- Lid screw holes repeat around the perimeter, usually vertical through the flange.
+- Ribs represent stiffness; add thin cubes between walls and bosses.
+- Do not fill the gear cavity; subtract a large internal volume while leaving wall_thickness.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn gearbox-housing rules into OpenSCAD.
+
+Rule: housing shell is outer box minus internal gear cavity.
+OpenSCAD action:
+  difference() {
+    cube([housing_length, housing_width, housing_height], center=true);
+    cube([housing_length-2*wall_thickness, housing_width-2*wall_thickness, housing_height-2*wall_thickness], center=true);
+  }
+
+Rule: shaft bores align with gear axes.
+OpenSCAD action:
+  for (x=[-shaft_center_distance/2, shaft_center_distance/2])
+    translate([x,0,shaft_height])
+      rotate([90,0,0]) cylinder(h=housing_width+2, d=shaft_clearance_diameter, center=true, $fn=64);
+
+Rule: bearing seats are larger coaxial recesses around shaft bores.
+OpenSCAD action:
+  for (x=[-shaft_center_distance/2, shaft_center_distance/2])
+    translate([x,housing_width/2-bearing_seat_depth/2,shaft_height])
+      rotate([90,0,0]) cylinder(h=bearing_seat_depth, d=bearing_outer_diameter, center=true, $fn=96);
+
+Rule: lid screw holes repeat around perimeter flange.
+OpenSCAD action:
+  for (x=[-lid_hole_x/2,lid_hole_x/2])
+    for (y=[-lid_hole_y/2,lid_hole_y/2])
+      translate([x,y,housing_height/2]) cylinder(h=lid_flange_thickness+2, d=lid_screw_diameter, center=true, $fn=32);
+
+Rule: ribs stiffen bearing bosses to housing walls.
+OpenSCAD action:
+  translate([rib_x,0,shaft_height]) cube([rib_thickness, housing_width, rib_height], center=true);

@@ -1,0 +1,145 @@
+GEARS-MASTER PRIMARY GEAR REFERENCE
+Source path: D:/downloads/gears-master (1)/gears-master
+Primary library: gears.scad
+Primary examples: D:/downloads/gears-master (1)/gears-master/examples
+Project-local library copy: D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad
+
+Use this as the most important OpenSCAD reference for all gear generation in this project.
+When a user asks for any gear, prefer the module names, parameters, formulas, and assembly patterns from gears-master.
+If exact library imports are allowed, use the project-local absolute include:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+If returning standalone OpenSCAD, mirror these module concepts with compatible parameter names and derived formulas.
+
+LIBRARY PURPOSE
+OpenSCAD library for parametric gear racks, involute spur gears, helical gears, herringbone gears, ring gears, bevel gears, spiral bevel gears, worm gears, rack-and-pinion assemblies, and planetary gear assemblies.
+The library follows DIN 867 style involute gear assumptions with standard pressure_angle=20 degrees.
+
+CORE MODULE SIGNATURES FROM gears.scad
+- rack(modul, length, height, width, pressure_angle=20, helix_angle=0)
+- herringbone_rack(modul, length, height, width, pressure_angle=20, helix_angle=45)
+- mountable_rack(modul, length, height, width, pressure_angle, helix_angle, fastners, profile, head)
+- mountable_herringbone_rack(modul, length, height, width, pressure_angle, helix_angle, fastners, profile, head)
+- spur_gear(modul, tooth_number, width, bore, pressure_angle=20, helix_angle=0, optimized=true)
+- herringbone_gear(modul, tooth_number, width, bore, pressure_angle=20, helix_angle=0, optimized=true)
+- rack_and_pinion(modul, rack_length, gear_teeth, rack_height, gear_bore, width, pressure_angle=20, helix_angle=0, together_built=true, optimized=true)
+- ring_gear(modul, tooth_number, width, rim_width, pressure_angle=20, helix_angle=0, shortening_factor=0.6)
+- herringbone_ring_gear(modul, tooth_number, width, rim_width, pressure_angle=20, helix_angle=0)
+- planetary_gear(modul, sun_teeth, planet_teeth, number_planets, width, rim_width, bore, pressure_angle=20, helix_angle=0, together_built=true, optimized=true)
+- bevel_gear(modul, tooth_number, partial_cone_angle, tooth_width, bore, pressure_angle=20, helix_angle=0)
+- bevel_herringbone_gear(modul, tooth_number, partial_cone_angle, tooth_width, bore, pressure_angle=20, helix_angle=0)
+- spiral_bevel_gear(modul, tooth_number, partial_cone_angle, tooth_width, bore, pressure_angle=20, helix_angle=30)
+- bevel_gear_pair(modul, gear_teeth, pinion_teeth, axis_angle=90, tooth_width, gear_bore, pinion_bore, pressure_angle=20, helix_angle=0, together_built=true)
+- bevel_herringbone_gear_pair(modul, gear_teeth, pinion_teeth, axis_angle=90, tooth_width, gear_bore, pinion_bore, pressure_angle=20, helix_angle=10, together_built=true)
+- worm(modul, thread_starts, length, bore, pressure_angle=20, lead_angle, together_built=true)
+- worm_gear(modul, tooth_number, thread_starts, width, length, worm_bore, gear_bore, pressure_angle=20, lead_angle=10, optimized=true, together_built=true, show_spur=1, show_worm=1)
+
+GEARS-MASTER DESIGN RULES TO PRESERVE
+- Use "modul" as the module parameter when following the library exactly.
+- Use "tooth_number" for single gears and "gear_teeth", "pinion_teeth", "sun_teeth", "planet_teeth" for assemblies.
+- Use "width" for cylindrical gear face width and "tooth_width" for bevel gear tooth face width.
+- Use "bore", "gear_bore", "pinion_bore", "worm_bore", or "gear_bore" as separate shaft openings.
+- Use "pressure_angle=20" by default.
+- Use "helix_angle=0" for straight teeth, nonzero helix_angle for helical or spiral-looking teeth.
+- Helical and herringbone gears adjust the transverse pressure angle to helix_angle.
+- Herringbone gears mirror two helical halves and reduce or cancel axial thrust.
+- "optimized=true" creates material reduction / surface improvement features when geometry allows.
+- "together_built=true" renders assemblies meshed together; false is useful for print layout.
+- For 3D printed gear assemblies, include adequate clearance and avoid fused planet/ring meshes.
+- For generic prompts with missing dimensions, use the defaults shown in the example calls below.
+- Do not output a placeholder module asking for modul, tooth_number, bore, etc.; generate a complete usable example instead.
+- Do not use echo("Please specify ...") for gear requests unless the user explicitly asks for an interactive parameter template.
+
+EXAMPLE CALLS FROM examples/
+Plain spur gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  spur_gear(modul=1, tooth_number=30, width=5, bore=4, pressure_angle=20, helix_angle=0, optimized=true);
+
+Helical / spiral cylindrical gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  spur_gear(modul=1, tooth_number=30, width=5, bore=4, pressure_angle=20, helix_angle=20, optimized=true);
+
+Herringbone gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  herringbone_gear(modul=1, tooth_number=30, width=5, bore=4, pressure_angle=20, helix_angle=30, optimized=true);
+
+Ring gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  ring_gear(modul=1, tooth_number=30, width=5, rim_width=3, pressure_angle=20, helix_angle=20);
+
+Herringbone ring gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  herringbone_ring_gear(modul=1, tooth_number=30, width=5, rim_width=3, pressure_angle=20, helix_angle=30);
+
+Rack:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  rotate([90,0,0])
+  rack(modul=1, length=60, height=5, width=20, pressure_angle=20, helix_angle=0);
+
+Herringbone rack:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  rotate([90,0,0])
+  herringbone_rack(modul=1, length=60, height=5, width=20, pressure_angle=20, helix_angle=45);
+
+Rack and pinion:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  rack_and_pinion(modul=1, rack_length=50, gear_teeth=30, rack_height=4, gear_bore=4, width=5, pressure_angle=20, helix_angle=0, together_built=true, optimized=true);
+
+Bevel gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  bevel_gear(modul=1, tooth_number=30, partial_cone_angle=45, tooth_width=5, bore=4, pressure_angle=20, helix_angle=20);
+
+Bevel gear pair:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  bevel_gear_pair(modul=1, gear_teeth=30, pinion_teeth=11, axis_angle=100, tooth_width=5, gear_bore=4, pinion_bore=4, pressure_angle=20, helix_angle=20, together_built=true);
+
+Bevel herringbone gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  bevel_herringbone_gear(modul=1, tooth_number=30, partial_cone_angle=45, tooth_width=5, bore=4, pressure_angle=20, helix_angle=30);
+
+Bevel herringbone gear pair:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  bevel_herringbone_gear_pair(modul=1, gear_teeth=30, pinion_teeth=11, axis_angle=90, tooth_width=5, gear_bore=0, pinion_bore=4, pressure_angle=20, helix_angle=20, together_built=true);
+
+Planetary gear:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  planetary_gear(modul=1, sun_teeth=16, planet_teeth=9, number_planets=5, width=5, rim_width=3, bore=4, pressure_angle=20, helix_angle=30, together_built=true, optimized=true);
+
+Worm:
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  worm(modul=1, thread_starts=2, length=15, bore=4, pressure_angle=20, lead_angle=10, together_built=true);
+
+Worm gear assembly:
+ include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  worm_gear(modul=1, tooth_number=30, thread_starts=2, width=8, length=20, worm_bore=4, gear_bore=4, pressure_angle=20, lead_angle=10, optimized=1, together_built=1, show_spur=1, show_worm=1);
+
+TYPE MAPPING FOR USER PROMPTS
+- "spur gear" -> spur_gear
+- Plain spur gear must use helix_angle=0.
+- "spiral gear" or "helical gear" -> spur_gear with nonzero helix_angle
+- "herringbone gear" or "double helical gear" -> herringbone_gear
+- "ring gear" or "annulus" -> ring_gear or herringbone_ring_gear
+- "rack" -> rack or mountable_rack
+- "rack and pinion" -> rack_and_pinion
+- "bevel gear" -> bevel_gear
+- "bevel pair", "miter gear", "right angle gear pair" -> bevel_gear_pair
+- "spiral bevel gear" -> spiral_bevel_gear for single gear, or bevel_gear_pair with nonzero helix_angle for pair-style output
+- "bevel herringbone" -> bevel_herringbone_gear or bevel_herringbone_gear_pair
+- "planetary gear" -> planetary_gear
+- "worm" -> worm
+- "worm gear", "worm drive", "worm and wheel" -> worm_gear
+
+FORMULA AND PLACEMENT GUIDANCE
+- Spur/helical center distance for two external gears: modul / 2 * (teeth_a + teeth_b).
+- Rack and pinion axis distance from rack pitch line: modul / 2 * gear_teeth.
+- Planetary center distance from sun to planet: modul / 2 * (sun_teeth + planet_teeth).
+- Planetary outer diameter with rim: modul * (sun_teeth + 2 * planet_teeth + 2.333) + 2 * rim_width.
+- Planetary ring tooth count is implied by sun and planet teeth: ring_teeth = sun_teeth + 2 * planet_teeth.
+- For bevel pairs, use axis_angle and matching cone geometry; do not render two flat spur gears.
+- For worm drives, use thread_starts, lead_angle, length, worm_bore, and gear_bore as explicit parameters.
+
+OUTPUT GUIDANCE
+- If the generated OpenSCAD can depend on the external library, write a short file that includes gears.scad and calls the correct module.
+- For a plain spur gear, do not use helix_angle=20 or any nonzero helix_angle; that creates a helical/slanted gear shape.
+- Do not hand-build spur teeth from rectangular cubes when gears.scad is available; use spur_gear(...) for a clean involute-style gear.
+- If the output must be standalone, implement simplified but faithful equivalents while preserving gears-master parameter names, proportions, and formulas.
+- Never ignore the requested gear type. A bevel gear must be conical. A worm gear must include a worm screw and wheel. A planetary gear must include sun, planets, ring, and carrier or at least their correct spatial relationship.

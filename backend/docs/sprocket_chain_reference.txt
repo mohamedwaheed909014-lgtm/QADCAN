@@ -1,0 +1,145 @@
+SPROCKETS AND CHAIN DRIVE REFERENCE
+Category: Power Transmission / Chain Drive
+Verified models: GrabCAD "sprocket #25 chain", Thingiverse "parametric sprocket OpenSCAD",
+  Printables "roller chain sprocket", GrabCAD "ANSI 40 sprocket", Cults3D "sprocket generator"
+
+ROLLER CHAIN STANDARDS
+────────────────────────
+  Chain designation format: ANSI # × pitch in 1/8" increments
+  #25  : pitch 6.35 mm (1/4"),  roller ø 3.18 mm,  inner width 3.18 mm  (hobby, 3D printers)
+  #35  : pitch 9.525 mm (3/8"), roller ø 5.08 mm,  inner width 4.78 mm
+  #40  : pitch 12.7 mm (1/2"),  roller ø 7.92 mm,  inner width 7.85 mm  (most common industrial)
+  #41  : pitch 12.7 mm (1/2"),  roller ø 7.77 mm,  inner width 6.35 mm  (lightweight #40)
+  #50  : pitch 15.875 mm (5/8"),roller ø 10.16 mm, inner width 9.40 mm
+  #60  : pitch 19.05 mm (3/4"), roller ø 11.91 mm, inner width 12.57 mm
+  #80  : pitch 25.4 mm (1"),    roller ø 15.88 mm, inner width 15.75 mm
+
+  ISO 606 metric chains (European): 06B, 08B, 10B, 12B, 16B
+  08B: pitch 12.7 mm, roller ø 8.51 mm, inner width 7.75 mm (equivalent to ANSI #40 pitch)
+
+SPROCKET GEOMETRY (for N teeth, pitch P)
+──────────────────────────────────────────
+  pitch_diameter  = P / sin(180/N)           // exact
+  outside_diameter= pitch_d + roller_d - P × 0.05   // approximate
+  root_diameter   = pitch_d - roller_d       // bottom of tooth space
+  hub_diameter    ≥ bore_d + 8 mm
+  tooth_height    = (outside_d - root_d) / 2
+  tooth_width     = roller_d + 0.15 mm       // tight clearance
+
+STANDARD TOOTH COUNTS (real sprocket inventory)
+─────────────────────────────────────────────────
+  #25 chain common teeth: 9, 11, 13, 15, 17, 20, 25, 30, 40, 45
+  #40 chain common teeth: 9, 11, 13, 15, 17, 19, 21, 25, 30, 35, 40, 45, 60
+
+  Example reductions (#40 chain):
+  9T / 36T = 4:1
+  15T / 45T = 3:1
+  17T / 51T = 3:1 (motor to wheel, go-kart)
+
+KEY PARAMETERS
+──────────────
+  chain_pitch        — from standard table above
+  roller_diameter    — from standard table above
+  num_teeth          — ≥ 9 to maintain chain wrap
+  bore_diameter      — shaft bore
+  hub_od             — bore_d + 10–16 mm
+  hub_length         — ≥ bore engagement + set screw clearance
+  plate_thickness    — sprocket web thickness: 5–10 mm for printed
+  set_screw_d        — M4–M6 depending on hub diameter
+  chain_width        — = inner_width + 0.5 mm clearance per side
+  mounting_hole_d    — M4 or M5 bolt circle on hub flange (optional)
+  tooth_relief       — 0.3–0.5 mm additional clearance on tooth profile for printed parts
+
+OPENSCAD STRUCTURE (simplified sprocket)
+─────────────────────────────────────────
+  chain_pitch  = 12.7;   // #40
+  roller_d     = 7.92;
+  num_teeth    = 17;
+  thickness    = 8;
+  bore_d       = 10;
+
+  pitch_d  = chain_pitch / sin(180/num_teeth);
+  outer_d  = pitch_d + roller_d * 0.8;
+  root_d   = pitch_d - roller_d * 1.1;
+
+  module sprocket() {
+    difference() {
+      union() {
+        // tooth body
+        cylinder(h=thickness, d=outer_d, center=true, $fn=128);
+        // hub
+        cylinder(h=thickness+4, d=bore_d+12, center=true, $fn=64);
+      }
+      // tooth spaces (roller clearance holes at pitch circle)
+      for(i=[0:num_teeth-1])
+        rotate([0, 0, 360*i/num_teeth])
+          translate([pitch_d/2, 0, 0])
+            cylinder(h=thickness+2, d=roller_d+0.3, center=true, $fn=32);
+      // root relief (reduce material between teeth)
+      cylinder(h=thickness+2, d=root_d, center=true, $fn=128);
+      // bore
+      cylinder(h=thickness+10, d=bore_d+0.2, center=true, $fn=64);
+      // set screw
+      translate([(bore_d/2 + 5), 0, 0])
+        rotate([90,0,0])
+          cylinder(h=bore_d+12, d=4.5, center=true, $fn=32);
+    }
+  }
+
+CHAIN LENGTH CALCULATION
+──────────────────────────
+  For two sprockets with N1, N2 teeth and centre distance C:
+  chain_links = 2×C/P + (N1+N2)/2 + (N2-N1)²/(4×PI²×C/P)
+  Round UP to nearest even number (chain must form closed loop)
+
+DESIGN RULES
+────────────
+  - Minimum 17 teeth on driving sprocket for smooth engagement (9–12 teeth causes noise/vibration)
+  - For printed sprockets: add 0.3–0.5 mm tooth clearance (roller_d + 0.5 mm spacing)
+  - Tooth profile: use circular arc tooth form (simplified involute) not just holes
+  - Hub bore press fit: bore = shaft_d + 0.0 to +0.05 mm; use heat to fit aluminium hub on shaft
+  - Chain alignment: sprockets must be within 1° coplanar; use spacers to align
+  - Lubrication: chain needs periodic oil; print a chain guide shield to contain lubricant
+  - Minimum wrap angle on small sprocket: ≥ 120° for reliable engagement (affects centre distance)
+
+OPENSCAD CODE INTERPRETATION
+Mechanical meaning to code:
+- A sprocket is a rotating disk with repeated chain teeth around a pitch circle.
+- Hub, web, rim, and teeth are solid material in union().
+- Shaft bore, keyway, lightening holes, and set-screw holes are removed material in difference().
+- Tooth count controls angular repetition around Z.
+- Chain roller pockets are valleys between teeth; approximate by repeated subtractive circular cutouts if needed.
+- Pitch radius is based on chain pitch and tooth count, not bore diameter.
+- Add hub around bore for torque transfer.
+- A chain guide is a separate stationary channel, not part of the rotating sprocket unless requested.
+
+OPENSCAD CODE RULE IMPLEMENTATIONS
+Use these patterns to turn sprocket and chain rules into OpenSCAD.
+
+Rule: sprocket pitch radius derives from chain pitch and tooth count.
+OpenSCAD action:
+  pitch_radius = chain_pitch / (2 * sin(180 / tooth_count));
+  outer_radius = pitch_radius + roller_diameter/2;
+
+Rule: teeth repeat around the sprocket.
+OpenSCAD action:
+  for (i=[0:tooth_count-1])
+    rotate([0,0,360*i/tooth_count])
+      translate([pitch_radius,0,0]) cube([tooth_radial_depth, tooth_width, sprocket_thickness], center=true);
+
+Rule: roller pockets are repeated subtractive circular valleys.
+OpenSCAD action:
+  for (i=[0:tooth_count-1])
+    rotate([0,0,360*(i+0.5)/tooth_count])
+      translate([pitch_radius,0,0]) cylinder(h=sprocket_thickness+2, d=roller_diameter+clearance, center=true, $fn=48);
+
+Rule: hub and bore transfer torque to shaft.
+OpenSCAD action:
+  cylinder(h=hub_width, d=hub_diameter, center=true, $fn=96);
+  cylinder(h=hub_width+2, d=bore_diameter+clearance, center=true, $fn=96);
+
+Rule: lightening holes repeat inside the web.
+OpenSCAD action:
+  for (i=[0:lightening_count-1])
+    rotate([0,0,360*i/lightening_count])
+      translate([lightening_radius,0,0]) cylinder(h=sprocket_thickness+2, d=lightening_hole_d, center=true, $fn=48);

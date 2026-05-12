@@ -1,0 +1,5 @@
+.env
+backend/logs/
+backend/accepted_history.jsonl
+__pycache__/
+*.pyc

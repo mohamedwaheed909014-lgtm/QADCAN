@@ -1,0 +1,140 @@
+GRABCAD REAL EXAMPLES REFERENCE - BEARING HOUSINGS
+
+Purpose:
+This is a high-priority RAG reference for grounding generated bearing housings in real
+GrabCAD examples. Use these examples as visual/product references only. Do not copy,
+redistribute, or claim ownership of third-party CAD files.
+
+Important copyright/source rule:
+GrabCAD CAD files are created and owned by third-party users. Use public page titles,
+metadata, and visual design patterns as reference only. Do not embed downloaded CAD
+geometry in this project.
+
+REAL GRABCAD / GRABCAD TUTORIAL REFERENCES
+
+1. Tutorial on Plummer Block Assembly
+URL: https://cad.grabcad.com/tutorials/tutorial-on-plummer-block-assembly
+Observed source facts:
+- GrabCAD tutorial describes a pillow block or plummer block as a pedestal supporting
+  a rotating shaft with compatible bearings and accessories.
+- The assembly consists of a mounting block that houses a bearing.
+Design lessons:
+- A real plummer block is a pedestal/mounting block, not a floating ring.
+- The housing body must visually and mechanically support the bearing from below.
+- Use mounting block, bearing pocket, shaft bore, cap/body split, and base feet as
+  primary features.
+
+2. UCP 208 Bearing by Chintan (CK) Patel
+URL: https://grabcad.com/library/ucp-208-bearing-2
+Observed source facts:
+- Listed as "UCP 208 Bearing".
+- Description says it is a pillow block bearing and tries to approximate the actual
+  outer shape.
+Design lessons:
+- UCP pillow blocks have an elongated footed base.
+- The bearing housing rises as a pedestal from the base.
+- The upper bearing body is not a full simple tube; the lower section blends into
+  the pedestal and feet.
+- Use two base mounting slots or holes.
+
+3. UCP Plummer Block Housing Unit Library
+URL: https://grabcad.com/library/ucp-plummer-block-housing-unit-library-1
+Observed source facts:
+- Listed as "UCP Plummer Block Housing Unit".
+- The uploader notes it is a library model said to come from Schaeffler media.
+Design lessons:
+- UCP is the correct family for foot-mounted pillow/plummer bearing units.
+- Shape should have two mounting feet, raised body, rounded bearing cavity, and
+  supported saddle geometry.
+- Keep the shaft axis horizontal and parallel to the base.
+
+4. UCF 204 Pillow Block Bearing
+URL: https://grabcad.com/library/ucf-204-pillow-block-bearing-1
+Observed source facts:
+- Listed as "UCF 204 Pillow Block Bearing".
+- Page listing describes shaft diameter 20 mm, M10 medium-duty, set-screw locking type.
+Design lessons:
+- UCF 204 is a flanged bearing unit, not a footed pillow block.
+- It should have a square flange, four mounting holes, central bearing boss, and
+  perpendicular shaft axis.
+- Do not use UCF geometry for a UCP/pillow-block prompt.
+
+5. UCF 205 Pillow Block Bearing
+URL: https://grabcad.com/library/ucf-205-pillow-block-bearing-1
+Observed source facts:
+- Listed as "UCF 205 Pillow Block Bearing".
+- Page listing describes shaft diameter 25 mm, M10 medium-duty, set-screw locking type.
+Design lessons:
+- Like UCF 204, this is a four-bolt flanged mounted bearing pattern.
+- Use it when the prompt asks for square flange or wall/plate mounting.
+
+6. UCT Take-up Housing Unit Library
+URL: https://grabcad.com/library/uct-take-up-housing-unit-library-1
+Observed source facts:
+- Listed as "UCT Take-up housing unit".
+- The uploader notes it is a library model said to come from Schaeffler media.
+Design lessons:
+- UCT geometry is for sliding/tensioning, not a normal fixed pillow block.
+- Use elongated guide body, adjustment slots/rails, and bearing carriage logic.
+- Use when the prompt mentions belt tensioner, chain tensioner, conveyor adjustment,
+  or take-up.
+
+7. KSTM-25 Pillow Block Bearing Igubal
+URL: listed on https://grabcad.com/igusuk-1/models?sort=most-commented
+Observed source facts:
+- Listed as "KSTM-25 Pillow block bearing Igubal 25mm pillow block bearing".
+Design lessons:
+- Lightweight polymer pillow blocks can still have a real base and bearing support.
+- Good reference for non-cast, compact, polymer-style bearing supports.
+
+8. ESTM-BB1-F20-B180-ES Pillow Block Bearing Xiros
+URL: https://grabcad.com/library/estm-bb1-f20-b180-es-pillow-block-bearing
+Observed source facts:
+- Listed as a Xiros 20 mm pillow block bearing, rigid, with stainless steel balls.
+Design lessons:
+- Use as reference for compact 20 mm polymer/light-duty bearing supports.
+- The design should still show mounting base and integrated bearing support.
+
+REAL-FAMILY SELECTION RULES
+
+If the prompt says:
+- pillow block, plummer block, UCP, pedestal bearing, mounted shaft support:
+  Use UCP/plummer-block geometry.
+  Required shape: footed base + pedestal/saddle + integrated boss + two mounting holes.
+
+- UCF, square flange, four-bolt flange, wall mount:
+  Use UCF geometry.
+  Required shape: square flange + four holes + central boss + perpendicular shaft axis.
+
+- UCFL, two-bolt flange:
+  Use two-bolt oval/diamond flange geometry.
+  Required shape: oval/diamond flange + two mounting holes + central bearing boss.
+
+- UCT, take-up, belt tensioner, chain tensioner:
+  Use take-up geometry.
+  Required shape: sliding/tension body + guide slots + adjustable bearing pocket.
+
+PILLOW BLOCK VISUAL CHECKLIST
+
+A generated pillow block should contain:
+- wide footed base, not just a rectangular plate
+- two symmetric mounting holes or slots in the feet
+- raised pedestal/saddle body under the bearing
+- integrated horizontal bearing boss
+- cap split-line, cap land, clamp line, ribs, or side webs
+- subtractive bearing pocket using bearing_od
+- subtractive shaft bore using shaft_diameter
+
+Reject the output if:
+- it looks like a pipe/ring sitting on a flat plate
+- it lacks a pedestal/saddle
+- it has no mounting feet
+- it has only one center mounting hole
+- the shaft axis is vertical for a pillow block
+- it confuses UCF flange geometry with UCP pillow-block geometry
+
+PROMPT INSTRUCTION TO MODEL
+When generating OpenSCAD, first decide the mounted-bearing unit family:
+UCP/pillow block, UCF/square flange, UCFL/two-bolt flange, or UCT/take-up.
+Then generate geometry matching that real family. Do not invent a generic
+ring-on-plate bearing holder.
