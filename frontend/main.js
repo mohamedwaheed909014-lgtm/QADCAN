@@ -21,6 +21,7 @@ const codeOutput     = document.querySelector('#code-output');
 const codeFilename   = document.querySelector('#code-filename');
 const referencesEl   = document.querySelector('#references');
 const validationEl   = document.querySelector('#validation');
+const materialsEl    = document.querySelector('#materials');
 const submitBtn      = document.querySelector('#submit-button');
 const acceptBtn      = document.querySelector('#accept-button');
 const copyBtn        = document.querySelector('#copy-button');
@@ -91,17 +92,6 @@ function formatDesignNotes(notes) {
     lines.push('Standard used:');
     standards.slice(0, 3).forEach(item => {
       lines.push(`- ${item.name || 'Mechanical design practice'}: ${item.summary || 'relevant proportions, clearances, and feature constraints'}`);
-    });
-  }
-
-  const materials = notes.material_suggestions || [];
-  if (materials.length) {
-    if (lines.length) lines.push('');
-    const materialScope = notes.material_scope || 'generated part body, not purchased bearings or fasteners';
-    lines.push(`Body material suggestion (${materialScope}):`);
-    materials.slice(0, 3).forEach(item => {
-      const appliesTo = item.applies_to ? ` Applies to: ${item.applies_to}.` : '';
-      lines.push(`- ${item.material || 'Material'}: ${item.reason || item.notes || 'chosen from usage and duty level'}.${appliesTo}`);
     });
   }
 
@@ -439,6 +429,34 @@ function renderValidation(items) {
   validationEl.innerHTML = summary + groupsHtml;
 }
 
+function renderMaterials(notes) {
+  const materials = notes?.material_suggestions || [];
+  if (!materials.length) {
+    materialsEl.className = 'empty-state';
+    materialsEl.textContent = 'No material suggestions returned.';
+    return;
+  }
+
+  const materialScope = notes.material_scope || 'generated part body, not purchased bearings or fasteners';
+  materialsEl.className = 'materials-panel';
+  materialsEl.innerHTML = `
+    <div class="material-scope">${escHtml(materialScope)}</div>
+    <div class="material-list">
+      ${materials.slice(0, 5).map((item, index) => {
+        const material = item.material || `Material ${index + 1}`;
+        const reason = item.reason || item.notes || 'Chosen from usage and duty level.';
+        const appliesTo = item.applies_to ? `<span>${escHtml(item.applies_to)}</span>` : '';
+        return `<article class="material-card">
+          <div class="material-card-top">
+            <strong>${escHtml(material)}</strong>
+            ${appliesTo}
+          </div>
+          <p>${escHtml(reason)}</p>
+        </article>`;
+      }).join('')}
+    </div>`;
+}
+
 async function loadGenerationLog(limit = 10) {
   const logEl = document.querySelector('#generation-log');
   if (!logEl) return;
@@ -616,6 +634,7 @@ async function send(userText) {
         excerpt: item.url || ''
       })));
       renderValidation([]);
+      renderMaterials(null);
       setCode('');
       history.push({ role: 'user', content: userText });
       history.push({ role: 'assistant', content: messageText });
@@ -641,6 +660,7 @@ async function send(userText) {
     };
     renderReferences(data.retrieved  || []);
     renderValidation(data.validation || []);
+    renderMaterials(data.design_notes);
 
     history.push({ role: 'user',      content: userText });
     history.push({ role: 'assistant', content: code });
@@ -850,6 +870,8 @@ clearBtn.addEventListener('click', () => {
   referencesEl.className = validationEl.className = 'empty-state';
   referencesEl.textContent = 'No retrieval results yet.';
   validationEl.textContent = 'Checks appear after generation.';
+  materialsEl.className = 'empty-state';
+  materialsEl.textContent = 'Material suggestions appear after generation.';
   setStatus('New conversation started.', 'success');
 });
 
