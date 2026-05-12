@@ -1,0 +1,114 @@
+COMMON TRUSSES REFERENCE
+Category: Structural trusses and framed members
+Units: millimeters
+
+Use this reference whenever the prompt mentions truss, roof truss, bridge truss,
+king post, queen post, Pratt, Howe, Warren, Fink, K-truss, top chord, bottom
+chord, web member, diagonal member, vertical member, panel point, gusset plate,
+node plate, bearing plate, or support pad.
+
+CORE MECHANICAL MODEL
+---------------------
+A truss is an assembly of straight prismatic members joined at nodes. Do not
+model a truss as one filled decorative triangle or one solid plate. Model each
+chord, vertical, and diagonal as a separate member between endpoint nodes.
+
+Common features:
+- Top chord: upper chord or rafter line, often compression-dominant.
+- Bottom chord: lower tie member connecting supports.
+- Web members: diagonals and verticals between chords.
+- Panel points: nodes where web members meet the chords.
+- Gusset plates: bolted or welded plates at nodes.
+- Bolt holes: holes through gusset plates and bearing plates.
+- Support pads: bearing plates at left and right supports.
+
+MAIN PARAMETERS
+---------------
+- span: horizontal support-to-support distance.
+- rise: roof-truss height from bottom chord to apex.
+- depth: bridge-truss vertical distance between bottom and top chords.
+- panel_count: number of bays along the span.
+- truss_type: king_post, queen_post, pratt, howe, warren, fink, k_truss.
+- member_width: visible in-plane member thickness.
+- member_depth: out-of-plane member depth.
+- truss_width: spacing or thickness direction for side frames and plates.
+
+NON-MAIN PARAMETERS
+-------------------
+- gusset_radius: round visual node plate radius or equivalent half-width.
+- gusset_thickness: node plate thickness.
+- bolt_diameter: hole diameter at gussets and bearing plates.
+- support_pad_length: bearing plate length along the span.
+- support_pad_width: bearing plate width across the truss.
+- edge_distance: bolt center to plate edge distance.
+- member_clearance: small clearance where overlapping members are visually split.
+- node_plate_offset: offset for front and rear gusset plates.
+- side_spacing: distance between paired side trusses in a 3D bridge model.
+
+DERIVED PARAMETERS AND FORMULAS
+-------------------------------
+- panel_length = span / panel_count
+- half_span = span / 2
+- roof_pitch_angle = atan(rise / half_span)
+- rafter_length = sqrt(half_span^2 + rise^2)
+- depth_default = span / 10 for simple bridge trusses
+- diagonal_length = sqrt(panel_length^2 + depth^2)
+- warren_diagonal_angle = atan(depth / panel_length)
+- pratt_howe_diagonal_angle = atan(depth / panel_length)
+- queen_post_x = span / 4 from centerline for symmetric queen-post truss
+- gusset_plate_width = 2.5 * member_width
+- gusset_thickness = 0.25 to 0.40 * member_width for visual CAD
+- minimum_bolt_edge_distance = 1.5 * bolt_diameter
+- slenderness_ratio = member_length / radius_of_gyration
+
+ASSUMPTIONS
+-----------
+- Geometry is conceptual CAD, not certified structural analysis.
+- Members are straight, prismatic, and pin-connected at common node points.
+- Loads are assumed to enter at nodes for truss-style force paths.
+- Compression members need buckling checks outside OpenSCAD.
+- Tension members need net-section and connection checks outside OpenSCAD.
+- Printed polymer trusses are scale models or unloaded prototypes unless
+  independently validated.
+
+COMMON TRUSS TYPES
+------------------
+- King-post truss: two rafters, bottom tie, one central vertical post, and two
+  angled struts from the bottom-center joint to midpoint nodes on the rafters.
+  Model each rafter as two segments so the strut-to-rafter node is explicit:
+  left support to left strut node, left strut node to apex, apex to right strut
+  node, and right strut node to right support.
+  Do not add a horizontal straining beam or collar beam to a king-post truss
+  unless the user explicitly asks for one.
+- Queen-post truss: bottom tie beam, two vertical queen posts, a horizontal
+  straining beam between the queen-post tops, and rafters that pass through the
+  queen-post top nodes to the apex. Do not add diagonal internal braces unless
+  the user explicitly asks for bracing.
+- Pratt truss: verticals plus diagonals sloping toward span center.
+- Howe truss: verticals plus diagonals sloping away from span center.
+- Warren truss: alternating triangular web members.
+- Fink truss: pitched roof truss with W-shaped web layout.
+- K-truss: each panel split into shorter K-shaped web members.
+
+OPENSCAD PATTERN
+----------------
+Use an endpoint member helper:
+
+module member_between(p1, p2, w, d) {
+  dx = p2[0] - p1[0];
+  dz = p2[1] - p1[1];
+  L = sqrt(dx*dx + dz*dz);
+  a = atan2(dz, dx);
+  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])
+    rotate([0, -a, 0])
+      cube([L, d, w], center=true);
+}
+
+Use gusset plates at nodes:
+
+module gusset_at(p, r, t, bolt_d) {
+  difference() {
+    translate([p[0], 0, p[1]]) cylinder(h=t, r=r, center=true, $fn=48);
+    translate([p[0], 0, p[1]]) cylinder(h=t+1, d=bolt_d, center=true, $fn=32);
+  }
+}

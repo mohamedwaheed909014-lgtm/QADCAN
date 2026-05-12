@@ -222,3 +222,155 @@ difference() {
         cylinder(h=web_thickness+2, d=8, center=true, $fn=48);
 }
 ```
+
+TRUSS FAMILY REFERENCE: REAL-WORLD STRUCTURAL TRUSSES
+Use this whenever the prompt mentions truss, roof truss, bridge truss, king post,
+queen post, Pratt, Howe, Warren, Fink, K-truss, top chord, bottom chord, diagonal
+web, vertical web, or gusset plate.
+
+Core modeling assumption:
+- A truss is an assembly of straight members connected at nodes, not a filled
+  decorative triangle.
+- Each member should be modeled between two endpoint nodes using length and angle.
+- Realistic generated code should include bottom chord, top chord or rafters, web
+  members, gusset plates, bolt holes, and support pads.
+
+Main parameters:
+- span: horizontal support-to-support distance.
+- rise: roof-truss height from bottom chord to apex.
+- depth: bridge-truss distance between top and bottom chords.
+- panel_count: number of bays along the span.
+- truss_width: out-of-plane thickness or side-truss spacing.
+- member_width and member_depth: chord/web member section dimensions.
+- gusset_radius, gusset_thickness, bolt_diameter: node connection details.
+- support_pad_length and support_pad_width: bearing footprint at supports.
+
+Derived parameters and formulas:
+- panel_length = span / panel_count
+- roof_pitch_angle = atan(rise / (span/2))
+- rafter_length = sqrt((span/2)^2 + rise^2)
+- queen_post_x = span/4 from each support for symmetric queen-post truss
+- truss_depth = span/8 to span/12 for simple bridge trusses
+- diagonal_length = sqrt(panel_length^2 + truss_depth^2)
+- gusset_plate_width = 2.5 * member_width
+- bolt_edge_distance >= 1.5 * bolt_diameter
+- slenderness_ratio = member_length / radius_of_gyration
+
+Materials:
+- Structural steel S235/S275/A36 for welded or bolted bridge, roof, and plant frames.
+- RHS/SHS hollow steel tube for clean welded trusses with torsional stiffness.
+- 6061-T6 or 6082-T6 aluminum for lightweight display rigs and removable frames.
+- Glulam or C24 timber for roof trusses and architectural spans.
+- PLA/PETG/PA-CF for scale models and non-load-bearing prototypes only.
+
+Common truss features:
+- Top chord / rafters: upper compression or bending-edge members.
+- Bottom chord / tie beam: lower tension member connecting supports.
+- Web members: diagonals and verticals that subdivide the span into panels.
+- Panel points: nodes where chords and webs meet.
+- Gusset plates: bolted or welded connector plates at nodes.
+- Bolt holes: connection detail through gusset plates and support pads.
+- Support pads / bearing plates: load transfer blocks at left and right supports.
+
+Main parameters:
+- span, rise or depth, panel_count, truss_type, member_width, member_depth,
+  truss_width.
+
+Non-main parameters:
+- gusset_radius, gusset_thickness, bolt_diameter, support_pad_length,
+  support_pad_width, edge_distance, member_clearance, node_plate_offset.
+
+Shared derived formulas:
+- panel_length = span / panel_count
+- support_reaction_points = +/- span/2
+- roof_pitch_angle = atan(rise / (span/2))
+- rafter_length = sqrt((span/2)^2 + rise^2)
+- bridge_diagonal_length = sqrt(panel_length^2 + depth^2)
+- warren_diagonal_angle = atan(depth / panel_length)
+- pratt_howe_diagonal_angle = atan(depth / panel_length)
+- gusset_plate_width = 2.5 * member_width
+- gusset_thickness = 0.25 to 0.40 * member_width for visual CAD
+- minimum_bolt_edge_distance = 1.5 * bolt_diameter
+
+Common truss types and usage:
+- King-post truss: two rafters, one central vertical king post, bottom tie beam,
+  and two angled struts from the bottom-center joint to midpoint nodes on the
+  rafters; short roof spans, sheds, porches. Split each rafter at the strut node
+  so the visible joints are left support -> left strut node -> apex -> right
+  strut node -> right support. Do not add a horizontal straining beam or collar
+  beam unless explicitly requested.
+- Queen-post truss: two vertical queen posts, bottom tie beam, rafters that pass
+  through the queen-post top nodes to the apex, and a horizontal straining beam
+  between the queen-post tops; medium roof spans and halls. Do not add diagonal
+  internal braces unless explicitly requested.
+- Pratt truss: verticals plus diagonals sloping toward the span center; steel bridge
+  and roof trusses.
+- Howe truss: verticals plus diagonals sloping away from span center; traditional
+  timber bridges and roof structures.
+- Warren truss: alternating triangular webs; bridge spans, crane booms, lightweight
+  frames.
+- Fink truss: W-shaped web under pitched rafters; residential and light commercial
+  roofs.
+- K-truss: panels split into K-shaped shorter webs; deep bridge trusses and large
+  industrial frames.
+
+OpenSCAD feature pattern:
+```scad
+$fn = 48;
+span = 160;
+rise = 48;
+truss_width = 8;
+member_width = 6;
+member_depth = 6;
+gusset_radius = 9;
+gusset_thickness = 2;
+bolt_diameter = 2.5;
+
+module member_between(p1, p2, w=member_width, d=member_depth) {
+  dx = p2[0] - p1[0];
+  dz = p2[1] - p1[1];
+  L = sqrt(dx*dx + dz*dz);
+  a = atan2(dz, dx);
+  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])
+    rotate([0, -a, 0])
+      cube([L, d, w], center=true);
+}
+
+module gusset_at(p) {
+  difference() {
+    translate([p[0], 0, p[1]])
+      cylinder(h=gusset_thickness, r=gusset_radius, center=true);
+    translate([p[0], 0, p[1]])
+      cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);
+  }
+}
+
+module support_pad(x) {
+  translate([x, 0, -member_width])
+    cube([18, truss_width + 6, 3], center=true);
+}
+
+module king_post_truss() {
+  left = [-span/2, 0];
+  right = [span/2, 0];
+  apex = [0, rise];
+  mid = [0, 0];
+  left_strut_node = [-span/4, rise/2];
+  right_strut_node = [span/4, rise/2];
+  union() {
+    member_between(left, right);
+    member_between(left, left_strut_node);
+    member_between(left_strut_node, apex);
+    member_between(apex, right_strut_node);
+    member_between(right_strut_node, right);
+    member_between(mid, apex);
+    member_between(mid, left_strut_node);
+    member_between(mid, right_strut_node);
+    for (p=[left, right, apex, mid, left_strut_node, right_strut_node]) gusset_at(p);
+    support_pad(-span/2);
+    support_pad(span/2);
+  }
+}
+
+king_post_truss();
+```

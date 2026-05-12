@@ -5,7 +5,7 @@
     "family": "structural_profiles_reference",
     "family_label": "Structural Profiles and Extrusions",
     "units": "millimeters",
-    "scope": "I-beams, H-beams, U-channels, T-sections, RHS, CHS, 2020/2040/4040 aluminium extrusions, queen-post trusses.",
+    "scope": "I-beams, H-beams, U-channels, T-sections, RHS, CHS, aluminium extrusions, and roof/bridge trusses.",
     "retrieval": {
       "primary_keywords": [
         "i-beam",
@@ -36,7 +36,40 @@
         "w beam",
         "hea beam",
         "heb beam",
-        "universal column"
+        "universal column",
+        "roof truss",
+        "bridge truss",
+        "king post",
+        "king-post truss",
+        "king post truss",
+        "queen-post truss",
+        "queen post truss",
+        "pratt truss",
+        "howe truss",
+        "warren truss",
+        "fink truss",
+        "k truss",
+        "k-truss",
+        "gusset plate",
+        "top chord",
+        "bottom chord",
+        "web member",
+        "diagonal member",
+        "vertical member",
+        "straining beam",
+        "support pad",
+        "truss common features",
+        "truss node",
+        "truss joint",
+        "gusset joint",
+        "chord member",
+        "vertical post",
+        "panel point",
+        "bearing plate",
+        "node spacing",
+        "member angle",
+        "truss parameters",
+        "truss formula"
       ],
       "negative_keywords": [
         "bearing housing",
@@ -70,6 +103,25 @@
         "material": "PETG / PLA",
         "use_case": "3D-printed structural prototype connectors and caps",
         "notes": "Use for brackets and end-caps only, not load-bearing beams."
+      },
+      {
+        "material": "A36 / S275 structural steel tube or flat bar",
+        "use_case": "welded or bolted roof and bridge truss members",
+        "notes": "High load capacity; add gusset plates at nodes and check buckling in compression members.",
+        "standards": [
+          "ASTM A36",
+          "EN 10025 S275"
+        ]
+      },
+      {
+        "material": "Glulam / C24 structural timber",
+        "use_case": "architectural roof trusses and timber king/queen-post frames",
+        "notes": "Use bolted steel plates or timber joinery at nodes; allow larger member depth than steel."
+      },
+      {
+        "material": "6061-T6 / 6082-T6 aluminum tube",
+        "use_case": "lightweight removable trusses, display rigs, and machine guarding",
+        "notes": "Lower stiffness than steel; increase section depth and avoid slender compression members."
       }
     ],
     "standards_used": [
@@ -87,6 +139,16 @@
         "name": "Queen-post truss geometry",
         "applies_to": "truss member layout and proportion",
         "note": "Rise/span ratio 0.3–0.5; queen posts at span/4 from centre; straining beam at queen post tops."
+      },
+      {
+        "name": "Truss member layout practice",
+        "applies_to": "roof and bridge truss node/member geometry",
+        "note": "Members connect node-to-node; panel_length = span/panel_count; gusset plates are placed at chord and web intersections."
+      },
+      {
+        "name": "AISC / Eurocode truss design assumptions",
+        "applies_to": "steel truss proportions and member checks",
+        "note": "Compression members require buckling checks; tension members require net-section and connection checks."
       }
     ],
     "output_policy": {
@@ -383,6 +445,975 @@
         "single rectangular bar"
       ],
       "openscad_module": "$fn = 48;\n\nbeam_length = 180;\nbeam_height = 80;\nflange_width = 80;\nflange_thickness = 9;\nweb_thickness = 6;\nweb_height = beam_height - 2 * flange_thickness;\n\nmodule wide_flange_h_beam() {\n  union() {\n    translate([0, beam_height/2 - flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    translate([0, -beam_height/2 + flange_thickness/2, 0]) cube([flange_width, flange_thickness, beam_length], center=true);\n    cube([web_thickness, web_height, beam_length], center=true);\n  }\n}\n\nwide_flange_h_beam();"
+    },
+    {
+      "id": "common_truss_features_and_parameters",
+      "family": "structural_profiles_reference",
+      "category": "truss_common_features",
+      "name": "Common truss features, parameters, formulas, and OpenSCAD helpers",
+      "aliases": [
+        "truss common features",
+        "truss parameters",
+        "truss formula",
+        "truss gusset",
+        "truss node",
+        "chord and web members"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 principles",
+        "timber truss detailing practice"
+      ],
+      "manufacturing_processes": [
+        "welded steel truss",
+        "bolted gusset plate truss",
+        "timber truss with connector plates",
+        "aluminum tube truss",
+        "3D printed scale model"
+      ],
+      "main_parameters": {
+        "span": "support-to-support distance",
+        "rise": "roof truss height to apex",
+        "depth": "bridge truss vertical chord spacing",
+        "panel_count": "number of repeated bays",
+        "member_width": "visible member width",
+        "member_depth": "out-of-plane member depth",
+        "truss_width": "side spacing or plate thickness direction",
+        "truss_type": "king, queen, Pratt, Howe, Warren, Fink, K, etc."
+      },
+      "non_main_parameters": {
+        "gusset_radius": "visual node plate radius or half-width",
+        "gusset_thickness": "node plate thickness",
+        "bolt_diameter": "bolt or hole diameter at gussets/supports",
+        "support_pad_length": "bearing plate length at each support",
+        "support_pad_width": "bearing plate width at each support",
+        "edge_distance": "minimum bolt-to-plate-edge distance",
+        "member_clearance": "small visual clearance between overlapping plates if needed",
+        "node_plate_offset": "offset for front/back gusset plates in double-sided trusses"
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "bridge_diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "warren_diagonal_angle": {
+          "formula": "atan(depth / panel_length)"
+        },
+        "pratt_howe_diagonal_angle": {
+          "formula": "atan(depth / panel_length)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "gusset_thickness_rule": {
+          "formula": "0.25 to 0.40 * member_width for visual CAD models"
+        },
+        "minimum_bolt_edge_distance": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "support_reaction_points": {
+          "formula": "x = +/- span/2"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "The truss is represented as pin-jointed straight members for geometry generation.",
+        "Members meet at shared node coordinates; loads are assumed to be applied at nodes.",
+        "OpenSCAD output is conceptual CAD geometry and not a certified structural calculation.",
+        "Compression members require buckling checks; tension members require net-section and connection checks.",
+        "Gusset plates and bolts are visual/mechanical features unless detailed fastener sizing is requested."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS for heavy welded/bolted trusses",
+        "6061-T6 or 6082-T6 aluminum tube for lightweight frames and display trusses",
+        "Glulam or C24 timber for roof trusses",
+        "PETG/PLA/PA-CF only for prototypes, teaching models, and non-load-bearing parts"
+      ],
+      "usage": "Shared reference for generating any real-world truss with chords, web members, nodes, gussets, bolts, supports, and parameter formulas.",
+      "main_features": [
+        "top chord or pitched rafters",
+        "bottom chord/tie beam",
+        "vertical posts or web members",
+        "diagonal web members",
+        "panel points/nodes",
+        "gusset plates with bolt holes",
+        "support pads/bearing plates"
+      ],
+      "design_rules": [
+        "Use member_between(p1,p2) for each physical member.",
+        "Use arrays or loops for repeated panel points.",
+        "Keep formulas visible as named variables when possible.",
+        "Show connection features at nodes when user asks for realistic truss details.",
+        "Do not generate a single solid triangular slab for a truss."
+      ],
+      "validation_criteria": [
+        "continuous bottom chord exists",
+        "top chord/rafters exist",
+        "web members connect at common nodes",
+        "major nodes have gusset plates when realistic detail is requested",
+        "supports are placed at +/- span/2",
+        "named formulas exist for panel_length and diagonal/rafter length"
+      ],
+      "failure_modes": [
+        "flat triangle with no separate members",
+        "members floating without shared node intersections",
+        "no bottom chord",
+        "wrong diagonal direction for Pratt or Howe prompts",
+        "missing gusset/bolt/support details in realistic requests"
+      ],
+      "openscad_module": "$fn = 48;\n\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\nsupport_pad_length = 22;\nsupport_pad_width = 18;\n\npanel_length = span / panel_count;\nroof_pitch_angle = atan(rise / (span/2));\nrafter_length = sqrt((span/2)*(span/2) + rise*rise);\nbridge_diagonal_length = sqrt(panel_length*panel_length + depth*depth);\ngusset_plate_width = 2.5 * member_width;\nminimum_bolt_edge_distance = 1.5 * bolt_diameter;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0])\n      cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]])\n      cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]])\n      cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width])\n    difference() {\n      cube([support_pad_length, support_pad_width, 3], center=true);\n      for (y=[-support_pad_width/4, support_pad_width/4])\n        translate([0, y, 0]) cylinder(h=4, d=bolt_diameter, center=true);\n    }\n}\n\nmodule common_truss_feature_demo() {\n  left = [-span/2, 0];\n  right = [span/2, 0];\n  apex = [0, rise];\n  mid = [0, 0];\n  union() {\n    member_between(left, right);      // bottom chord\n    member_between(left, apex);       // left top chord / rafter\n    member_between(apex, right);      // right top chord / rafter\n    member_between(mid, apex);        // vertical web / post\n    member_between(left, [0, rise/2]); // diagonal web example\n    member_between([0, rise/2], right);\n    for (p=[left, right, apex, mid, [0, rise/2]]) gusset_at(p);\n    support_pad(-span/2);\n    support_pad(span/2);\n  }\n}\n\ncommon_truss_feature_demo();"
+    },
+    {
+      "id": "king_post_truss",
+      "family": "structural_profiles_reference",
+      "category": "roof_truss",
+      "name": "King-post roof truss",
+      "aliases": [
+        "king post truss",
+        "king-post truss",
+        "king post roof truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Short-span roofs, sheds, porches, and small timber/steel frames.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "one central vertical king post from bottom chord to apex",
+        "two angled struts from bottom-center joint to midpoint nodes on the rafters",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "For king-post trusses, split rafters at the strut-to-rafter nodes so the visible joints are left support to left strut node to apex to right strut node to right support.",
+        "For king-post trusses, do not add a horizontal straining beam or collar beam unless explicitly requested.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "rafters segmented through both strut-to-rafter nodes",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "missing angled struts from bottom-center joint to rafters",
+        "one long rafter hides or skips the strut-to-rafter joint",
+        "horizontal straining beam added to a default king-post truss",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule king_post_truss() {\n  left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; center=[0,0]; left_strut_node=[-span/4,rise/2]; right_strut_node=[span/4,rise/2];\n  union() { member_between(left,right); member_between(left,left_strut_node); member_between(left_strut_node,apex); member_between(apex,right_strut_node); member_between(right_strut_node,right); member_between(center,apex); member_between(center,left_strut_node); member_between(center,right_strut_node); for (p=[left,right,apex,center,left_strut_node,right_strut_node]) gusset_at(p); support_pad(-span/2); support_pad(span/2); }\n}\nking_post_truss();"
+    },
+    {
+      "id": "queen_post_truss",
+      "family": "structural_profiles_reference",
+      "category": "roof_truss",
+      "name": "Queen-post roof truss",
+      "aliases": [
+        "queen post truss",
+        "queen-post truss",
+        "queen post roof truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        },
+        "queen_post_x": {
+          "formula": "+/- span/4 from center"
+        },
+        "straining_beam_height": {
+          "formula": "0.55 to 0.70 * rise"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Medium-span roofs, halls, sheds, and architectural frames.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "two vertical queen posts and a horizontal straining beam between post tops",
+        "rafters segmented through the queen-post top nodes to the apex",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "For queen-post trusses, build rafters through the queen-post top nodes and do not add diagonal internal braces unless explicitly requested.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "two vertical queen posts",
+        "horizontal straining beam between queen-post top nodes",
+        "no floating disconnected member",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "floating disconnected member",
+        "collapsed narrow truss instead of a wide span",
+        "unrequested diagonal internal braces in the queen-post layout",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule queen_post_truss() {\n  left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; ql=[-span/4,0]; qr=[span/4,0]; qlt=[-span/4,rise/2]; qrt=[span/4,rise/2];\n  union() { member_between(left,right); member_between(left,qlt); member_between(qlt,apex); member_between(apex,qrt); member_between(qrt,right); member_between(ql,qlt); member_between(qr,qrt); member_between(qlt,qrt); for (p=[left,right,apex,ql,qr,qlt,qrt]) gusset_at(p); support_pad(-span/2); support_pad(span/2); }\n}\nqueen_post_truss();"
+    },
+    {
+      "id": "pratt_truss",
+      "family": "structural_profiles_reference",
+      "category": "bridge_truss",
+      "name": "Pratt bridge/roof truss",
+      "aliases": [
+        "pratt truss",
+        "pratt bridge truss",
+        "steel pratt truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Steel bridge trusses, long roof trusses, and industrial frames.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "diagonals slope toward the center of the span under gravity loading",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule pratt_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,0]); member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,depth]); } for(i=[0:panel_count]) member_between([-span/2+i*pl,0],[-span/2+i*pl,depth]); for(i=[0:panel_count-1]) if(i<panel_count/2) member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,depth]); else member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,0]); for(i=[0:panel_count]) { gusset_at([-span/2+i*pl,0]); gusset_at([-span/2+i*pl,depth]); } support_pad(-span/2); support_pad(span/2); } }\npratt_truss();"
+    },
+    {
+      "id": "howe_truss",
+      "family": "structural_profiles_reference",
+      "category": "bridge_truss",
+      "name": "Howe bridge/roof truss",
+      "aliases": [
+        "howe truss",
+        "howe bridge truss",
+        "timber howe truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Timber bridges, traditional roof trusses, and heavy timber/iron layouts.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "diagonals slope away from the center of the span under gravity loading",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule howe_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,0]); member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,depth]); } for(i=[0:panel_count]) member_between([-span/2+i*pl,0],[-span/2+i*pl,depth]); for(i=[0:panel_count-1]) if(i<panel_count/2) member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,0]); else member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,depth]); for(i=[0:panel_count]) { gusset_at([-span/2+i*pl,0]); gusset_at([-span/2+i*pl,depth]); } support_pad(-span/2); support_pad(span/2); } }\nhowe_truss();"
+    },
+    {
+      "id": "warren_truss",
+      "family": "structural_profiles_reference",
+      "category": "bridge_truss",
+      "name": "Warren truss",
+      "aliases": [
+        "warren truss",
+        "triangular bridge truss",
+        "alternating triangle truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Bridge spans, crane booms, lightweight frames, and equipment supports.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "alternating triangular web members with no required verticals",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule warren_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,0]); member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,depth]); if(i%2==0) member_between([-span/2+i*pl,0],[-span/2+(i+1)*pl,depth]); else member_between([-span/2+i*pl,depth],[-span/2+(i+1)*pl,0]); } for(i=[0:panel_count]) { gusset_at([-span/2+i*pl,0]); gusset_at([-span/2+i*pl,depth]); } support_pad(-span/2); support_pad(span/2); } }\nwarren_truss();"
+    },
+    {
+      "id": "fink_truss",
+      "family": "structural_profiles_reference",
+      "category": "roof_truss",
+      "name": "Fink roof truss",
+      "aliases": [
+        "fink truss",
+        "w web roof truss",
+        "residential roof truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Residential roofs, light commercial roofs, and prefabricated timber roof trusses.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "W-shaped internal web pattern under pitched rafters",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule fink_truss() { left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; ql=[-span/4,0]; qr=[span/4,0]; ml=[-span/4,rise/2]; mr=[span/4,rise/2]; center=[0,0]; union() { member_between(left,right); member_between(left,apex); member_between(apex,right); member_between(left,ml); member_between(ml,center); member_between(center,mr); member_between(mr,right); member_between(ql,ml); member_between(qr,mr); for(p=[left,right,apex,ql,qr,ml,mr,center]) gusset_at(p); support_pad(-span/2); support_pad(span/2); } }\nfink_truss();"
+    },
+    {
+      "id": "k_truss",
+      "family": "structural_profiles_reference",
+      "category": "bridge_truss",
+      "name": "K-truss",
+      "aliases": [
+        "k truss",
+        "k-truss",
+        "k web truss",
+        "bridge k truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC steel design practice",
+        "Eurocode 3 / timber code principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber joinery with steel plates",
+        "3D printed scale model"
+      ],
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 38,
+        "panel_count": 6,
+        "truss_width": 8,
+        "member_width": 6,
+        "member_depth": 6,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "constraint_parameters": {
+        "span": {
+          "default": 180
+        },
+        "rise": {
+          "formula": "0.25 to 0.40 * span for pitched roof trusses"
+        },
+        "depth": {
+          "formula": "span/8 to span/12 for bridge-style trusses"
+        },
+        "panel_count": {
+          "default": 6,
+          "note": "even count preferred for symmetric web layouts"
+        },
+        "gusset_thickness": {
+          "formula": "0.25 to 0.40 * member_width"
+        }
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "bolt_edge_distance_min": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration"
+        }
+      },
+      "assumptions": [
+        "Straight prismatic members joined at ideal pin-like nodes.",
+        "Loads assumed to enter at nodes for conceptual geometry generation.",
+        "OpenSCAD output is CAD geometry, not certified structural analysis.",
+        "Compression members require buckling checks outside the CAD model."
+      ],
+      "material_suggestions": [
+        "A36/S275 steel flat bar or RHS",
+        "C24 timber or glulam",
+        "6061-T6 or 6082-T6 aluminum tube",
+        "PETG/PLA/PA-CF only for scale models or unloaded prototypes"
+      ],
+      "usage": "Deep bridge trusses and industrial frames where shorter compression web members help.",
+      "main_features": [
+        "bottom chord between supports",
+        "top chord or rafters",
+        "each panel is split into K-shaped web members meeting a mid-height node",
+        "gusset plates at major joints",
+        "bolt holes through gusset plates",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every member.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep named parameters for span, rise/depth, panel_count, member size, gusset size, and bolt diameter.",
+        "Place gusset plates at nodes where members meet."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "correct web-member direction for requested truss type",
+        "gusset plates/node plates present when realistic detail is requested",
+        "support pads at left and right bearings"
+      ],
+      "failure_modes": [
+        "single triangle or solid plate instead of member assembly",
+        "missing bottom chord",
+        "diagonals in the wrong direction for named truss type",
+        "members not meeting at common nodes",
+        "no gusset plates on realistic bolted/welded truss requests"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\ndepth = 38;\npanel_count = 6;\ntruss_width = 8;\nmember_width = 6;\nmember_depth = 6;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, truss_width + 8, 3], center=true);\n}\n\nmodule k_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { x0=-span/2+i*pl; x1=x0+pl; xm=(x0+x1)/2; member_between([x0,0],[x1,0]); member_between([x0,depth],[x1,depth]); member_between([x0,0],[xm,depth/2]); member_between([x0,depth],[xm,depth/2]); member_between([xm,depth/2],[x1,0]); member_between([xm,depth/2],[x1,depth]); gusset_at([xm,depth/2]); } for(i=[0:panel_count]) { x=-span/2+i*pl; member_between([x,0],[x,depth]); gusset_at([x,0]); gusset_at([x,depth]); } support_pad(-span/2); support_pad(span/2); } }\nk_truss();"
     }
   ]
 }

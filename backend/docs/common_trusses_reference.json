@@ -1,0 +1,633 @@
+{
+  "type": "mechanical_parts_database",
+  "metadata": {
+    "version": "1.0.0",
+    "family": "common_trusses_reference",
+    "family_label": "Common Trusses",
+    "units": "millimeters",
+    "scope": "Roof trusses, bridge trusses, king-post, queen-post, Pratt, Howe, Warren, Fink, and K-truss layouts with features, parameters, formulas, assumptions, and OpenSCAD generation patterns.",
+    "retrieval": {
+      "primary_keywords": [
+        "truss",
+        "trusses",
+        "roof truss",
+        "bridge truss",
+        "king post",
+        "king-post truss",
+        "queen post",
+        "queen-post truss",
+        "pratt truss",
+        "howe truss",
+        "warren truss",
+        "fink truss",
+        "k-truss",
+        "top chord",
+        "bottom chord",
+        "web member",
+        "panel point",
+        "gusset plate",
+        "node plate",
+        "bearing plate",
+        "support pad",
+        "truss formulas",
+        "truss parameters",
+        "truss openscad"
+      ],
+      "negative_keywords": [
+        "gear",
+        "bearing housing",
+        "fan mount",
+        "enclosure",
+        "flange pipe",
+        "servo",
+        "wheel",
+        "sprocket"
+      ],
+      "min_score_threshold": 0.12
+    },
+    "material_suggestions": [
+      {
+        "material": "A36 / S275 structural steel",
+        "use_case": "welded or bolted bridge, roof, and plant trusses",
+        "notes": "Good default for load-bearing steel trusses; compression members still require buckling checks.",
+        "standards": [
+          "ASTM A36",
+          "EN 10025 S275"
+        ]
+      },
+      {
+        "material": "RHS / SHS hollow steel tube",
+        "use_case": "clean welded trusses, machine frames, crane booms, and gantries",
+        "notes": "Better torsional stiffness than flat bar for 3D frames."
+      },
+      {
+        "material": "C24 timber or glulam",
+        "use_case": "king-post, queen-post, Fink, and architectural roof trusses",
+        "notes": "Use larger member depths and bolted or toothed connector plates."
+      },
+      {
+        "material": "6061-T6 / 6082-T6 aluminum tube",
+        "use_case": "lightweight removable display rigs and non-permanent frames",
+        "notes": "Lower stiffness than steel; increase section depth and control member slenderness."
+      },
+      {
+        "material": "PETG / PLA / PA-CF",
+        "use_case": "scale models and non-load-bearing prototypes",
+        "notes": "Do not treat printed polymer trusses as certified structural parts."
+      }
+    ],
+    "standards_used": [
+      {
+        "name": "General truss design practice",
+        "applies_to": "member layout, panel points, and node-to-node modeling",
+        "note": "Members should meet at common nodes; panel_length = span / panel_count."
+      },
+      {
+        "name": "AISC / Eurocode steel design principles",
+        "applies_to": "steel truss member assumptions",
+        "note": "Compression members require buckling checks; tension members require net-section and connection checks."
+      },
+      {
+        "name": "Timber truss detailing practice",
+        "applies_to": "king-post, queen-post, and Fink roof trusses",
+        "note": "Timber trusses typically use larger sections and connector plates."
+      }
+    ],
+    "output_policy": {
+      "openscad_code": "Geometry-only OpenSCAD with named parameters, one module, and no prose.",
+      "material_suggestions": "chat_after_code_only",
+      "standards_explanation": "chat_after_code_only",
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "standard explanation paragraphs",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    }
+  },
+  "parts": [
+    {
+      "id": "truss_common_features_parameters",
+      "category": "truss_reference",
+      "name": "Common truss features, parameters, formulas, and assumptions",
+      "aliases": [
+        "truss common features",
+        "truss parameters",
+        "truss formulas",
+        "truss assumptions",
+        "truss gusset plates",
+        "chord and web members"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC / Eurocode principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plate",
+        "timber connector plate",
+        "aluminum tube assembly",
+        "3D printed scale model"
+      ],
+      "family": "common_trusses_reference",
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 36,
+        "panel_count": 6,
+        "member_width": 6,
+        "member_depth": 8,
+        "truss_width": 10,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5,
+        "support_pad_length": 20,
+        "support_pad_width": 18
+      },
+      "main_parameters": {
+        "span": "horizontal support-to-support distance",
+        "rise": "roof-truss height from bottom chord to apex",
+        "depth": "bridge-truss distance between top and bottom chord centerlines",
+        "panel_count": "number of repeated bays along the span",
+        "truss_type": "king_post, queen_post, pratt, howe, warren, fink, or k_truss",
+        "member_width": "visible in-plane member thickness",
+        "member_depth": "out-of-plane member depth",
+        "truss_width": "overall side spacing or plate direction"
+      },
+      "non_main_parameters": {
+        "gusset_radius": "node plate radius or visual half-width",
+        "gusset_thickness": "connector plate thickness",
+        "bolt_diameter": "bolt or hole diameter at gussets",
+        "support_pad_length": "bearing plate length",
+        "support_pad_width": "bearing plate width",
+        "edge_distance": "minimum bolt center to plate edge",
+        "member_clearance": "small clearance between overlapping visual members",
+        "node_plate_offset": "front/back offset for double-sided gussets",
+        "side_spacing": "distance between paired side trusses in a 3D bridge"
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count",
+          "note": "horizontal bay length"
+        },
+        "half_span": {
+          "formula": "span / 2",
+          "note": "centerline to support distance"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))",
+          "note": "OpenSCAD atan returns degrees"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)",
+          "note": "king-post or simple pitched rafter length"
+        },
+        "depth_default": {
+          "formula": "span / 10",
+          "note": "visual default for simple bridge trusses"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)",
+          "note": "single panel diagonal length"
+        },
+        "gusset_plate_width": {
+          "formula": "2.5 * member_width"
+        },
+        "gusset_thickness_rule": {
+          "formula": "0.25 to 0.40 * member_width for visual CAD"
+        },
+        "minimum_bolt_edge_distance": {
+          "formula": "1.5 * bolt_diameter"
+        },
+        "slenderness_ratio": {
+          "formula": "member_length / radius_of_gyration",
+          "note": "structural check outside OpenSCAD"
+        }
+      },
+      "assumptions": [
+        "Geometry is conceptual CAD, not certified structural analysis.",
+        "Members are straight, prismatic, and joined at common endpoint nodes.",
+        "Loads are assumed to enter at panel points for truss-style force paths.",
+        "Compression members require buckling checks outside OpenSCAD.",
+        "Tension members require net-section and connection checks outside OpenSCAD."
+      ],
+      "main_features": [
+        "top chord or rafters",
+        "bottom chord or tie beam",
+        "web members made from diagonals and verticals",
+        "panel points where members meet",
+        "gusset plates or node plates",
+        "bolt holes in connector plates",
+        "support pads or bearing plates at both ends"
+      ],
+      "design_rules": [
+        "Use endpoint-based member_between(p1,p2) placement for every chord and web.",
+        "Do not model a truss as one filled triangular plate.",
+        "Keep span, rise or depth, panel_count, member size, gusset size, and bolt diameter as named parameters.",
+        "Place gusset plates at nodes where members meet.",
+        "Use support pads at left and right bearing points when realistic detail is requested."
+      ],
+      "validation_criteria": [
+        "separate visible members between node points",
+        "continuous bottom chord",
+        "top chord or rafters present",
+        "gusset plates at major nodes",
+        "support pads at left and right supports"
+      ],
+      "failure_modes": [
+        "single solid triangle instead of a member assembly",
+        "missing bottom chord",
+        "web members do not meet at common nodes",
+        "no gusset plates on a realistic bolted truss"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\ndepth = 36;\npanel_count = 6;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0];\n  dz = p2[1] - p1[1];\n  L = sqrt(dx*dx + dz*dz);\n  a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2])\n    rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\n\nmodule gusset_at(p) {\n  difference() {\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true);\n    translate([p[0], 0, p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true);\n  }\n}\n\nmodule support_pad(x) {\n  translate([x, 0, -member_width]) cube([20, member_depth + 10, 3], center=true);\n}\n\nmodule simple_panel_truss() {\n  pl = span / panel_count;\n  union() {\n    for (i=[0:panel_count-1]) {\n      member_between([-span/2+i*pl,0], [-span/2+(i+1)*pl,0]);\n      member_between([-span/2+i*pl,depth], [-span/2+(i+1)*pl,depth]);\n    }\n    for (i=[0:panel_count]) {\n      x = -span/2 + i*pl;\n      member_between([x,0], [x,depth]);\n      gusset_at([x,0]);\n      gusset_at([x,depth]);\n    }\n    support_pad(-span/2);\n    support_pad(span/2);\n  }\n}\n\nsimple_panel_truss();"
+    },
+    {
+      "id": "king_post_roof_truss",
+      "category": "roof_truss",
+      "name": "King-post roof truss",
+      "aliases": [
+        "king post",
+        "king-post truss",
+        "king post truss",
+        "simple roof truss"
+      ],
+      "standards": [
+        "timber roof truss practice",
+        "steel roof truss practice"
+      ],
+      "manufacturing_processes": [
+        "timber bolted connector plates",
+        "welded steel",
+        "bolted steel gussets",
+        "3D printed scale model"
+      ],
+      "family": "common_trusses_reference",
+      "standard_dimensions_mm": {
+        "span": 160,
+        "rise": 48,
+        "member_width": 6,
+        "member_depth": 8,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "main_parameters": {
+        "span": "support-to-support distance",
+        "rise": "height from tie beam to apex",
+        "member_width": "chord and post width",
+        "member_depth": "member depth through the model"
+      },
+      "non_main_parameters": {
+        "gusset_radius": "node plate radius",
+        "gusset_thickness": "node plate thickness",
+        "bolt_diameter": "center bolt hole diameter",
+        "support_pad_length": "bearing block length"
+      },
+      "derived_parameters": {
+        "half_span": {
+          "formula": "span / 2"
+        },
+        "roof_pitch_angle": {
+          "formula": "atan(rise / (span/2))"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "king_post_length": {
+          "formula": "rise"
+        },
+        "strut_node_x": {
+          "formula": "span / 4 from centerline"
+        },
+        "strut_node_z": {
+          "formula": "rise / 2 for midpoint nodes on straight rafters"
+        },
+        "strut_length": {
+          "formula": "sqrt((span/4)^2 + (rise/2)^2)"
+        }
+      },
+      "assumptions": [
+        "Short roof span with one central post.",
+        "The bottom chord acts as a tie between supports.",
+        "Struts run from the bottom-center joint to midpoint nodes on the left and right rafters.",
+        "A horizontal straining beam belongs to queen-post layouts, not the default king-post layout.",
+        "The CAD model shows geometry and connection intent only."
+      ],
+      "main_features": [
+        "bottom tie beam",
+        "left and right rafters",
+        "central king post",
+        "left and right angled struts from bottom center to rafter midpoint nodes",
+        "gusset plates at supports, apex, midpoint, and strut-to-rafter nodes",
+        "support pads at both bearing points"
+      ],
+      "design_rules": [
+        "Use two sloped rafters from supports to apex.",
+        "Split each rafter at the strut-to-rafter node: left support to left strut node, left strut node to apex, apex to right strut node, and right strut node to right support.",
+        "Add one vertical post from bottom midpoint to apex.",
+        "Add two angled struts from the bottom-center joint to midpoint nodes on the rafters.",
+        "Do not add a horizontal straining beam, collar beam, or crossbar between rafters unless explicitly requested.",
+        "Keep support, apex, center, and strut-to-rafter nodes connected with gussets."
+      ],
+      "validation_criteria": [
+        "triangular roof outline with bottom chord",
+        "rafters are segmented through the left and right strut nodes",
+        "single central vertical post",
+        "two diagonal struts rising from bottom center to the rafters",
+        "no horizontal member between the rafters",
+        "gusset at apex"
+      ],
+      "failure_modes": [
+        "missing center post",
+        "missing angled struts",
+        "one long rafter hides or skips the strut-to-rafter joint",
+        "horizontal straining beam added to a default king-post truss",
+        "filled triangular plate instead of separate members"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 160;\nrise = 48;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0]; dz = p2[1] - p1[1]; L = sqrt(dx*dx + dz*dz); a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2]) rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule king_post_truss() { left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; mid=[0,0]; left_strut_node=[-span/4,rise/2]; right_strut_node=[span/4,rise/2]; union() { member_between(left,right); member_between(left,left_strut_node); member_between(left_strut_node,apex); member_between(apex,right_strut_node); member_between(right_strut_node,right); member_between(mid,apex); member_between(mid,left_strut_node); member_between(mid,right_strut_node); for(p=[left,right,apex,mid,left_strut_node,right_strut_node]) gusset_at(p); support_pad(-span/2); support_pad(span/2); } }\nking_post_truss();"
+    },
+    {
+      "id": "queen_post_roof_truss",
+      "category": "roof_truss",
+      "name": "Queen-post roof truss",
+      "aliases": [
+        "queen post",
+        "queen-post truss",
+        "queen post truss",
+        "straining beam truss"
+      ],
+      "standards": [
+        "timber roof truss practice",
+        "steel roof truss practice"
+      ],
+      "manufacturing_processes": [
+        "timber bolted connector plates",
+        "welded steel",
+        "bolted steel gussets",
+        "3D printed scale model"
+      ],
+      "family": "common_trusses_reference",
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "member_width": 6,
+        "member_depth": 8,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "main_parameters": {
+        "span": "support-to-support distance",
+        "rise": "height to roof apex",
+        "member_width": "rafter, tie, and post width",
+        "member_depth": "member depth through the model"
+      },
+      "non_main_parameters": {
+        "queen_post_offset": "horizontal post location from centerline",
+        "gusset_radius": "node plate radius",
+        "gusset_thickness": "node plate thickness",
+        "bolt_diameter": "center bolt hole diameter"
+      },
+      "derived_parameters": {
+        "queen_post_x": {
+          "formula": "span / 4 from centerline"
+        },
+        "queen_post_height": {
+          "formula": "rise / 2 for a simple symmetric visual model"
+        },
+        "rafter_length": {
+          "formula": "sqrt((span/2)^2 + rise^2)"
+        },
+        "straining_beam_length": {
+          "formula": "span / 2"
+        }
+      },
+      "assumptions": [
+        "Symmetric roof truss with queen posts at quarter points.",
+        "The straining beam connects the tops of the queen posts.",
+        "Rafters pass through the queen-post top nodes and meet at the apex.",
+        "No diagonal internal braces are included unless the user explicitly asks for bracing.",
+        "OpenSCAD geometry is visual, not a structural certification."
+      ],
+      "main_features": [
+        "bottom tie beam",
+        "two sloped rafters",
+        "two queen posts",
+        "straining beam between queen posts",
+        "rafter joints at the tops of the queen posts",
+        "gusset plates at supports, post feet, post tops, and apex"
+      ],
+      "design_rules": [
+        "Place queen posts symmetrically at +/- span/4.",
+        "Connect post tops with a horizontal straining beam.",
+        "Build rafters as four connected segments: left support to left post top, left post top to apex, apex to right post top, and right post top to right support.",
+        "Do not add diagonal internal braces, V braces, or floating members unless explicitly requested."
+      ],
+      "validation_criteria": [
+        "two vertical queen posts",
+        "straining beam between post tops",
+        "continuous bottom chord",
+        "rafters pass through both queen-post top nodes",
+        "no floating member above or away from the truss",
+        "no diagonal internal braces in the default queen-post layout"
+      ],
+      "failure_modes": [
+        "only one central post, which is a king-post truss",
+        "missing straining beam",
+        "floating disconnected member",
+        "collapsed narrow truss instead of a wide span",
+        "unrequested diagonal internal braces"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule queen_post_truss() { left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; ql=[-span/4,0]; qr=[span/4,0]; qlt=[-span/4,rise/2]; qrt=[span/4,rise/2]; union() { member_between(left,right); member_between(left,qlt); member_between(qlt,apex); member_between(apex,qrt); member_between(qrt,right); member_between(ql,qlt); member_between(qr,qrt); member_between(qlt,qrt); for(p=[left,right,apex,ql,qr,qlt,qrt]) gusset_at(p); support_pad(-span/2); support_pad(span/2); } }\nqueen_post_truss();"
+    },
+    {
+      "id": "pratt_howe_bridge_truss",
+      "category": "bridge_truss",
+      "name": "Pratt and Howe bridge truss family",
+      "aliases": [
+        "pratt truss",
+        "howe truss",
+        "vertical and diagonal bridge truss",
+        "panel bridge truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "AISC / Eurocode principles"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber bridge truss",
+        "3D printed scale model"
+      ],
+      "family": "common_trusses_reference",
+      "standard_dimensions_mm": {
+        "span": 180,
+        "depth": 36,
+        "panel_count": 6,
+        "member_width": 6,
+        "member_depth": 8,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "main_parameters": {
+        "span": "support-to-support distance",
+        "depth": "top chord to bottom chord spacing",
+        "panel_count": "number of bridge panels",
+        "truss_type": "pratt or howe",
+        "member_width": "member in-plane width",
+        "member_depth": "member out-of-plane depth"
+      },
+      "non_main_parameters": {
+        "gusset_radius": "node plate radius",
+        "gusset_thickness": "node plate thickness",
+        "bolt_diameter": "node bolt hole diameter",
+        "support_pad_length": "bearing plate length"
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "diagonal_angle": {
+          "formula": "atan(depth / panel_length)"
+        },
+        "depth_default": {
+          "formula": "span / 10"
+        }
+      },
+      "assumptions": [
+        "Verticals are included at panel points.",
+        "Pratt diagonals slope toward the span center in the usual gravity-load convention.",
+        "Howe diagonals slope away from the span center.",
+        "The generated OpenSCAD model is a layout model, not an analysis model."
+      ],
+      "main_features": [
+        "parallel top and bottom chords",
+        "vertical posts at panel points",
+        "directional diagonals",
+        "gusset plates at all panel nodes",
+        "support pads at bearing points"
+      ],
+      "design_rules": [
+        "Use Pratt when diagonals should slope toward center.",
+        "Use Howe when diagonals should slope away from center.",
+        "Keep panel_count even for symmetric center behavior."
+      ],
+      "validation_criteria": [
+        "top chord and bottom chord are continuous",
+        "verticals exist at panel points",
+        "diagonals have the requested Pratt or Howe direction"
+      ],
+      "failure_modes": [
+        "diagonals reversed for the requested truss type",
+        "missing verticals",
+        "single solid web plate"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\ndepth = 36;\npanel_count = 6;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\nuse_pratt = true;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule pratt_howe_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { x0=-span/2+i*pl; x1=x0+pl; member_between([x0,0],[x1,0]); member_between([x0,depth],[x1,depth]); pratt_left = i < panel_count/2; if(use_pratt) { if(pratt_left) member_between([x0,0],[x1,depth]); else member_between([x0,depth],[x1,0]); } else { if(pratt_left) member_between([x0,depth],[x1,0]); else member_between([x0,0],[x1,depth]); } } for(i=[0:panel_count]) { x=-span/2+i*pl; member_between([x,0],[x,depth]); gusset_at([x,0]); gusset_at([x,depth]); } support_pad(-span/2); support_pad(span/2); } }\npratt_howe_truss();"
+    },
+    {
+      "id": "warren_fink_k_truss_patterns",
+      "category": "truss_patterns",
+      "name": "Warren, Fink, and K-truss web patterns",
+      "aliases": [
+        "warren truss",
+        "fink truss",
+        "k-truss",
+        "k truss",
+        "triangular web truss",
+        "w web roof truss"
+      ],
+      "standards": [
+        "general truss design practice",
+        "timber and steel truss detailing"
+      ],
+      "manufacturing_processes": [
+        "welded steel",
+        "bolted gusset plates",
+        "timber connector plates",
+        "3D printed scale model"
+      ],
+      "family": "common_trusses_reference",
+      "standard_dimensions_mm": {
+        "span": 180,
+        "rise": 54,
+        "depth": 36,
+        "panel_count": 6,
+        "member_width": 6,
+        "member_depth": 8,
+        "gusset_radius": 9,
+        "gusset_thickness": 2,
+        "bolt_diameter": 2.5
+      },
+      "main_parameters": {
+        "span": "support-to-support distance",
+        "rise": "Fink roof-truss height",
+        "depth": "Warren or K-truss top-bottom chord spacing",
+        "panel_count": "number of repeated panels",
+        "truss_type": "warren, fink, or k_truss",
+        "member_width": "member in-plane width",
+        "member_depth": "member out-of-plane depth"
+      },
+      "non_main_parameters": {
+        "mid_node_height": "K-truss internal node height, usually depth/2",
+        "gusset_radius": "node plate radius",
+        "gusset_thickness": "node plate thickness",
+        "bolt_diameter": "node bolt hole diameter",
+        "support_pad_width": "bearing plate width"
+      },
+      "derived_parameters": {
+        "panel_length": {
+          "formula": "span / panel_count"
+        },
+        "warren_diagonal_length": {
+          "formula": "sqrt(panel_length^2 + depth^2)"
+        },
+        "warren_diagonal_angle": {
+          "formula": "atan(depth / panel_length)"
+        },
+        "k_web_half_diagonal_length": {
+          "formula": "sqrt((panel_length/2)^2 + (depth/2)^2)"
+        },
+        "fink_inner_node_height": {
+          "formula": "rise / 2"
+        }
+      },
+      "assumptions": [
+        "Warren trusses use alternating triangular web members.",
+        "Fink trusses are pitched roof trusses with a W-shaped web layout.",
+        "K-trusses split panels into shorter diagonals meeting a mid-height node.",
+        "OpenSCAD output is a parametric geometry pattern, not a load rating."
+      ],
+      "main_features": [
+        "Warren: alternating triangular web",
+        "Fink: pitched rafters with W-web below",
+        "K-truss: mid-height nodes and K-shaped web members",
+        "gusset plates at all major nodes",
+        "support pads at both ends"
+      ],
+      "design_rules": [
+        "Use Warren for alternating bridge triangles.",
+        "Use Fink for residential or light roof truss prompts.",
+        "Use K-truss for deep bridge or industrial frame prompts.",
+        "Do not substitute a solid zig-zag plate for individual members."
+      ],
+      "validation_criteria": [
+        "web members are separate bars",
+        "requested web pattern is visible",
+        "nodes include gusset plates",
+        "support pads exist at bearings"
+      ],
+      "failure_modes": [
+        "missing alternating Warren pattern",
+        "Fink truss without W-web",
+        "K-truss without mid-panel nodes"
+      ],
+      "openscad_module": "$fn = 48;\nspan = 180;\ndepth = 36;\npanel_count = 6;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule warren_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { x0=-span/2+i*pl; x1=x0+pl; member_between([x0,0],[x1,0]); member_between([x0,depth],[x1,depth]); if(i%2==0) member_between([x0,0],[x1,depth]); else member_between([x0,depth],[x1,0]); } for(i=[0:panel_count]) { x=-span/2+i*pl; gusset_at([x,0]); gusset_at([x,depth]); } support_pad(-span/2); support_pad(span/2); } }\nwarren_truss();"
+    }
+  ]
+}
