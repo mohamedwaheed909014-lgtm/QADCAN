@@ -52,7 +52,6 @@ try:
 except ImportError:
     _SentenceTransformer = None
 
-
 log = logging.getLogger("openscad-copilot.rag")
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -139,8 +138,46 @@ FAMILY_ID_TO_LABEL: dict[str, str] = {
 FAMILY_ID_TO_LABEL["bearing_housing_reference"] = "Bearing Housing / Pillow Block"
 FAMILY_ID_TO_LABEL[GENERAL_RAG_ID]              = GENERAL_RAG_LABEL
 
+PULLEY_SUBTYPE_KEYWORDS = {
+    "smooth_bearing_idler": [
+        "smooth idler",
+        "smooth idler pulley",
+        "bearing idler",
+        "bearing sleeve",
+        "idler sleeve",
+        "free spinning pulley",
+        "passive pulley",
+        "belt tensioner",
+        "belt tensioner idler",
+        "623zz",
+        "624zz",
+        "625zz",
+        "608zz",
+        "shoulder bolt idler",
+        "m3 shoulder bolt",
+        "m4 shoulder bolt",
+        "m5 shoulder bolt"
+    ],
 
+    "toothed_timing_pulley": [
+        "timing pulley",
+        "drive pulley",
+        "motor pulley",
+        "toothed pulley",
+        "grub screw pulley",
+        "captive nut pulley",
+        "pulley3dp",
+        "pulleycad",
+        "pulleyteeth",
+        "pulleyretainer",
+        "pulleyidler",
+        "toothwidthtweak",
+        "teeth",
+        "tooth count"
+    ]
+}
 PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
+    
     "shaft_reference": [
         "shaft", "axle", "spindle", "rotating", "cylindrical",
         "keyway", "d shaft", "splined shaft", "lead screw", "threaded shaft", "motor shaft",
@@ -202,8 +239,17 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "linear guide", "v-slot", "linear bearing",
     ],
     "pulley_belt_drive_reference": [
-        "pulley", "belt drive", "gt2", "timing pulley", "belt pulley",
-        "idler pulley", "tensioner pulley", "v-belt",
+        "pulley", "belt drive", "timing pulley", "belt pulley",
+        "toothed pulley", "flanged pulley", "idler pulley", "tensioner pulley",
+        "smooth idler", "smooth idler pulley", "bearing idler", "bearing sleeve",
+        "belt tensioner", "free spinning pulley", "passive pulley", "idler sleeve",
+        "623zz", "624zz", "625zz", "608zz",
+        "shoulder bolt idler", "m4 shoulder bolt", "m3 shoulder bolt", "m5 shoulder bolt",
+        "gt2", "gt2 2mm", "gt2 3mm", "gt2 5mm",
+        "htd", "htd 3mm", "htd 5mm", "htd 8mm", "htd3", "htd5", "htd8",
+        "t2.5", "t5", "t10", "at5", "mxl", "xl timing", "40dp",
+        "grub screw pulley", "captive nut pulley", "pulley-generator.scad",
+        "belt width", "toothWidthTweak",
     ],
     "robotics_servo_reference": [
         "servo", "mg996r", "servo bracket", "robotics", "servo mount",
@@ -636,6 +682,12 @@ def _keyword_hits(query: str, keywords: list[str]) -> int:
 
 def detect_primary_families(query: str) -> list[str]:
     lowered = query.lower()
+    if re.search(r"\b(gt2|htd|mxl|40dp|t2\.5|t5|t10|at5|timing\s+pulley|belt\s+pulley|pulley-generator\.scad)\b", lowered):
+        remaining = [
+            doc_id for doc_id in _detect_primary_families_by_keyword(query)
+            if doc_id != "pulley_belt_drive_reference"
+        ]
+        return ["pulley_belt_drive_reference", *remaining]
     if re.search(r"\b(sprocket|roller chain|chain sprocket|chain wheel|ansi\s*#?\s*(25|35|40|41|50|60|80)|#\s*(25|35|40|41|50|60|80)\s*(chain|sprocket))\b", lowered):
         remaining = [
             doc_id for doc_id in _detect_primary_families_by_keyword(query)
@@ -658,6 +710,16 @@ def _detect_primary_families_by_keyword(query: str) -> list[str]:
 def detect_primary_family(text: str) -> str | None:
     families = detect_primary_families(text)
     return families[0] if families else None
+
+
+def detect_pulley_subtype(query: str) -> str | None:
+    q = query.lower()
+
+    for subtype, keywords in PULLEY_SUBTYPE_KEYWORDS.items():
+        if _keyword_hits(q, keywords) > 0:
+            return subtype
+
+    return None
 
 
 def _is_family_database_doc(doc_id: str, family_id: str) -> bool:
@@ -954,20 +1016,77 @@ class KnowledgeBase:
         top_k: int,
     ) -> list[dict]:
         family_ids = detect_primary_families(query)
+        pulley_subtype = detect_pulley_subtype(query)
 
         scored: list[tuple[float, Document]] = []
+
         for doc, raw in zip(docs, scores):
-            if "gear_reference" in family_ids and doc.id != PRIMARY_SUPPORT_DOC_BY_FAMILY.get("gear_reference") and doc.family != "gear_reference":
+            if (
+                "gear_reference" in family_ids
+                and doc.id != PRIMARY_SUPPORT_DOC_BY_FAMILY.get("gear_reference")
+                and doc.family != "gear_reference"
+            ):
                 continue
-            if family_ids and doc.id in SUPPORT_DOC_KEYWORDS and doc.family and doc.family not in family_ids:
+
+            if (
+                family_ids
+                and doc.id in SUPPORT_DOC_KEYWORDS
+                and doc.family
+                and doc.family not in family_ids
+            ):
                 continue
+
             adj = _adjust_score(raw, doc, family_ids, query)
-            # Drop documents below their declared or default threshold
+
+            # ── Pulley subtype correction ────────────────────────────────────
+            doc_text = doc.text.lower()
+            doc_id = doc.id.lower()
+
+            if pulley_subtype == "smooth_bearing_idler":
+                # Prefer standalone smooth bearing-idler records.
+                if (
+                    "smooth_bearing_idler" in doc_id
+                    or "smooth bearing idler" in doc_text
+                    or "standalone" in doc_text
+                    or "no include required" in doc_text
+                    or "does not use pulley-generator.scad" in doc_text
+                ):
+                    adj = min(1.0, adj + 0.35)
+
+                # Penalize timing pulley/library examples.
+                if (
+                    "pulley3dp" in doc_text
+                    or "pulleycad" in doc_text
+                    or "include <pulley-generator.scad>" in doc_text
+                    or "teethcount" in doc_text
+                ):
+                    adj = max(0.0, adj - 0.45)
+
+            elif pulley_subtype == "toothed_timing_pulley":
+                # Penalize smooth idler records for toothed pulley prompts.
+                if (
+                    "smooth bearing idler" in doc_text
+                    or "standalone" in doc_text
+                    or "does not use pulley-generator.scad" in doc_text
+                    or "no include required" in doc_text
+                ):
+                    adj = max(0.0, adj - 0.30)
+
+                # Prefer pulley-generator timing pulley examples.
+                if (
+                    "pulley3dp" in doc_text
+                    or "pulleycad" in doc_text
+                    or "include <pulley-generator.scad>" in doc_text
+                ):
+                    adj = min(1.0, adj + 0.20)
+
+            # Drop documents below their declared or default threshold.
             threshold = MIN_SCORE_BY_DOC.get(doc.id, doc.min_score_threshold)
             if adj >= threshold:
                 scored.append((adj, doc))
 
         scored.sort(key=lambda item: item[0], reverse=True)
+
         hits: list[dict] = []
         used_ids: set[str] = set()
 
@@ -976,18 +1095,23 @@ class KnowledgeBase:
             primary_support_id = PRIMARY_SUPPORT_DOC_BY_FAMILY.get(fid)
             if not primary_support_id:
                 continue
-            match = next((item for item in scored if item[1].id == primary_support_id), None)
+
+            match = next(
+                (item for item in scored if item[1].id == primary_support_id),
+                None,
+            )
             if match and match[1].id not in used_ids:
                 hits.append(self._make_hit(match[1], match[0]))
                 used_ids.add(match[1].id)
                 if len(hits) >= top_k:
-                    break
+                    return hits
 
-        # 2. Always surface the best database match for each detected primary family.
+        # 2. Always surface the best database match for each detected family.
         for fid in family_ids:
             match = next(
                 (
-                    item for item in scored
+                    item
+                    for item in scored
                     if item[1].id == fid or _is_family_database_doc(item[1].id, fid)
                 ),
                 None,
@@ -996,15 +1120,19 @@ class KnowledgeBase:
                 hits.append(self._make_hit(match[1], match[0]))
                 used_ids.add(match[1].id)
                 if len(hits) >= top_k:
-                    break
+                    return hits
 
-        # 3. For bearing queries: also pull in the true-pillow-block support doc when
-        #    relevant keywords are present.
+        # 3. For bearing queries: also pull in the true-pillow-block support doc.
         if "bearing_housing_reference" in family_ids and _keyword_hits(
-            query, SUPPORT_DOC_KEYWORDS.get("bearing_housing_true_pillow_block_reference", [])
+            query,
+            SUPPORT_DOC_KEYWORDS.get("bearing_housing_true_pillow_block_reference", []),
         ):
             tpb = next(
-                (item for item in scored if item[1].id == "bearing_housing_true_pillow_block_reference"),
+                (
+                    item
+                    for item in scored
+                    if item[1].id == "bearing_housing_true_pillow_block_reference"
+                ),
                 None,
             )
             if tpb and tpb[1].id not in used_ids and len(hits) < top_k:
@@ -1016,12 +1144,15 @@ class KnowledgeBase:
         for score, doc in scored:
             if doc.id in used_ids:
                 continue
+
             if doc.id in SUPPORT_DOC_KEYWORDS:
                 if support_added >= 1 and family_ids:
                     continue
                 support_added += 1
+
             hits.append(self._make_hit(doc, score))
             used_ids.add(doc.id)
+
             if len(hits) >= top_k:
                 break
 

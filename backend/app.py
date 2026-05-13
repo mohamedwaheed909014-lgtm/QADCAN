@@ -95,10 +95,10 @@ _load_windows_user_env(
     ]
 )
 
-OPENAI_DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.2")
+OPENAI_DEFAULT_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 OPENAI_MODELS = [
     item.strip()
-    for item in os.getenv("OPENAI_MODELS", "gpt-5,gpt-5.2,gpt-4.1-mini,gpt-5-mini").split(",")
+    for item in os.getenv("OPENAI_MODELS", "gpt-4.1-mini").split(",")
     if item.strip()
 ]
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
@@ -372,7 +372,7 @@ SYSTEM_PROMPT = "\n\n".join(
         "When main parameters are present, assume secondary dimensions from relevant mechanical design practice and clearly encode them as named OpenSCAD parameters.",
         "Keep material suggestions and standard explanations out of the OpenSCAD file; the backend chat response will report them after code generation.",
         
-        OPENSCAD_CHEATSHEET,
+        OPENSCAD_CHEATSHEET
     ]
 )
 
@@ -462,6 +462,57 @@ ENGINEERING_FAMILY_PROFILES: dict[str, dict] = {
             "Keep extrusion cross-sections symmetric around the main axis when appropriate.",
         ],
         "sources": [{"name": "Steel section handbooks", "type": "industry"}],
+    },
+    "pulley_belt_drive_reference": {
+        "label": "Pulley / Belt Drive",
+        "criticality": "medium",
+        "review_required": True,
+        "manufacturability": [
+           "INCLUDE POLICY: Use include <pulley-generator.scad> only for toothed/timing pulleys that call pulley3DP(), pulley(), pulleyCAD(), pulleyTeeth(), pulleyRetainer(), pulleyIdler(), pulleyBase(), or captiveGrubAndNut().",
+    "NO-INCLUDE POLICY: Smooth bearing idlers using 623ZZ/624ZZ/625ZZ/608ZZ are standalone bearing sleeves and must NOT use include <pulley-generator.scad>.",
+    "NO-INCLUDE POLICY: Smooth bearing idlers must NOT use pulley3DP(), pulley(), pulleyCAD(), pulleyTeeth(), pulleyRetainer(), pulleyIdler(), pulleyBase(), grub screws, captive nuts, or motor hubs.",
+    "Smooth bearing idlers must be generated using standalone OpenSCAD primitives only: cylinder(), union(), difference(), and translate().",
+    "If the prompt contains both GT2 and smooth/idler/bearing/624ZZ/623ZZ/625ZZ/608ZZ, classify it as smooth_bearing_idler, not toothed_timing_pulley.",
+    "Use pulley-generator.scad for timing pulley tooth profiles instead of hand-made triangular teeth.",
+    "Use exact case-sensitive belt model strings such as HTD 5mm and GT2 2mm.",
+    "Keep the shaft bore coaxial on Z; grub/set screws and nut pockets are radial side features, not coaxial bores.",
+    "Use toothWidthTweak around 0.2 mm for FDM 3D printing clearance.",
+            "Use exact case-sensitive belt model strings such as HTD 5mm and GT2 2mm.",
+            "Keep the shaft bore coaxial on Z; grub/set screws and nut pockets are radial side features, not coaxial bores.",
+            "Use toothWidthTweak around 0.2 mm for FDM 3D printing clearance.",
+        ],
+        "include_policy": {
+    "toothed_timing_pulley": {
+        "include_required": True,
+        "required_include": "include <pulley-generator.scad>",
+        "allowed_modules": [
+            "pulley3DP",
+            "pulley",
+            "pulleyCAD",
+            "pulleyTeeth",
+            "pulleyRetainer",
+            "pulleyIdler",
+            "pulleyBase",
+            "captiveGrubAndNut"
+        ]
+    },
+    "smooth_bearing_idler": {
+        "include_required": False,
+        "forbidden_include": "include <pulley-generator.scad>",
+        "forbidden_modules": [
+            "pulley3DP",
+            "pulley",
+            "pulleyCAD",
+            "pulleyTeeth",
+            "pulleyRetainer",
+            "pulleyIdler",
+            "pulleyBase",
+            "captiveGrubAndNut"
+        ],
+        "required_method": "standalone OpenSCAD primitives only"
+    }
+},
+        "sources": [{"name": "pulley-generator.scad reference", "type": "library"}],
     },
     
 }
@@ -752,7 +803,41 @@ def generate_llm_clarification(
     parsed["generated_by"] = "llm"
     return parsed, actual_provider, actual_model, used_fallback
 
+def detect_pulley_subtype(prompt: str) -> str | None:
+    p = prompt.lower()
 
+    smooth_keywords = [
+        "smooth idler",
+        "bearing idler",
+        "624zz",
+        "623zz",
+        "625zz",
+        "608zz",
+        "idler sleeve",
+        "free spinning pulley",
+        "belt tensioner",
+        "passive pulley",
+        "bearing sleeve"
+    ]
+
+    toothed_keywords = [
+        "tooth",
+        "teeth",
+        "timing pulley",
+        "drive pulley",
+        "motor pulley",
+        "grub screw",
+        "set screw",
+        "captive nut"
+    ]
+
+    if any(k in p for k in smooth_keywords):
+        return "smooth_bearing_idler"
+
+    if any(k in p for k in toothed_keywords):
+        return "timing_pulley"
+
+    return None
 def _material_scope_for_family(family_id: str | None) -> str:
     if family_id == "bearing_housing_reference":
         return "housing body, pedestal, and mounting feet; not the bearing internals"
@@ -1233,6 +1318,19 @@ def build_messages(
             "when requested, gussets/ribs are triangular prisms using polygon()+linear_extrude() or polyhedron(), not flat rectangular blocks. "
             "When four holes are requested on a leg, use a 2x2 pattern within that leg's own width/length."
         )
+    if family_id == "pulley_belt_drive_reference":
+        family_lines.append(
+            "For timing pulley and belt-drive requests, pulley-generator.scad is authoritative. "
+            "Always begin with include <pulley-generator.scad>. "
+            "Use the exact model string from the database, for example HTD 5mm or GT2 2mm, including spaces and case. "
+            "CRITICAL — set teethCount, beltWidth, and shaftDiameter to the exact numeric values stated in the user prompt. "
+            "Never substitute the database default (20 teeth) when the user specifies a different tooth count. "
+            "MODULE SELECTION: use pulley3DP() for any simple request that does not explicitly ask for "
+            "captive nuts, grub screws, retainerInfo, idlerInfo, or baseInfo customization. "
+            "Use pulley() only when the user explicitly requests custom nut/screw/retainer configuration. "
+            "Do not invent triangular teeth, do not approximate HTD/GT2 grooves with polygons, and do not create smooth cylinders as timing pulleys. "
+            "For FDM 3D printing use toothWidthTweak around 0.2 and autoFlip=true."
+        )
     family_lines.append("Do not include material recommendations or standard explanations in OpenSCAD comments; those are chat-after-code notes only.")
     messages.append({"role": "system", "content": "\n".join(family_lines)})
 
@@ -1400,6 +1498,163 @@ def deterministic_sprocket_library_call(prompt: str) -> str:
     return f"""use <{SPROCKET_SCAD_PATH}>
 $fn = 180;
 sprocket(size={size}, teeth={teeth}, bore={bore_mm:g}/25.4, hub_diameter={hub_od_mm:g}/25.4, hub_height={hub_h_mm:g}/25.4, keyway={keyway}, setscrew={setscrew});"""
+
+
+def deterministic_pulley_library_call(prompt: str) -> str:
+    """Return a correct pulley-generator.scad call derived entirely from the prompt.
+
+    Key fixes:
+    - Teeth regex handles hyphens: "30-tooth" and "30 tooth" both match.
+    - Belt width regex handles "6 mm belt" (no 'width' word needed).
+    - Module selection: use pulley3DP() for simple requests (no structured
+      parameter keywords); only use pulley() when grub/nut/captive config
+      is explicitly requested.
+    - All values come from the prompt; defaults only fill genuine gaps.
+    """
+    lowered = prompt.lower()
+
+    # ── Belt profile detection ──────────────────────────────────────────
+    supported_models = [
+        "GT2 2mm", "GT2 3mm", "GT2 5mm",
+        "HTD 3mm", "HTD 5mm", "HTD 8mm",
+        "T2.5", "T5", "T10", "AT5", "MXL", "40DP", "XL", "H",
+    ]
+    model = "GT2 2mm"
+    for candidate in supported_models:
+        if candidate.lower() in lowered:
+            model = candidate
+            break
+    if model == "GT2 2mm":
+        if re.search(r"\bhtd\s*5\s*mm|\bhtd5\b|\b5m\s*htd\b", lowered):
+            model = "HTD 5mm"
+        elif re.search(r"\bhtd\s*3\s*mm|\bhtd3\b|\b3m\s*htd\b", lowered):
+            model = "HTD 3mm"
+        elif re.search(r"\bhtd\s*8\s*mm|\bhtd8\b|\b8m\s*htd\b", lowered):
+            model = "HTD 8mm"
+
+    # ── Value extractor ─────────────────────────────────────────────────
+    def number(patterns: list[str], default: float) -> float:
+        for pattern in patterns:
+            match = re.search(pattern, prompt, re.IGNORECASE)
+            if not match:
+                continue
+            for group in match.groups():
+                if group is None:
+                    continue
+                try:
+                    return float(group)
+                except ValueError:
+                    continue
+        return default
+
+    # ── Tooth count — handles "30-tooth", "30 tooth", "30t", "30 teeth" ─
+    teeth = int(number([
+        r"\b(\d+)\s*[-–]?\s*(?:tooth|teeth)\b",   # "30-tooth", "30 tooth"
+        r"\b(\d+)\s*[-–]?\s*t\b",                  # "30t"
+        r"\bteeth(?:Count| count)?\s*(?:=|:)?\s*(\d+)\b",
+    ], 20))
+
+    # ── Belt width — handles "6 mm belt", "6mm belt", "belt width 6mm" ──
+    default_belt_width = 15 if model == "HTD 5mm" else 9 if model in {"HTD 3mm", "GT2 3mm"} else 6
+    belt_width = number([
+        r"\b(\d+(?:\.\d+)?)\s*mm\s*belt(?:\s*width)?\b",      # "6 mm belt" or "6 mm belt width"
+        r"\bbelt(?:\s*width)?\s*(?:=|:)?\s*(\d+(?:\.\d+)?)\s*mm?\b",  # "belt width 6mm"
+        r"\bfor\s+a\s+(\d+(?:\.\d+)?)\s*mm\s*belt\b",         # "for a 6mm belt"
+    ], default_belt_width)
+
+    # ── Shaft bore ──────────────────────────────────────────────────────
+    default_shaft = 8.0 if model == "HTD 5mm" else 5.2 if ("3d" in lowered or "print" in lowered) else 5.0
+    shaft_d = number([
+        r"\b(\d+(?:\.\d+)?)\s*mm\s*(?:shaft|bore)\b",          # "5 mm bore" / "5 mm shaft"
+        r"\b(?:shaft|bore)(?:\s*diameter|_d)?\s*(?:=|:|of)?\s*(\d+(?:\.\d+)?)\s*mm?\b",
+        r"\bbore\s+(?:of\s+)?(\d+(?:\.\d+)?)\s*mm?\b",
+    ], default_shaft)
+
+    # ── Module selection ────────────────────────────────────────────────
+    # Use pulley() only when the prompt explicitly requests custom nut/grub config.
+    # Use pulley3DP() for all simple generation requests (the common case).
+    use_full_pulley = bool(re.search(
+        r"\b(captive\s*nut|grub\s*screw|set\s*screw|retainer\s*info|idler\s*info"
+        r"|base\s*info|nut\s*profile|pulley\s*\(\)|dual\s*nut|two\s*nut"
+        r"|structured\s*param|full\s*param)\b",
+        lowered,
+    ))
+
+    if not use_full_pulley:
+        # ── Simple path: pulley3DP() ────────────────────────────────────
+        tooth_tweak = 0.25 if "petg" in lowered else 0.2
+        return f"""include <pulley-generator.scad>
+
+// ── MAIN PARAMETERS ──
+model         = "{model}";
+teethCount    = {teeth};
+beltWidth     = {belt_width:g};
+shaftDiameter = {shaft_d:g};
+
+// ── TWEAKS ──
+toothWidthTweak = {tooth_tweak:g};
+toothDepthTweak = 0.0;
+
+pulley3DP(
+    model           = model,
+    teethCount      = teethCount,
+    beltWidth       = beltWidth,
+    shaftDiameter   = shaftDiameter,
+    toothWidthTweak = toothWidthTweak,
+    toothDepthTweak = toothDepthTweak
+);"""
+
+    # ── Full path: pulley() with structured params ──────────────────────
+    grub_match = re.search(r"\bM\s*(3|4|5|6)\b", prompt, re.IGNORECASE)
+    grub_size = int(grub_match.group(1)) if grub_match else 3
+    nut_count = 2 if re.search(r"\bdual\b|\btwo\b|\b2\s*(nuts?|screws?)\b", lowered) else 1
+    nut_angle = 90 if nut_count <= 2 else 120
+    screw_clearance = {3: 3.2, 4: 4.2, 5: 5.3, 6: 6.4}.get(grub_size, grub_size + 0.2)
+    nut_flat  = {3: 5.7, 4: 7.0, 5: 8.0, 6: 10.0}.get(grub_size, grub_size * 1.7)
+    nut_thick = {3: 2.7, 4: 3.2, 5: 4.0, 6: 5.0}.get(grub_size, grub_size * 0.8)
+    base_d = max(shaft_d + 2 * (nut_thick + 3) + 2, 20 if shaft_d <= 8 else shaft_d + 16)
+    base_h = max(nut_flat + 2, 8)
+    tooth_tweak = 0.25 if "petg" in lowered else 0.2
+
+    return f"""include <pulley-generator.scad>
+
+// ── MAIN PARAMETERS ──
+model         = "{model}";
+teethCount    = {teeth};
+beltWidth     = {belt_width:g};
+shaftDiameter = {shaft_d:g};
+
+// ── STRUCTURED PARAMETERS ──
+retainerInfo = [2, 1, 1];
+idlerInfo    = [2, 1, 1];
+baseInfo     = [{base_d:g}, {base_h:g}];
+nutProfile   = ["hex", {screw_clearance:g}, {nut_flat:g}, {nut_thick:g}];
+captiveNuts  = [{nut_count}, {nut_angle}, 1.5];
+
+// ── TWEAKS ──
+toothWidthTweak = {tooth_tweak:g};
+toothDepthTweak = 0.0;
+
+pulley(
+    model           = model,
+    teethCount      = teethCount,
+    beltWidth       = beltWidth,
+    shaftDiameter   = shaftDiameter,
+    retainerInfo    = retainerInfo,
+    idlerInfo       = idlerInfo,
+    baseInfo        = baseInfo,
+    nutProfile      = nutProfile,
+    captiveNuts     = captiveNuts,
+    toothWidthTweak = toothWidthTweak,
+    toothDepthTweak = toothDepthTweak,
+    autoFlip        = true
+);"""
+
+
+def enforce_mechanical_library_output(prompt: str, code: str, family_id: str | None) -> str:
+    if family_id == "pulley_belt_drive_reference":
+        return deterministic_pulley_library_call(prompt)
+    return enforce_gears_master_output(prompt, code, family_id)
 
 
 def enforce_gears_master_output(prompt: str, code: str, family_id: str | None) -> str:
@@ -2339,7 +2594,7 @@ def chat(request: ChatRequest) -> dict:
         raise HTTPException(status_code=400, detail=f"Model '{model}' is disabled in this app because it fails in the current Ollama app path.")
 
     try:
-        retrieval_k = min(request.top_k, 2) if provider == "ollama" else request.top_k
+        retrieval_k = min(max(request.top_k, 4), 6) if provider == "ollama" else request.top_k
         memory_text = conversation_user_memory(request.history, text)
         detected_family = detect_family(memory_text)
         clarification = build_clarification_request(memory_text, detected_family) if request.enable_clarification else None
@@ -2375,13 +2630,13 @@ def chat(request: ChatRequest) -> dict:
 
         retrieval_query = memory_text
         retrieved = knowledge_base.retrieve(retrieval_query, top_k=retrieval_k, selected_doc_ids=request.selected_doc_ids)
-        history_hits = accepted_history.retrieve(retrieval_query, top_k=2, family_id=detected_family)
-        combined_context = history_hits + retrieved
+        history_hits = accepted_history.retrieve(retrieval_query, top_k=1, family_id=detected_family) if detected_family else []
+        combined_context = retrieved + history_hits
 
         messages = build_messages(text, request.history, combined_context, provider=provider, family_id=detected_family)
         raw, actual_provider, actual_model, used_fallback = generate_with_fallback(request, messages)
         result = extract_scad(raw)
-        result = enforce_gears_master_output(text, result, detected_family)
+        result = enforce_mechanical_library_output(text, result, detected_family)
         initial_validation = validate_scad(result, text)
 
         if actual_provider == "ollama" and not used_fallback:
@@ -2393,7 +2648,7 @@ def chat(request: ChatRequest) -> dict:
             result, validity, repair_provider, repair_model, repair_used_fallback = auto_repair_result(
                 request, text, combined_context, result, initial_validation
             )
-            result = enforce_gears_master_output(text, result, detected_family)
+            result = enforce_mechanical_library_output(text, result, detected_family)
             validity = validate_scad(result, text)
     except requests.RequestException as exc:
         raise HTTPException(status_code=502, detail=f"Service error: {exc}") from exc

@@ -1,146 +1,651 @@
 PULLEYS AND BELT DRIVE REFERENCE
+Version 2.2  |  Library: pulley-generator.scad  |  + Standalone smooth bearing idler
 Category: Power Transmission / Belt Drive
-Verified models: Thingiverse thing:3296969 (parametric toothed belt pulley OpenSCAD, remixed),
-  Thingiverse thing:7316286 (scottneumann configurable gears and pulleys),
-  Thingiverse thing:7317413 (pulley belt design companion),
-  GrabCAD "GT2 pulley 20 teeth", Printables "parametric pulley" tag
 
-BELT PROFILE STANDARDS
-──────────────────────
-  GT2 (Gates Tooth):  pitch 2.0 mm, tooth radius 0.555 mm  — most common in 3D printers
-  GT3:                pitch 3.0 mm, higher torque variant of GT2
-  HTD 3M:             pitch 3.0 mm, rounded tooth, higher load
-  HTD 5M:             pitch 5.0 mm, heavy-duty CNC
-  HTD 8M:             pitch 8.0 mm, industrial
-  T2.5:               pitch 2.5 mm, trapezoidal tooth, older CNC systems
-  T5:                 pitch 5.0 mm, trapezoidal, common servo drives
-  T10:                pitch 10.0 mm, heavy industrial
-  MXL:                pitch 2.032 mm, imperial standard
-  XL:                 pitch 5.08 mm (1/5"), light duty
-  V-Belt (A/B/C/D):   trapezoidal cross-section, friction drive, not toothed
+OUTPUT POLICY — READ BEFORE GENERATING CODE
+─────────────────────────────────────────────
+  PROMPT PARAMETER BINDING (critical):
+    Every numeric value stated in the user prompt MUST appear verbatim in the code.
+    - "30 teeth"   → teethCount    = 30   (NOT 20)
+    - "5 mm bore"  → shaftDiameter = 5    (NOT default)
+    - "6 mm belt"  → beltWidth     = 6    (NOT default)
+    Database defaults apply ONLY when the user does not state a value.
+    NEVER substitute a default for a user-specified value.
 
-STANDARD GT2 PULLEY DIMENSIONS (real parts)
-────────────────────────────────────────────
-  16T GT2: pitch_d = 10.19 mm, OD ≈ 12.2 mm, bore common 5 mm (NEMA17)
-  20T GT2: pitch_d = 12.73 mm, OD ≈ 14.8 mm, bore common 5 mm
-  30T GT2: pitch_d = 19.10 mm, OD ≈ 21.1 mm
-  36T GT2: pitch_d = 22.92 mm, OD ≈ 24.9 mm
-  40T GT2: pitch_d = 25.46 mm, OD ≈ 27.5 mm
-  60T GT2: pitch_d = 38.20 mm, OD ≈ 40.2 mm
-  pitch_diameter = teeth × pitch / PI  for GT2
+  MODULE SELECTION:
+    - pulley3DP()  → use when prompt gives only model, teeth, belt width, bore.
+                     This is the default for simple generation requests.
+    - pulley()     → use ONLY when prompt explicitly requests retainerInfo,
+                     idlerInfo, baseInfo, nutProfile, captiveNuts, or custom nut config.
+    - pulleyCAD()  → use when prompt specifies a target outer diameter.
+    When in doubt: use pulley3DP().
 
-STANDARD BELT WIDTHS: GT2/GT3 — 6 mm, 9 mm, 15 mm
+  TOOTH COUNT RULE:
+    teethCount is ALWAYS taken from the user prompt.
+    "30-tooth" → teethCount = 30.
+    "60-tooth" → teethCount = 60.
+    Only default to 20 if the user does not mention tooth count at all.
 
-KEY PARAMETERS
-──────────────
-  belt_pitch            — tooth pitch in mm (2.0 for GT2)
-  num_teeth             — number of pulley teeth (16–60 typical)
-  pitch_diameter        — num_teeth × belt_pitch / PI
-  pulley_od             — pitch_diameter + 2 × tooth_height (≈ pitch_d + 1–2 mm)
-  belt_width            — 6 mm standard for desktop CNC/printer
-  pulley_height         — belt_width + 2 × flange_height (typically belt_width + 3–6 mm)
-  flange_diameter       — pulley_od + 2 × flange_height
-  flange_height         — 1.0–1.5 mm per side; keeps belt on track
-  flange_thickness      — 1.0–1.5 mm
-  bore_diameter         — shaft bore; motor shaft + 0.1–0.2 mm for press
-  hub_diameter          — ≥ bore_d + 6 mm wall
-  hub_length            — ≥ belt_width
-  set_screw_d           — M3 for bore ≤10 mm, M4 for ≤20 mm
-  set_screw_hole_depth  — hub_diameter / 2
+LIBRARY INCLUDE
+───────────────
+  Every SCAD file using these pulleys MUST start with:
+      include <pulley-generator.scad>
 
-IDLER PULLEY (smooth, no teeth)
-────────────────────────────────
-  - OD ≈ same as toothed pulley OD (so belt wraps cleanly)
-  - Uses 623zz (OD 10 mm, bore 3 mm) or 624zz (OD 13 mm, bore 4 mm) or 625zz (OD 16 mm, bore 5 mm)
-  - Typically a shoulder bolt or M3/M5 screw through bearing bore
-  - Add 0.5–1.0 mm raised rim to retain belt
+  Source:  https://github.com/isc/openscad.pulley-generator
+  Base:    http://thingiverse.com/thing:16627
+  Authors: droftarts (January 2012), isc (August 2021)
 
-TIMING BELT LENGTH FORMULA
-────────────────────────────
-  For two pulleys:
-  belt_length = 2 × centre_distance
-              + PI/2 × (pitch_d1 + pitch_d2)
-              + (pitch_d1 - pitch_d2)² / (4 × centre_distance)
+SUPPORTED BELT PROFILE MODELS (exact strings for `model` parameter)
+──────────────────────────────────────────────────────────────────────
+  "MXL"       "40DP"     "XL"        "H"
+  "T2.5"      "T5"       "T10"       "AT5"
+  "HTD 3mm"   "HTD 5mm"  "HTD 8mm"
+  "GT2 2mm"   "GT2 3mm"  "GT2 5mm"
 
-OPENSCAD STRUCTURE (simplified toothed pulley)
+  NOTE: Model strings are case-sensitive and must match exactly
+        (including spaces in "HTD 5mm", "GT2 2mm", etc.).
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LIBRARY MODULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MODULE: pulley3DP  (recommended for 3D printing)
 ────────────────────────────────────────────────
-  belt_pitch   = 2.0;
-  num_teeth    = 20;
-  belt_width   = 6;
-  bore_d       = 5;
-  flange_h     = 1.5;
+  Simplified wrapper with hardcoded sensible defaults.
+  Only requires the four main parameters.
 
-  pitch_d      = num_teeth * belt_pitch / PI;
-  pulley_od    = pitch_d + 1.5;            // approximate
-  total_h      = belt_width + 2*flange_h;
+  MAIN PARAMETERS (required):
+    model           — belt profile string (see list above)
+    teethCount      — number of teeth
+    beltWidth       — belt width in mm
+    shaftDiameter   — motor/shaft bore diameter in mm
 
-  module toothed_pulley() {
-    difference() {
-      union() {
-        // flanges
-        cylinder(h=total_h, d=pulley_od + 2*flange_h, center=true, $fn=128);
-        // pulley body (cut down to expose "teeth" via difference below)
-      }
-      // belt groove (remove material between flanges)
-      cylinder(h=belt_width, d=pulley_od, center=true, $fn=128);
-      // bore
-      cylinder(h=total_h+2, d=bore_d+0.15, center=true, $fn=64);
-      // set-screw hole
-      translate([0, 0, 0]) rotate([90,0,0])
-        cylinder(h=pulley_od, d=3.2, center=true, $fn=32);
-      // teeth (approximate as small cylinders around pitch circle)
-      for(i=[0:num_teeth-1])
-        rotate([0,0,360*i/num_teeth])
-          translate([pitch_d/2, 0, 0])
-            cylinder(h=belt_width+2, r=belt_pitch*0.3, center=true, $fn=16);
-    }
-  }
+  OPTIONAL PARAMETERS:
+    toothWidthTweak — mm added to belt tooth width model (default 0.2)
+                      Positive = wider groove = looser fit.
+                      Start at 0.2 for 3D printing; reduce toward 0 for tighter.
+    toothDepthTweak — mm added to tooth depth (default 0). Changes tooth shape.
+
+  HARDCODED DEFAULTS:
+    retainerInfo = [2, 1, 1]           retainer 2mm wider, 1mm taper, 1mm flat
+    idlerInfo    = [2, 1, 1]           idler 2mm wider, 1mm taper, 1mm flat
+    baseInfo     = [20, 8]             20mm diameter hub, 8mm tall
+    nutProfile   = ["hex", 3.2, 5.7, 2.7]  M3 hex nut
+    captiveNuts  = [1, 90, 1.2]        1 nut, 90deg, 1.2mm from shaft surface
+    autoFlip     = true
+
+  USAGE EXAMPLE:
+    include <pulley-generator.scad>
+
+    model         = "GT2 2mm";
+    teethCount    = 20;
+    beltWidth     = 6;
+    shaftDiameter = 5.0;
+    toothWidthTweak = 0.2;
+    toothDepthTweak = 0.0;
+
+    pulley3DP(
+        model           = model,
+        teethCount      = teethCount,
+        beltWidth       = beltWidth,
+        shaftDiameter   = shaftDiameter,
+        toothWidthTweak = toothWidthTweak,
+        toothDepthTweak = toothDepthTweak
+    );
+
+
+MODULE: pulley  (full parametric)
+──────────────────────────────────
+  All assembly sections independently controlled.
+
+  MAIN PARAMETERS:
+    model           — belt profile string
+    teethCount      — number of teeth
+    beltWidth       — belt width in mm
+    shaftDiameter   — shaft bore diameter in mm
+
+  STRUCTURED PARAMETERS:
+    retainerInfo  = [offset_mm, taperedHeight_mm, flatHeight_mm]
+      offset        = radial enlargement over teeth OD (mm)
+      taperedHeight = height of tapered section above teeth
+      flatHeight    = straight height above the taper
+      Produces a flange ABOVE the toothed region to retain belt upward.
+
+    idlerInfo     = [offset_mm, taperedHeight_mm, flatHeight_mm]
+      Same structure as retainerInfo.
+      Produces a flange BELOW the toothed region to retain belt downward.
+
+    baseInfo      = [diameter_mm, height_mm]
+      Hub cylinder below the idler flange.
+
+    nutProfile    = [type, screwDiameter_mm, nutFaceSize_mm, nutThickness_mm]
+      type = "hex" or "square"
+      screwDiameter = shaft hole size for grub screw (e.g. 3.2 for M3)
+      nutFaceSize   = nut height/face-to-face (e.g. 5.7 for M3)
+      nutThickness  = nut depth (e.g. 2.7 for M3)
+
+    captiveNuts   = [numberOfNuts, angleBetweenNuts_deg, offsetFromShaft_mm]
+      offsetFromShaft = gap between nut inner face and motor shaft surface.
+                        Library adds shaftDiameter/2 internally.
+
+  OPTIONAL PARAMETERS:
+    toothWidthTweak = 0   (mm, default 0)
+    toothDepthTweak = 0   (mm, default 0)
+    autoFlip        = false
+
+  USAGE EXAMPLE:
+    include <pulley-generator.scad>
+
+    // ── MAIN PARAMETERS ──
+    model         = "GT2 2mm";
+    teethCount    = 20;
+    beltWidth     = 6;
+    shaftDiameter = 5.0;
+
+    // ── STRUCTURED PARAMETERS ──
+    retainerInfo  = [2, 1, 1];
+    idlerInfo     = [2, 1, 1];
+    baseInfo      = [20, 8];
+    nutProfile    = ["hex", 3.2, 5.7, 2.7];
+    captiveNuts   = [1, 90, 1.2];
+
+    // ── OPTIONAL ──
+    toothWidthTweak = 0.2;
+    toothDepthTweak = 0.0;
+
+    pulley(
+        model           = model,
+        teethCount      = teethCount,
+        beltWidth       = beltWidth,
+        shaftDiameter   = shaftDiameter,
+        retainerInfo    = retainerInfo,
+        idlerInfo       = idlerInfo,
+        baseInfo        = baseInfo,
+        nutProfile      = nutProfile,
+        captiveNuts     = captiveNuts,
+        toothWidthTweak = toothWidthTweak,
+        toothDepthTweak = toothDepthTweak,
+        autoFlip        = true
+    );
+
+
+MODULE: pulleyCAD  (exact-diameter CAD representation)
+───────────────────────────────────────────────────────
+  Auto-calculates retainer/idler offsets to achieve exactly `pulleyDiameter`.
+  No nutProfile or captiveNuts — for visual/CAD use only, not 3D printing.
+
+  MAIN PARAMETERS:
+    model          — belt profile string
+    teethCount     — number of teeth
+    beltWidth      — belt width in mm
+    shaftDiameter  — bore diameter in mm
+    pulleyDiameter — desired total outer diameter of assembled pulley (mm)
+    retainerHeight — flat height of retainer flange (mm)
+    idlerHeight    — flat height of idler flange (mm)
+    baseDiameter   — hub cylinder diameter (mm)
+    baseHeight     — hub cylinder height (mm)
+
+  DERIVED INTERNALLY:
+    retainerIdlerOffset = (pulleyDiameter - pulleyTeethDiameter) / 2
+
+  USAGE EXAMPLE:
+    include <pulley-generator.scad>
+
+    model          = "GT2 2mm";
+    teethCount     = 60;
+    beltWidth      = 6;
+    shaftDiameter  = 8.0;
+    pulleyDiameter = 42.0;
+    retainerHeight = 1.0;
+    idlerHeight    = 1.0;
+    baseDiameter   = 20.0;
+    baseHeight     = 6.0;
+
+    pulleyCAD(
+        model          = model,
+        teethCount     = teethCount,
+        beltWidth      = beltWidth,
+        shaftDiameter  = shaftDiameter,
+        pulleyDiameter = pulleyDiameter,
+        retainerHeight = retainerHeight,
+        idlerHeight    = idlerHeight,
+        baseDiameter   = baseDiameter,
+        baseHeight     = baseHeight
+    );
+
+
+PART MODULES (individual assembly sections)
+───────────────────────────────────────────
+  pulleyTeeth( model, teeth, height, toothWidthTweak=0, toothDepthTweak=0 )
+      Toothed cylinder only — no base, retainer, or idler.
+
+  pulleyRetainer( teeth, pulleyDiameter, retainerInfo )
+      Top flange (above teeth) only.
+
+  pulleyIdler( teeth, pulleyDiameter, idlerInfo )
+      Bottom flange (below teeth) only.
+
+  pulleyBase( diameter, height, upperSection )
+      Hub cylinder only. Auto-bevels top edge by up to 1mm when
+      diameter > upperSection. No bevel if diameter <= upperSection.
+
+  captiveGrubAndNut( nutProfile, captiveNuts, entranceDepth, screwLength )
+      Nut pocket NEGATIVE volume — use inside difference() when
+      building a custom base.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+LIBRARY FUNCTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+function pulleyData( model, teeth )
+  Returns: [pulley_OD, tooth_depth, tooth_width, polyPoints]
+  pulley_OD = outer diameter of solid cylinder BEFORE teeth are subtracted.
+  polyPoints = polygon profile of one belt tooth shape (subtracted groove).
+
+function calc_pulley_dia_tooth_spacing( teeth, tooth_pitch, pitch_line_offset )
+  Formula: 2 * ((teeth * tooth_pitch) / (PI * 2) - pitch_line_offset)
+  Used by: MXL, 40DP, XL, H, T10, HTD 3mm, HTD 5mm, HTD 8mm, GT2 2mm, GT2 3mm, GT2 5mm
+
+function calc_pulley_dia_tooth_spacing_curvefit( teeth, b, c, d )
+  Formula: ((c * pow(teeth,d)) / (b + pow(teeth,d))) * teeth
+  Used by: T2.5, T5, AT5 — curve-fit because effective pitch varies with tooth count.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BELT PROFILE DATA — ALL 14 MODELS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Profile   | Pitch  | PLO    | Tooth  | Tooth  | OD Formula        | OD 20T  | Tooth Shape    | Application
+          | (mm)   | (mm)   | Depth  | Width  |                   | (mm)    |                |
+          |        |        | (mm)   | (mm)   |                   |         |                |
+──────────┼────────┼────────┼────────┼────────┼───────────────────┼─────────┼────────────────┼────────────────────────────
+MXL       | 2.032  | 0.254  | 0.508  | 1.321  | spacing(t,2.032,0.254)  | ≈12.45  | trapezoidal    | Light imperial, instruments
+40DP      | 2.073  | 0.178  | 0.457  | 1.226  | spacing(t,2.073,0.178)  | ≈12.76  | trapezoidal    | Imperial diametral pitch
+XL        | 5.080  | 0.254  | 1.270  | 3.051  | spacing(t,5.08,0.254)   | ≈31.97  | trapezoidal    | Light imperial 1/5" pitch
+H         | 9.525  | 0.381  | 1.905  | 5.359  | spacing(t,9.525,0.381)  | ≈59.93  | trapezoidal    | Heavy imperial 3/8", car timing
+T2.5      | 2.500  | —      | 0.700  | 1.678  | curvefit(t,0.7467,0.796,1.026)  | ≈15.16  | trapezoidal    | Older metric small CNC
+T5        | 5.000  | —      | 1.190  | 3.264  | curvefit(t,0.6523,1.591,1.064)  | ≈30.83  | trapezoidal    | Metric servo drives
+T10       | 10.000 | 0.930  | 2.500  | 6.130  | spacing(t,10,0.93)      | ≈61.86  | trapezoidal    | Heavy metric, industrial
+AT5       | 5.000  | —      | 1.190  | 4.268  | curvefit(t,0.6523,1.591,1.064)  | ≈30.83  | asym. trap.    | Higher back-tension than T5
+HTD 3mm   | 3.000  | 0.381  | 1.289  | 2.270  | spacing(t,3,0.381)      | ≈18.35  | curvilinear    | Robotics, heavy 3DP, light industrial
+HTD 5mm   | 5.000  | 0.572  | 2.199  | 3.781  | spacing(t,5,0.5715)     | ≈30.43  | curvilinear    | Most common HTD; heavy CNC/robot
+HTD 8mm   | 8.000  | 0.686  | 3.607  | 6.603  | spacing(t,8,0.6858)     | ≈49.25  | curvilinear    | Heaviest HTD; industrial high-torque
+GT2 2mm   | 2.000  | 0.254  | 0.764  | 1.494  | spacing(t,2,0.254)      | ≈12.22  | GT2 rounded    | 3D printers, CoreXY, desktop CNC
+GT2 3mm   | 3.000  | 0.381  | 1.169  | 2.310  | spacing(t,3,0.381)      | ≈18.35  | GT2 rounded    | Heavy 3DP, medium CNC, robots
+GT2 5mm   | 5.000  | 0.572  | 1.969  | 3.952  | spacing(t,5,0.5715)     | ≈30.43  | GT2 rounded    | High-torque GT2, large CNC, robots
+
+PLO = pitch_line_offset (mm); used in spacing formula.
+For T2.5/T5/AT5, use curvefit formula with parameters from row.
+All OD values are the SOLID CYLINDER DIAMETER before teeth are subtracted from it.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DERIVED PARAMETER FORMULAS (use in your SCAD)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  pulley_OD          = pulleyData(model, teethCount)[0]
+                     — auto-computed by library from model string and teethCount.
+
+  retainerDiameter   = pulley_OD + 2 * retainerInfo[0]
+  idlerDiameter      = pulley_OD + 2 * idlerInfo[0]
+
+  totalHeight        = baseInfo[1]
+                     + idlerInfo[1] + idlerInfo[2]
+                     + beltWidth
+                     + retainerInfo[1] + retainerInfo[2]
+
+  example (defaults, 6mm belt):
+    totalHeight = 8 + 1 + 1 + 6 + 1 + 1 = 18 mm
+
+  toothDistanceFromCentre   ← computed internally by library:
+    = sqrt( (pulley_OD/2)^2 - ((tooth_width + toothWidthTweak)/2)^2 )
+
+  retainerIdlerOffset (pulleyCAD only):
+    = (pulleyDiameter - pulley_OD) / 2
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ASSEMBLY GEOMETRY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  BOTTOM-TO-TOP STACK (when autoFlip = false):
+  ┌─────────────────────┐  retainer (pulleyRetainer)
+  │/////////////////////│  — tapered+flat disc above teeth
+  │  |||||||||||||||    │  teeth (pulleyTeethCore)
+  │\\\\\\\\\\\\\\\\\\\  │  — toothed cylinder; grooves subtracted from solid
+  ├─────────────────────┤  idler (pulleyIdler)
+  │                     │  — tapered+flat disc below teeth
+  │     BASE/HUB        │  base (pulleyBase)
+  │  [nut] [nut]        │  — wide cylinder with captive nut pockets
+  └──────────┬──────────┘
+             │  shaft bore (subtracted through full height along Z-axis)
+
+  PULLEY AXIS: Z — shaft bore is cylinder(r=shaftDiameter/2) along Z.
+
+  TOOTH GEOMETRY (SUBTRACTIVE):
+    Library starts with solid cylinder at radius = pulley_OD/2.
+    For each tooth: rotate to position, translate to pulley_OD/2 - tooth_distance,
+    scale by toothWidthTweak and toothDepthTweak, then subtract
+    linear_extrude(beltWidth+2) polygon(polyPoints).
+    Belt rubber teeth are the positive shapes that fit into these grooves.
+
+  RETAINER SHAPE:
+    rotate_extrude polygon: flat base at pulley_OD/2, slopes outward by offset
+    over taperedHeight, then continues flat at flatHeight.
+
+  IDLER SHAPE:
+    Same cross-section inverted — taper starts at outer edge, slopes inward
+    toward pulley_OD/2 as you go up.
+
+  BASE BEVEL:
+    If base diameter > upperSection by ≤ 1mm: bevel = difference.
+    If base diameter > upperSection by > 1mm: bevel = 1mm.
+    If base diameter ≤ upperSection: no bevel.
+
+  CAPTIVE NUT POCKET:
+    Placed at baseHeight/2 inside base.
+    Pocket aimed radially from shaft outward.
+    offsetFromShaft in captiveNuts[2] is added to shaftDiameter/2 by the library.
+    Nut entrance slot extends to base surface for nut insertion.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CONSTRAINT CHECKS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ERROR — baseInfo[1] < nutProfile[2]:
+    Base height is less than nut face size → captive nuts won't fit.
+    Fix: increase baseInfo[1] to at least nutProfile[2].
+
+  ERROR — (baseInfo[0] - shaftDiameter) / 2 < nutProfile[3] + 3:
+    Base too narrow for nut depth → nut pocket breaks through base wall.
+    Fix: increase baseInfo[0] or reduce nutProfile[3].
+
+  ERROR — unsupported model string:
+    Library echoes "***** UNSUPPORTED MODEL *****" and produces no geometry.
+    Fix: use exact model string from supported list (case-sensitive, spaces matter).
+
+  WARNING — teethCount < 16 (GT2 2mm):
+    Too few teeth → poor belt engagement; teeth may skip or shear.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DESIGN RULES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  TOOTH FIT TUNING:
+    toothWidthTweak = 0.2 mm — standard starting point for 3D printing.
+    Positive value widens the subtracted groove → looser belt fit.
+    If belt is too tight: increase by 0.1mm at a time.
+    If belt is too loose: decrease toward 0 or go slightly negative.
+    Do NOT use toothDepthTweak unless groove depth is insufficient; it
+    distorts the tooth profile shape.
+
+  SHAFT BORE:
+    For NEMA17 (5.0mm shaft): use shaftDiameter = 5.2 mm for 3D-print clearance.
+    For machined parts: shaftDiameter = shaft_nominal + 0.1 mm press fit,
+                                     or shaft_nominal + 0.2 mm running fit.
+
+  AUTO FLIP:
+    autoFlip = true: library flips if (pulley_OD + 2*idlerInfo[0]) > baseInfo[0].
+    Puts the flat base face down on the print bed — avoids large overhangs.
+    Recommended for 3D printing whenever baseInfo[0] < retainerDiameter.
+
+  CAPTIVE NUT SIZING (M3):
+    nutProfile = ["hex", 3.2, 5.7, 2.7]
+      3.2 = grub screw hole diameter (M3 clearance)
+      5.7 = hex nut face-to-face distance
+      2.7 = hex nut thickness
+    Min base height = 5.7 mm (nut face size).
+    Min base wall   = 2.7 + 3 = 5.7 mm each side → base_d ≥ shaft_d + 11.4 mm.
+
+  CAPTIVE NUT QUANTITY:
+    1 nut at 90°: single nut, typical for small pulleys.
+    2 nuts at 90°: symmetrical for balanced grip.
+    3 nuts at 120°: maximum grip, balanced on shaft.
+
+  MINIMUM TOOTH ENGAGEMENT:
+    Wrap arc ≥ 6 teeth on driving pulley for reliable torque transfer.
+
+  $FN (resolution):
+    Library internally uses $fn = teethCount * 4 for toothed cylinder.
+    No user action needed; set a global $fn only for other geometry.
+
+  BELT WIDTH SELECTION:
+    GT2 2mm:  6 mm (standard), 9 mm, 15 mm
+    HTD 5mm:  9 mm, 15 mm, 25 mm
+    T5:       6 mm, 10 mm, 16 mm, 25 mm
+    T10:      10 mm, 16 mm, 25 mm, 32 mm, 50 mm
+    H:        12.7 mm, 19.05 mm, 25.4 mm, 38.1 mm
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GT2 2mm SMOOTH BEARING IDLER PULLEY — 6 mm BELT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PART ID: gt2_2mm_smooth_bearing_idler
+ALIASES: smooth idler, bearing idler, idler pulley, gt2 idler, gt2 smooth idler,
+         gt2 2mm idler, 6mm belt idler, 624zz idler, belt tensioner, passive pulley,
+         free spinning pulley, idler sleeve, bearing sleeve
+
+LIBRARY: STANDALONE — does NOT use pulley-generator.scad.
+  No include required. Pure OpenSCAD primitives only.
+
+DESCRIPTION:
+  A smooth sleeve pressed onto a ball bearing outer race. Belt runs on the
+  smooth outer surface between two raised shoulder flanges. Bearing spins
+  freely on a fixed shoulder bolt through the inner bore. Used as belt guide,
+  tensioner, or direction-change idler in GT2 2mm belt drives.
+
+STANDARD BEARING OPTIONS
+─────────────────────────
+  Bearing | Bore  | OD    | Width | Axle bolt        | Notes
+  ────────┼───────┼───────┼───────┼──────────────────┼──────────────────────────
+  623ZZ   | 3 mm  | 10 mm | 4 mm  | M3 shoulder bolt |
+  624ZZ   | 4 mm  | 13 mm | 5 mm  | M4 shoulder bolt | ← recommended for GT2 6mm belt
+  625ZZ   | 5 mm  | 16 mm | 5 mm  | M5 shoulder bolt |
+  608ZZ   | 8 mm  | 22 mm | 7 mm  | M8 bolt          | large idler, heavy load
+
+  RECOMMENDED: 624ZZ — bore 4 mm, OD 13 mm, width 5 mm, M4 shoulder bolt.
+
+MAIN PARAMETERS
+────────────────
+  bearing_OD    = 13.0   mm   624ZZ outer diameter — sleeve presses onto this
+  bearing_bore  =  4.0   mm   624ZZ inner bore — shoulder bolt passes through
+  bearing_width =  5.0   mm   624ZZ axial width
+  belt_width    =  6.0   mm   GT2 standard 6 mm belt
+
+SECONDARY PARAMETERS
+─────────────────────
+  wall          =  1.5   mm   sleeve wall over bearing OD (min 1.0 mm)
+  flange_h      =  1.0   mm   radial overhang of retention shoulder above belt surface (min 1.0 mm)
+  flange_t      =  1.2   mm   axial thickness of each retention shoulder
+  bore_tol      = -0.10  mm   sleeve bore = bearing_OD + bore_tol
+                              negative = interference fit onto bearing OD
+                              3D print: -0.10 to -0.15 mm
+                              machined: 0.00 mm (nominal press)
+
+DERIVED PARAMETERS (formulas)
+───────────────────────────────
+  sleeve_OD     = bearing_OD + 2 * wall              = 13 + 2*1.5  = 16.0 mm
+  sleeve_bore   = bearing_OD + bore_tol              = 13 + (-0.1) = 12.9 mm
+  flange_OD     = sleeve_OD  + 2 * flange_h          = 16 + 2*1.0  = 18.0 mm
+  total_h       = belt_width + 2 * flange_t          = 6  + 2*1.2  =  8.4 mm
+
+  sleeve_bore < bearing_OD  (always — ensures interference fit)
+  total_h ≤ bearing_width + 2.0 mm  (sleeve must not exceed bearing axial span)
+
+MAIN FEATURES
+──────────────
+  1. Belt contact zone — smooth cylinder at sleeve_OD/2, height = belt_width.
+     NO teeth, NO grooves. Surface must be smooth; orient print with Z axis vertical.
+  2. Bottom retention flange — flat disc at lower end, OD = flange_OD.
+     Prevents belt falling off downward.
+  3. Top retention flange — flat disc at upper end, OD = flange_OD.
+     Prevents belt riding off upward.
+  4. Inner bore — cylinder at sleeve_bore/2, height = total_h + clearance.
+     Tight press fit onto bearing OD. Does NOT contact the axle bolt.
+
+CONSTRAINT CHECKS
+──────────────────
+  ERROR   — sleeve_bore >= bearing_OD:
+    Bore must be SMALLER than bearing OD for interference fit.
+    Fix: set bore_tol = -0.10 mm (3D print) or 0.00 mm (machined).
+
+  ERROR   — total_h > bearing_width + 2.0:
+    Sleeve too tall — will bottom on frame before bearing seats.
+    Fix: reduce flange_t or belt_width offset.
+
+  WARNING — wall < 1.0 mm:
+    Risk of sleeve splitting during press fit or under belt load.
+
+  WARNING — flange_h < 1.0 mm:
+    Belt will walk off under lateral load.
 
 DESIGN RULES
-────────────
-  - Minimum tooth engagement: wrap arc ≥ 6 teeth on driving pulley
-  - Centre distance: ≥ (D_large - D_small)/2 + 25 mm; keep < 10× larger pulley OD
-  - Belt sag for horizontal runs: pre-tension so belt deflects ≈ 1.5% of span under light push
-  - Pulley alignment: flanges must be within ±0.5 mm axial alignment to prevent belt walking
-  - Set screw position: 90° offset from keyway or D-flat; not on tooth root
-  - For 3D printed pulleys: $fn ≥ 4 × num_teeth for smooth tooth profile
+─────────────
+  - sleeve_bore = bearing_OD - 0.10 mm for 3D printing (interference gives press fit on cooling).
+  - Axle bolt shoulder diameter must equal bearing inner bore (4 mm for 624ZZ).
+  - Axle bolt shoulder length must equal bearing_width exactly — prevents axial play.
+  - Add flat washer (OD > sleeve_OD) between bolt head and sleeve, and between sleeve and frame.
+    This prevents bolt head/nut from gripping sleeve and stopping free rotation.
+  - Belt contact surface must be smooth: no visible layer lines. Post-process with sandpaper
+    or orient print vertically. Layer lines cause belt wear and noise.
+  - flange_t >= 1.0 mm to resist belt side loads without shearing at flange root.
 
-OPENSCAD CODE INTERPRETATION
-Mechanical meaning to code:
-- A pulley is a rotating wheel with an outer belt surface and a central shaft bore.
-- Rim, hub, belt flanges, and timing teeth/ridges are solid material in union().
-- Shaft bore, set-screw hole, keyway, and optional lightening holes are removed material in difference().
-- The pulley axis is Z; bore is a cylinder along Z at the origin.
-- Flanges are thin larger-diameter cylinders at both ends of belt width.
-- Timing features are repeated around the circumference using tooth_count angular repetition.
-- A set-screw hole is a transverse cylinder aimed radially at the bore.
-- Do not use bore radius to size belt teeth; use tooth_count, pitch, and pitch diameter.
+FAILURE MODES TO AVOID
+────────────────────────
+  - bore too large: bearing OD loose in sleeve; re-print with bore_tol = -0.15 mm.
+  - bore too small: cannot press bearing in; re-print with bore_tol = -0.05 mm.
+  - no flanges or flanges too short: belt walks off axially.
+  - rough belt contact surface: belt catches on layer lines; wears rapidly.
+  - bolt shoulder contacts sleeve bore instead of bearing inner race: bearing locked, cannot spin.
+  - sleeve height > bearing_width + 2 mm: sleeve bottoms on frame, bearing not seated.
 
-OPENSCAD CODE RULE IMPLEMENTATIONS
-Use these patterns to turn pulley and belt-drive rules into OpenSCAD.
+MOUNTING NOTE
+──────────────
+  Shoulder bolt: shoulder_dia = 4 mm (= bearing inner bore), shoulder_length = 5 mm (= bearing width).
+  Assembly: frame → washer → sleeve+bearing → washer → bolt head.
+  Tighten so inner race is clamped to frame; outer race (with sleeve) spins freely.
 
-Rule: pulley rim and hub are coaxial solids.
-OpenSCAD action:
-  union() {
-    cylinder(h=belt_width, d=pulley_outer_diameter, center=true, $fn=tooth_count*6);
-    cylinder(h=hub_width, d=hub_diameter, center=true, $fn=96);
+OPENSCAD — STANDALONE (no library include)
+────────────────────────────────────────────
+  // GT2 2mm smooth bearing idler pulley — 624ZZ, 6 mm belt
+
+  // ── MAIN PARAMETERS ──
+  bearing_OD    = 13.0;   // mm — 624ZZ outer diameter
+  bearing_bore  =  4.0;   // mm — 624ZZ inner bore (M4 shoulder bolt)
+  bearing_width =  5.0;   // mm — 624ZZ axial width
+  belt_width    =  6.0;   // mm — GT2 6 mm belt
+
+  // ── SECONDARY PARAMETERS ──
+  wall          = 1.5;    // mm — wall over bearing OD
+  flange_h      = 1.0;    // mm — radial overhang of retention shoulder
+  flange_t      = 1.2;    // mm — axial thickness of each shoulder
+  bore_tol      = -0.10;  // mm — interference: bore = bearing_OD + bore_tol
+
+  // ── DERIVED PARAMETERS ──
+  sleeve_OD   = bearing_OD + 2 * wall;      // 16.0 mm — belt contact diameter
+  sleeve_bore = bearing_OD + bore_tol;      // 12.9 mm — press fit onto bearing OD
+  flange_OD   = sleeve_OD + 2 * flange_h;   // 18.0 mm — retention shoulder OD
+  total_h     = belt_width + 2 * flange_t;  //  8.4 mm — total sleeve height
+
+  $fn = 128;
+
+  module gt2_smooth_idler_624zz() {
+      difference() {
+          union() {
+              // Belt contact zone — smooth, no teeth
+              cylinder(h = belt_width, d = sleeve_OD, center = true);
+
+              // Bottom retention flange
+              translate([0, 0, -(belt_width/2 + flange_t/2)])
+                  cylinder(h = flange_t, d = flange_OD, center = true);
+
+              // Top retention flange
+              translate([0, 0, belt_width/2 + flange_t/2])
+                  cylinder(h = flange_t, d = flange_OD, center = true);
+          }
+
+          // Inner bore — press fit onto bearing OD (NOT onto bolt)
+          cylinder(h = total_h + 2, d = sleeve_bore, center = true, $fn = 96);
+      }
   }
 
-Rule: shaft bore removes material along pulley axis.
-OpenSCAD action:
-  cylinder(h=hub_width+2, d=bore_diameter+clearance, center=true, $fn=96);
+  gt2_smooth_idler_624zz();
 
-Rule: flanges prevent belt walking.
-OpenSCAD action:
-  for (z=[-belt_width/2-flange_thickness/2, belt_width/2+flange_thickness/2])
-    translate([0,0,z]) cylinder(h=flange_thickness, d=flange_diameter, center=true, $fn=96);
 
-Rule: timing tooth features repeat around circumference.
-OpenSCAD action:
-  for (i=[0:tooth_count-1])
-    rotate([0,0,360*i/tooth_count])
-      translate([pitch_diameter/2,0,0]) cube([tooth_depth, tooth_width, belt_width], center=true);
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MATERIAL SUGGESTIONS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-Rule: radial set screw points toward the bore.
-OpenSCAD action:
-  translate([pulley_outer_diameter/2,0,0]) rotate([0,90,0]) cylinder(h=pulley_outer_diameter+2, d=set_screw_diameter, center=true, $fn=48);
+  6061-T6 Aluminum — machined pulleys, all profiles.
+    Best surface finish for belt engagement. Anodize for wear resistance.
+
+  POM (Delrin / Acetal) — machined idler sleeves.
+    Self-lubricating; tight tolerances; good belt contact surface.
+
+  PA12 (Nylon 12) — 3D-printed timing pulleys, all profiles.
+    Best wear resistance for printed parts.
+    Use toothWidthTweak = 0.2 and set $fn = teethCount * 4.
+
+  PETG — 3D-printed prototypes, light duty.
+    Easier to print than PA12; lower wear resistance.
+    Use toothWidthTweak = 0.25 for looser fit.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BELT LENGTH FORMULA (two-pulley open drive)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  belt_length ≈ 2×C + (π/2)×(D1+D2) + (D1−D2)² / (4×C)
+
+  C  = shaft centre-to-centre distance (mm)
+  D1 = pitch diameter of pulley 1 = pulley_OD + 2×PLD  (PLD from belt profile)
+  D2 = pitch diameter of pulley 2
+
+  For closed-loop (CoreXY): round to nearest available stock belt tooth count.
+  Minimum teeth in mesh on driving pulley: 6.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OPENSCAD CODE INTERPRETATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  PULLEY AXIS: Z. Shaft bore is cylinder(r=shaftDiameter/2, h=total) along Z.
+
+  TOOTH GROOVE CONSTRUCTION (inside pulleyTeethCore):
+    1. Solid cylinder at r=pulley_OD/2, h=beltWidth, $fn=teeth*4.
+    2. For i in [1:teeth]: rotate i*(360/teeth) around Z, translate to
+       tooth_distance_from_centre below surface, scale by toothWidthTweak
+       and toothDepthTweak, then subtract linear_extrude(beltWidth+2)
+       polygon(polyPoints).
+    This is SUBTRACTIVE. The belt rubber tooth fits INTO the groove.
+
+  RETAINER (above teeth, pulleyRetainer):
+    rotate_extrude polygon:
+      [0,0] → [pulley_OD/2, 0] → [pulley_OD/2+offset, taperedH]
+           → [pulley_OD/2+offset, taperedH+flatH] → [0, taperedH+flatH]
+    Results in a disc with angled outer wall.
+
+  IDLER (below teeth, pulleyIdler):
+    rotate_extrude polygon (inverted taper):
+      [0,0] → [pulley_OD/2+offset, 0] → [pulley_OD/2+offset, flatH]
+           → [pulley_OD/2, taperedH+flatH] → [0, taperedH+flatH]
+
+  SHAFT BORE:
+    cylinder(r=shaftDiameter/2, h=retainerH+beltWidth+idlerH+baseH+2)
+    translated down by 1mm — runs through entire assembly.
+
+  CAPTIVE NUT POCKET:
+    Placed at baseHeight/2, rotated j*angleBetweenNuts around Z,
+    then rotated [90,0,0] to aim radially. Pocket = nut entrance slot
+    (cube) + hex/square nut recess + grub screw hole cylinder.
+
+  DO NOT:
+    — Use pulley_OD as the pitch diameter (it is the tooth-tip/groove-root OD).
+    — Confuse retainerInfo[0] (radial offset) with flange diameter.
+    — Skip include <pulley-generator.scad> — all modules depend on it.
+    — Use unsupported model strings — no error geometry, just echoed warning.
