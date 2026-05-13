@@ -23,8 +23,8 @@ from typing import Literal
 
 import numpy as np
 import requests
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import FileResponse
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
 from pydantic import BaseModel, Field
@@ -481,6 +481,15 @@ DEFAULT_ENGINEERING_PROFILE = {
 app = FastAPI(title="Mechanical OpenSCAD Copilot")
 
 
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    log.exception("Unhandled backend error on %s", request.url.path)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": f"Internal server error: {exc}"},
+    )
+
+
 class ChatMessage(BaseModel):
     role: Literal["user", "assistant", "system"]
     content: str
@@ -508,6 +517,69 @@ class AcceptRequest(BaseModel):
 
 def detect_family(prompt: str, code: str = "") -> str | None:
     return detect_primary_family(f"{prompt}\n{code}")
+
+
+def _extract_scad_modules(code: str) -> list[str]:
+    return sorted(set(re.findall(r"\bmodule\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", code)))
+
+
+def _extract_scad_parameters(code: str, limit: int = 24) -> list[str]:
+    params: list[str] = []
+    for match in re.finditer(r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([^;]+);", code, re.MULTILINE):
+        name = match.group(1)
+        if name.startswith("$"):
+            continue
+        value = " ".join(match.group(2).strip().split())
+        params.append(f"{name}={value}")
+        if len(params) >= limit:
+            break
+    return params
+
+
+def _extract_design_features(prompt: str, code: str) -> list[str]:
+    text = f"{prompt}\n{code}".lower()
+    feature_patterns = [
+        ("two perpendicular plates", r"\b(l[-_ ]?bracket|angle bracket|perpendicular plates?)\b"),
+        ("horizontal base plate", r"\bhorizontal (leg|plate)|base plate\b"),
+        ("vertical upright plate", r"\bvertical (leg|plate)|upright\b"),
+        ("triangular gusset", r"\bgusset|triangular web|reinforc"),
+        ("side gussets", r"\bside gussets?|two gussets?\b"),
+        ("mounting holes", r"\bmounting holes?|hole_d|hole_diameter|clearance holes?\b"),
+        ("slotted holes", r"\bslot|slotted|hull\s*\("),
+        ("counterbore", r"\bcounterbore"),
+        ("countersink", r"\bcountersink"),
+        ("motor shaft clearance", r"\bshaft clearance|shaft_clearance|boss"),
+        ("NEMA bolt pattern", r"\bnema|bolt circle|bolt_circle"),
+        ("split clamp", r"\bsplit clamp|clamp screw|saddle"),
+        ("coaxial bore", r"\bcoaxial|central bore|shaft bore"),
+        ("D-flat shaft", r"\bd[-_ ]?flat|flat shaft"),
+        ("set screw", r"\bset screw|grub screw"),
+        ("hex pocket", r"\bhex|nut trap|captive nut"),
+    ]
+    return [label for label, pattern in feature_patterns if re.search(pattern, text)]
+
+
+def build_accepted_design_summary(prompt: str, code: str) -> dict:
+    family_id = detect_family(prompt, code)
+    modules = _extract_scad_modules(code)
+    parameters = _extract_scad_parameters(code)
+    features = _extract_design_features(prompt, code)
+    primary_shape = (
+        modules[0].replace("_", " ") if modules else
+        FAMILY_ID_TO_LABEL.get(family_id or GENERAL_RAG_ID, "mechanical part")
+    )
+    title_parts = [primary_shape]
+    if features:
+        title_parts.append(", ".join(features[:3]))
+    return {
+        "family_id": family_id,
+        "family_label": FAMILY_ID_TO_LABEL.get(family_id or GENERAL_RAG_ID, GENERAL_RAG_LABEL),
+        "primary_shape": primary_shape,
+        "modules": modules,
+        "parameters": parameters,
+        "features": features,
+        "title": " - ".join(title_parts),
+    }
 
 
 def build_engineering_profile(prompt: str, family_id: str | None) -> dict:
@@ -788,6 +860,7 @@ class AcceptedHistory:
                 except json.JSONDecodeError:
                     continue
                 if item.get("prompt") and item.get("code"):
+                    item.setdefault("summary", build_accepted_design_summary(item.get("prompt", ""), item.get("code", "")))
                     self._items.append(item)
             self._embeddings = None
 
@@ -807,6 +880,7 @@ class AcceptedHistory:
         }
         if not item["prompt"] or not item["code"]:
             raise ValueError("Accepted history needs both prompt and code.")
+        item["summary"] = build_accepted_design_summary(item["prompt"], item["code"])
 
         with self._lock:
             with self.path.open("a", encoding="utf-8") as handle:
@@ -816,7 +890,18 @@ class AcceptedHistory:
         return item
 
     def _history_text(self, item: dict) -> str:
-        return f"{item.get('prompt', '')}\n{item.get('code', '')[:1800]}"
+        summary = item.get("summary") or build_accepted_design_summary(item.get("prompt", ""), item.get("code", ""))
+        lines = [
+            f"Family: {summary.get('family_label', GENERAL_RAG_LABEL)} ({summary.get('family_id') or GENERAL_RAG_ID})",
+            f"Primary shape: {summary.get('primary_shape', '')}",
+            "Modules: " + ", ".join(summary.get("modules") or []),
+            "Features: " + ", ".join(summary.get("features") or []),
+            "Parameters: " + ", ".join(summary.get("parameters") or []),
+            "Original request: " + item.get("prompt", ""),
+            "Code structure:",
+            item.get("code", "")[:1800],
+        ]
+        return "\n".join(line for line in lines if line.strip())
 
     def _ensure_embeddings(self) -> np.ndarray:
         if self._embeddings is None:
@@ -824,18 +909,27 @@ class AcceptedHistory:
             self._embeddings = embed_texts(texts, is_query=False) if texts else np.array([])
         return self._embeddings
 
-    def retrieve(self, query: str, top_k: int = 2) -> list[dict]:
+    def retrieve(self, query: str, top_k: int = 2, family_id: str | None = None) -> list[dict]:
         with self._lock:
             if not self._items:
                 return []
             try:
+                candidate_items = [
+                    item for item in self._items
+                    if not family_id or (item.get("summary") or {}).get("family_id") == family_id
+                ]
+                if not candidate_items:
+                    return []
                 if EMBEDDING_BACKEND == "tfidf":
-                    texts = [self._history_text(item) for item in self._items]
+                    texts = [self._history_text(item) for item in candidate_items]
                     vectorizer = TfidfVectorizer(stop_words="english", ngram_range=(1, 2))
                     matrix = vectorizer.fit_transform(texts + [query])
                     scores = cosine_similarity(matrix[-1], matrix[:-1]).ravel()
                 else:
-                    embeddings = self._ensure_embeddings()
+                    if len(candidate_items) == len(self._items):
+                        embeddings = self._ensure_embeddings()
+                    else:
+                        embeddings = embed_texts([self._history_text(item) for item in candidate_items], is_query=False)
                     if embeddings.size == 0:
                         return []
                     query_vector = embed_texts([query], is_query=True)
@@ -846,17 +940,30 @@ class AcceptedHistory:
                 for index in order:
                     if len(hits) >= top_k or scores[index] < minimum_score:
                         break
-                    item = self._items[index]
+                    item = candidate_items[index]
                     code = item.get("code", "")
+                    summary = item.get("summary") or build_accepted_design_summary(item.get("prompt", ""), code)
+                    title = summary.get("title") or item.get("prompt", "")[:70]
                     hits.append(
                         {
                             "id": f"accepted::{item['id']}",
-                            "title": f"Accepted Design: {item.get('prompt', '')[:70]}",
+                            "title": f"Accepted Design: {title[:90]}",
                             "source": "accepted-history",
                             "score": round(float(scores[index]), 4),
-                            "excerpt": f"Prompt: {item.get('prompt', '')}\nCode:\n{code[:420]}",
+                            "family": summary.get("family_id"),
+                            "excerpt": (
+                                f"Shape: {summary.get('primary_shape', '')}\n"
+                                f"Features: {', '.join(summary.get('features') or [])}\n"
+                                f"Parameters: {', '.join((summary.get('parameters') or [])[:10])}\n"
+                                f"Original request: {item.get('prompt', '')}"
+                            ),
                             "text": (
-                                "Accepted user-approved design. Prefer this when the new request is similar.\n"
+                                "Accepted user-approved design. Prefer this only when the family, shape, features, and parameters are similar.\n"
+                                f"Family: {summary.get('family_label', GENERAL_RAG_LABEL)} ({summary.get('family_id') or GENERAL_RAG_ID})\n"
+                                f"Primary shape: {summary.get('primary_shape', '')}\n"
+                                f"Modules: {', '.join(summary.get('modules') or [])}\n"
+                                f"Features: {', '.join(summary.get('features') or [])}\n"
+                                f"Parameters: {', '.join(summary.get('parameters') or [])}\n\n"
                                 f"Original prompt:\n{item.get('prompt', '')}\n\n"
                                 f"Accepted OpenSCAD code:\n{code[:3000]}"
                             ),
@@ -870,7 +977,7 @@ class AcceptedHistory:
     def recent(self, limit: int = 20) -> list[dict]:
         with self._lock:
             return [
-                {key: item.get(key) for key in ("id", "created_at", "prompt", "provider", "model")}
+                {key: item.get(key) for key in ("id", "created_at", "prompt", "provider", "model", "summary")}
                 for item in self._items[-limit:][::-1]
             ]
 
@@ -1115,6 +1222,16 @@ def build_messages(
             "Prefer returning a tiny OpenSCAD file that uses the library with: use <D:/downloads/openscad_copilot (1)/openscad_copilot/backend/docs/sprocket.scad>. "
             "Call sprocket(size, teeth, bore, hub_diameter, hub_height, keyway, setscrew) with inch inputs for bore and hub dimensions. "
             "Do not reimplement sprocket geometry from scratch, do not use gear module/addendum/dedendum logic, and never output a plain cylinder or smooth disk."
+        )
+    if family_id == "bracket_and_motor_mount_reference":
+        family_lines.append(
+            "For L-brackets and angle brackets, use the canonical coordinate model from the bracket RAG: "
+            "base plate in XY with Z thickness; upright plate in YZ at one base edge with X thickness; "
+            "base holes pass through Z; upright holes pass through X using rotate([0,90,0]); "
+            "upright hole Z positions are positive within the upright height; "
+            "plain L-bracket is the default, so do not add gussets unless the user explicitly asks for gusset, rib, reinforced, heavy-duty, load-bearing, or shelf support; "
+            "when requested, gussets/ribs are triangular prisms using polygon()+linear_extrude() or polyhedron(), not flat rectangular blocks. "
+            "When four holes are requested on a leg, use a 2x2 pattern within that leg's own width/length."
         )
     family_lines.append("Do not include material recommendations or standard explanations in OpenSCAD comments; those are chat-after-code notes only.")
     messages.append({"role": "system", "content": "\n".join(family_lines)})
@@ -1833,6 +1950,89 @@ module pillow_block_bearing_housing() {{
 pillow_block_bearing_housing();"""
 
 
+def deterministic_l_bracket_scad(prompt: str) -> str:
+    lowered = prompt.lower()
+    leg_a = (
+        _number_for_pattern(prompt, r"leg[_\s-]*a(?:_length|\s+length)?\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+(?:base|horizontal)")
+        or 50
+    )
+    leg_b = (
+        _number_for_pattern(prompt, r"leg[_\s-]*b(?:_length|\s+length)?\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+(?:upright|vertical)")
+        or leg_a
+    )
+    bracket_width = (
+        _number_for_pattern(prompt, r"bracket[_\s-]*width\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or _number_for_pattern(prompt, r"\bwidth\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or 30
+    )
+    plate_thickness = (
+        _number_for_pattern(prompt, r"plate[_\s-]*thickness\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or _number_for_pattern(prompt, r"\bthickness\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or 4
+    )
+    hole_d = 5.5
+    if re.search(r"\bm3\b", lowered):
+        hole_d = 3.4
+    elif re.search(r"\bm4\b", lowered):
+        hole_d = 4.5
+    elif re.search(r"\bm6\b", lowered):
+        hole_d = 6.6
+    elif re.search(r"\bm8\b", lowered):
+        hole_d = 8.8
+    edge_margin = (
+        _number_for_pattern(prompt, r"edge[_\s-]*margin\s*(?:=|of)?\s*(\d+(?:\.\d+)?)")
+        or max(12, 1.5 * hole_d)
+    )
+    wants_gusset = bool(re.search(r"\b(gussets?|ribs?|reinforced|heavy[- ]?duty|load[- ]?bearing|shelf support)\b", lowered))
+    gusset_block = ""
+    if wants_gusset:
+        gusset_block = """
+      for (y = [-bracket_width/2 + gusset_depth/2, bracket_width/2 - gusset_depth/2])
+        translate([-leg_a_length/2 + plate_thickness, y, plate_thickness])
+          rotate([90, 0, 0])
+            linear_extrude(height = gusset_depth, center = true)
+              polygon(points = [[0, 0], [gusset_run, 0], [0, gusset_run]]);
+"""
+
+    return f"""$fn = 96;
+
+leg_a_length    = {leg_a:g};
+leg_b_length    = {leg_b:g};
+bracket_width   = {bracket_width:g};
+plate_thickness = {plate_thickness:g};
+hole_d          = {hole_d:g};
+edge_margin     = {edge_margin:g};
+gusset_depth    = 6;
+gusset_run      = min(leg_a_length, leg_b_length) * 0.6;
+
+module l_bracket() {{
+  difference() {{
+    union() {{
+      translate([0, 0, plate_thickness/2])
+        cube([leg_a_length, bracket_width, plate_thickness], center = true);
+
+      translate([-leg_a_length/2 + plate_thickness/2, 0, leg_b_length/2])
+        cube([plate_thickness, bracket_width, leg_b_length], center = true);
+{gusset_block}    }}
+
+    for (x = [-leg_a_length/2 + edge_margin, leg_a_length/2 - edge_margin])
+      for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])
+        translate([x, y, plate_thickness/2])
+          cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);
+
+    for (z = [edge_margin, leg_b_length - edge_margin])
+      for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])
+        translate([-leg_a_length/2 + plate_thickness/2, y, z])
+          rotate([0, 90, 0])
+            cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);
+  }}
+}}
+
+l_bracket();"""
+
+
 def score_validation(checks: list[dict]) -> int:
     return _val_score(checks)
 
@@ -2175,7 +2375,7 @@ def chat(request: ChatRequest) -> dict:
 
         retrieval_query = memory_text
         retrieved = knowledge_base.retrieve(retrieval_query, top_k=retrieval_k, selected_doc_ids=request.selected_doc_ids)
-        history_hits = accepted_history.retrieve(retrieval_query, top_k=2)
+        history_hits = accepted_history.retrieve(retrieval_query, top_k=2, family_id=detected_family)
         combined_context = history_hits + retrieved
 
         messages = build_messages(text, request.history, combined_context, provider=provider, family_id=detected_family)
@@ -2198,6 +2398,32 @@ def chat(request: ChatRequest) -> dict:
     except requests.RequestException as exc:
         raise HTTPException(status_code=502, detail=f"Service error: {exc}") from exc
     except Exception as exc:
+        if (
+            locals().get("detected_family") == "bracket_and_motor_mount_reference"
+            and re.search(r"\b(l[-_ ]?bracket|angle bracket)\b", locals().get("memory_text", text), re.IGNORECASE)
+        ):
+            result = sanitize_scad_metadata(deterministic_l_bracket_scad(memory_text))
+            validity = validate_scad(result, memory_text)
+            family_schema = knowledge_base.family_schema(detected_family)
+            design_notes = build_design_notes(memory_text, engineering_profile, family_schema)
+            return {
+                "result": result,
+                "provider": "deterministic",
+                "model": "l-bracket-fallback",
+                "requested_provider": provider,
+                "requested_model": model,
+                "used_fallback": True,
+                "auto_repaired": False,
+                "repair_provider": "deterministic",
+                "repair_model": "l-bracket-fallback",
+                "retrieved": [{key: value for key, value in hit.items() if key != "text"} for hit in locals().get("combined_context", [])],
+                "history_hits": [{key: value for key, value in hit.items() if key != "text"} for hit in locals().get("history_hits", [])],
+                "engineering": engineering_profile,
+                "part_family": family_schema,
+                "design_notes": design_notes,
+                "initial_validation": validity,
+                "validation": validity,
+            }
         provider_error = _provider_error_response(exc)
         if provider_error:
             raise provider_error from exc

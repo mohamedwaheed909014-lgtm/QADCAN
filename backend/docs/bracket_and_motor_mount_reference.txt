@@ -62,35 +62,114 @@ KEY PARAMETERS
   fillet_radius         — 1–3 mm for printable parts
 
 OPENSCAD STRUCTURE (L-bracket)
-───────────────────────────────
+------------------------------
+Use this coordinate model for every L-bracket and angle bracket:
+- Base plate lies in XY; its thickness is Z.
+- Upright plate lies in YZ at one edge of the base; its thickness is X.
+- Base holes pass through Z.
+- Upright holes pass through X using rotate([0,90,0]).
+- Plain L-bracket is the default: do not add gussets unless the prompt explicitly asks for gusset, rib, reinforced, heavy-duty, load-bearing, or shelf support.
+
+  $fn = 96;
+  leg_a_length    = 50;
+  leg_b_length    = 50;
+  bracket_width   = 30;
   plate_thickness = 4;
-  leg_a = 50;
-  leg_b = 50;
-  width = 30;
-  hole_d = 5.5;    // M5
-  edge_m = 8;
+  hole_d          = 5.5;
+  edge_margin     = 12;
 
   module l_bracket() {
-    union() {
-      // horizontal leg
-      difference() {
-        cube([leg_a, width, plate_thickness]);
-        // holes
-        for(x=[edge_m, leg_a-edge_m])
-          for(y=[edge_m, width-edge_m])
-            translate([x, y, -1]) cylinder(h=plate_thickness+2, d=hole_d, $fn=32);
+    difference() {
+      union() {
+        translate([0, 0, plate_thickness/2])
+          cube([leg_a_length, bracket_width, plate_thickness], center = true);
+
+        translate([-leg_a_length/2 + plate_thickness/2, 0, leg_b_length/2])
+          cube([plate_thickness, bracket_width, leg_b_length], center = true);
       }
-      // vertical leg
-      translate([0, 0, plate_thickness])
-        difference() {
-          cube([plate_thickness, width, leg_b]);
-          for(z=[edge_m, leg_b-edge_m])
-            for(y=[edge_m, width-edge_m])
-              translate([-1, y, z]) rotate([0,90,0])
-                cylinder(h=plate_thickness+2, d=hole_d, $fn=32);
-        }
+
+      for (x = [-leg_a_length/2 + edge_margin, leg_a_length/2 - edge_margin])
+        for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])
+          translate([x, y, plate_thickness/2])
+            cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);
+
+      for (z = [edge_margin, leg_b_length - edge_margin])
+        for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])
+          translate([-leg_a_length/2 + plate_thickness/2, y, z])
+            rotate([0, 90, 0])
+              cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);
     }
   }
+
+Optional gusset rule:
+- Only add this if the prompt explicitly asks for a gusset/rib/reinforced/heavy-duty/load-bearing bracket.
+- Gussets are triangular prisms in XZ extruded through a small Y thickness.
+
+  gusset_depth = 6;
+  gusset_run = min(leg_a_length, leg_b_length) * 0.6;
+
+  for (y = [-bracket_width/2 + gusset_depth/2, bracket_width/2 - gusset_depth/2])
+    translate([-leg_a_length/2 + plate_thickness, y, plate_thickness])
+      rotate([90, 0, 0])
+        linear_extrude(height = gusset_depth, center = true)
+          polygon(points = [[0, 0], [gusset_run, 0], [0, gusset_run]]);
+
+
+
+OPENSCAD STRUCTURE (NEMA23 photo-style L motor mount)
+-----------------------------------------------------
+Use this when the prompt asks for a NEMA23 motor mount bracket like a photo with a base plate, upright motor plate, side gussets, and slotted base.
+
+Main NEMA23 parameters:
+  nema23_face_size       = 57.3;
+  nema23_bolt_spacing    = 47.1;   // square spacing, not circular bolt pattern
+  motor_hole_d           = 5.5;    // M5 clearance
+  shaft_clearance_d      = 38;     // large motor boss/shaft opening
+  plate_thickness        = 6;
+  base_length            = 95;
+  base_width             = 75;
+  face_width             = 75;
+  face_height            = 82;
+  base_slot_length       = 55;
+  base_slot_d            = 6;
+  base_slot_spacing      = 42;
+
+Required geometry:
+- Horizontal base plate in XY with thickness along Z.
+- Vertical motor face plate in YZ with thickness along X.
+- Large centered shaft/boss clearance hole through the vertical face along X.
+- Four NEMA23 M5 mounting holes in a square 47.1 mm pattern through the vertical face along X.
+- Two long rounded base slots through Z, made with hull() between two cylinders.
+- Two triangular side gussets between base and upright, one near each side edge.
+- Chamfered top/outside corners on the upright face plate, like the photo.
+
+OpenSCAD actions:
+  module rounded_slot(length, diameter, height) {
+    hull() {
+      translate([-length/2 + diameter/2, 0, 0]) cylinder(h=height, d=diameter, center=true, $fn=40);
+      translate([ length/2 - diameter/2, 0, 0]) cylinder(h=height, d=diameter, center=true, $fn=40);
+    }
+  }
+
+  // vertical face holes through X
+  translate([-base_length/2 + plate_thickness/2, 0, face_height/2])
+    rotate([0,90,0]) cylinder(h=plate_thickness+2, d=shaft_clearance_d, center=true, $fn=96);
+
+  for (y=[-nema23_bolt_spacing/2, nema23_bolt_spacing/2])
+    for (z=[face_height/2-nema23_bolt_spacing/2, face_height/2+nema23_bolt_spacing/2])
+      translate([-base_length/2 + plate_thickness/2, y, z])
+        rotate([0,90,0]) cylinder(h=plate_thickness+2, d=motor_hole_d, center=true, $fn=40);
+
+  // base slots through Z
+  for (y=[-base_slot_spacing/2, base_slot_spacing/2])
+    translate([base_length*0.12, y, plate_thickness/2])
+      rounded_slot(base_slot_length, base_slot_d, plate_thickness+2);
+
+Failure modes for NEMA23 photo-style mount:
+- Do not output only a flat motor plate.
+- Do not use circular/rotated bolt holes for NEMA23; use square Y/Z spacing.
+- Do not use simple round base holes when the photo/prompt shows long slots.
+- Do not extrude gussets along Z; triangular gussets lie in XZ and extrude through Y.
 
 OPENSCAD STRUCTURE (NEMA17 motor mount)
 ────────────────────────────────────────
@@ -126,7 +205,8 @@ SLOTTED HOLE (adjustment slot) PATTERN
 DESIGN RULES
 ────────────
   - Corner fillet radius ≥ 1 mm to reduce stress concentration in 3D prints
-  - For vertical loads on L-brackets: add diagonal gusset triangle
+  - Plain L-brackets do not include gussets by default
+  - For vertical loads or when explicitly requested: add diagonal triangular gusset webs
   - Gusset height = max(leg_a, leg_b) × 0.6 for good stiffness
   - Bolt hole edge margin: ≥ 1.5 × hole_d from hole centre to nearest edge
   - NEMA motor mounts: counter-bore bolt holes from motor side (M3 cap head: ø5.5, depth 3)
@@ -134,13 +214,16 @@ DESIGN RULES
 
 OPENSCAD CODE INTERPRETATION
 Mechanical meaning to code:
-- Bracket plates are solid cubes. Put base plates, vertical plates, ribs, bosses, and gussets in union().
+- Bracket plates are solid cubes. Put base plates, vertical plates, and requested ribs/bosses/gussets in union().
 - Holes, slots, motor shaft openings, and counterbores are removed material. Put them in difference().
 - Use Z as plate thickness for flat brackets; use X or Y as thickness for vertical plates.
+- For L-brackets specifically, the upright plate should have X thickness, Y width, and Z height.
+- Upright mounting holes must be rotated through the plate thickness. Use rotate([0,90,0]) before the subtractive cylinder.
+- Upright mounting-hole Z positions must be positive within the upright height: edge_margin and leg_b_length-edge_margin.
 - Slotted holes mean hull() between two cylinders, then subtract the hull from the plate.
 - Motor mounts need one central shaft clearance and a repeated bolt pattern around it.
 - NEMA bolt patterns are square patterns; place holes at +/- spacing/2 in X and Y.
-- Gussets represent triangular support; approximate with rotated cubes or triangular prism polyhedron if needed.
+- Gussets are optional for L-brackets. If requested, use polygon() + linear_extrude() or a triangular polyhedron. Do not use a flat rectangular block.
 - Keep hole edge margin by deriving hole positions from plate size and edge_margin.
 
 OPENSCAD CODE RULE IMPLEMENTATIONS
@@ -149,16 +232,28 @@ Use these patterns to turn bracket and motor-mount rules into OpenSCAD.
 Rule: L bracket is two perpendicular plates.
 OpenSCAD action:
   union() {
-    cube([leg_length, bracket_width, plate_thickness], center=true);
-    translate([-leg_length/2 + plate_thickness/2,0,vertical_height/2])
-      cube([plate_thickness, bracket_width, vertical_height], center=true);
+    translate([0,0,plate_thickness/2])
+      cube([leg_a_length, bracket_width, plate_thickness], center=true);
+    translate([-leg_a_length/2 + plate_thickness/2,0,leg_b_length/2])
+      cube([plate_thickness, bracket_width, leg_b_length], center=true);
   }
 
-Rule: gusset strengthens the inside corner.
+Rule: vertical L-bracket holes pass through upright plate thickness.
 OpenSCAD action:
-  translate([-leg_length/2 + plate_thickness,0,plate_thickness])
-    rotate([0,45,0])
-      cube([plate_thickness*1.5, bracket_width, plate_thickness*1.5], center=true);
+  for (z=[edge_margin, leg_b_length-edge_margin])
+    for (y=[-bracket_width/2+edge_margin, bracket_width/2-edge_margin])
+      translate([-leg_a_length/2 + plate_thickness/2, y, z])
+        rotate([0,90,0])
+          cylinder(h=plate_thickness+2, d=hole_d, center=true);
+
+Rule: requested triangular side gussets are thin webs near both side edges. Do not add this rule for a plain L-bracket.
+OpenSCAD action:
+  for (y=[-bracket_width/2+gusset_depth/2, bracket_width/2-gusset_depth/2])
+    translate([0,y,0])
+      translate([-leg_a_length/2+plate_thickness, gusset_depth/2, plate_thickness])
+        rotate([90,0,0])
+          linear_extrude(height=gusset_depth, center=true)
+            polygon([[0,0],[gusset_run,0],[0,gusset_run]]);
 
 Rule: slot is an elongated mounting hole.
 OpenSCAD action:

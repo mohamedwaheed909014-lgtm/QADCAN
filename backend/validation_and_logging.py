@@ -517,12 +517,53 @@ FAMILY_VALIDATION_RULES: dict[str, list[tuple[str, Any, str, str]]] = {
              or bool(re.search(r"\bshaft_boss_d|shaft_clearance_d|boss_d\s*=", c, re.IGNORECASE))
          ),
          "Motor mount needs a central shaft clearance hole for the motor boss.", "error"),
+        ("Photo-style NEMA L mount has base slots",
+         lambda c: (
+             not bool(re.search(r"\bnema\s*23\b|nema23", c, re.IGNORECASE))
+             or not bool(re.search(r"\bslot|slotted|photo", c, re.IGNORECASE))
+             or bool(re.search(r"\bhull\s*\(", c, re.IGNORECASE))
+         ),
+         "Photo-style NEMA23 L motor mount should use rounded base slots made with hull() between cylinders.", "warning"),
+        ("NEMA23 L mount face holes pass through X",
+         lambda c: (
+             not bool(re.search(r"\bnema\s*23\b|nema23", c, re.IGNORECASE))
+             or not bool(re.search(r"\bl[_-]?bracket|angle|mount", c, re.IGNORECASE))
+             or bool(re.search(r"rotate\s*\(\s*\[\s*0\s*,\s*90\s*,\s*0\s*\]\s*\)\s*[\r\n\s]*cylinder", c, re.IGNORECASE))
+         ),
+         "NEMA23 L motor mount face holes and shaft clearance must pass through X using rotate([0,90,0]).", "error"),
         ("L-bracket has two perpendicular plates",
          lambda c: (
              not bool(re.search(r"\bl[_-]?bracket\b", c, re.IGNORECASE))
              or c.lower().count("cube(") >= 2
          ),
          "L-bracket needs two perpendicular plate cubes in union().", "warning"),
+        ("L-bracket upright holes pass through X",
+         lambda c: (
+             not bool(re.search(r"\bl[_-]?bracket\b|angle\s+bracket", c, re.IGNORECASE))
+             or not bool(re.search(r"\bvertical|upright|leg_b|plate_b", c, re.IGNORECASE))
+             or bool(re.search(r"rotate\s*\(\s*\[\s*0\s*,\s*90\s*,\s*0\s*\]\s*\)\s*[\r\n\s]*(?:cylinder|slot_cut|hull)", c, re.IGNORECASE))
+         ),
+         "Upright L-bracket holes must be rotated through the plate thickness along X with rotate([0,90,0]).", "error"),
+        ("L-bracket upright hole Z positions are positive",
+         lambda c: (
+             not bool(re.search(r"\bl[_-]?bracket\b|angle\s+bracket", c, re.IGNORECASE))
+             or not bool(re.search(r"for\s*\(\s*z\s*=\s*\[\s*-", c, re.IGNORECASE))
+         ),
+         "Upright hole Z positions should be edge_margin and leg_b_length-edge_margin, not negative centered coordinates.", "error"),
+        ("L-bracket gusset is triangular",
+         lambda c: (
+             not bool(re.search(r"\bl[_-]?bracket\b|angle\s+bracket", c, re.IGNORECASE))
+             or not bool(re.search(r"\bgusset|rib", c, re.IGNORECASE))
+             or bool(re.search(r"\bpolygon\s*\(|\bpolyhedron\s*\(", c, re.IGNORECASE))
+         ),
+         "L-bracket gussets/ribs should be triangular webs using polygon()+linear_extrude() or polyhedron(), not flat rectangular blocks.", "warning"),
+        ("Rounded bracket does not double thickness with 3D minkowski",
+         lambda c: (
+             not bool(re.search(r"\brounded|corner_radius", c, re.IGNORECASE))
+             or not bool(re.search(r"\bminkowski\s*\(", c, re.IGNORECASE))
+             or bool(re.search(r"\boffset\s*\(|linear_extrude\s*\(", c, re.IGNORECASE))
+         ),
+         "For rounded bracket corners, prefer a 2D rounded profile with offset()/linear_extrude(); 3D minkowski can double the plate thickness.", "warning"),
     ],
 
     # â”€â”€ Clamp / jig / fixture â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

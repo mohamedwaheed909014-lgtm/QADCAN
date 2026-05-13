@@ -610,7 +610,13 @@ async function send(userText) {
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload),
     });
-    const data = await res.json();
+    const raw = await res.text();
+    let data = {};
+    try {
+      data = raw ? JSON.parse(raw) : {};
+    } catch {
+      data = { detail: raw || `HTTP ${res.status}` };
+    }
     if (!res.ok) throw new Error(data.detail || 'API error.');
 
     typing.remove();

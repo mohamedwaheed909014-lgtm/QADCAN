@@ -20,7 +20,12 @@
         "motor flange",
         "mounting bracket",
         "bridge mount",
-        "tube clamp"
+        "tube clamp",
+        "nema23 l bracket",
+        "nema 23 angle bracket",
+        "slotted base motor mount",
+        "photo style motor mount",
+        "stepper motor l bracket"
       ],
       "negative_keywords": [
         "bearing housing",
@@ -59,14 +64,14 @@
       {
         "material": "PETG",
         "use_case": "prototype and low-load 3D-printed brackets",
-        "notes": "Good layer adhesion; acceptable up to 70 °C."
+        "notes": "Good layer adhesion; acceptable up to 70 \u00b0C."
       }
     ],
     "standards_used": [
       {
         "name": "NEMA ICS motor face patterns",
         "applies_to": "bolt circle, shaft bore, and faceplate dimensions",
-        "note": "NEMA 17: 42.3 mm face, 31 mm bolt circle, 4×M3. NEMA 23: 57.3 mm face, 47.1 mm bolt circle, 4×M5."
+        "note": "NEMA 17: 42.3 mm face, 31 mm bolt circle, 4\u00d7M3. NEMA 23: 57.3 mm face, 47.1 mm bolt circle, 4\u00d7M5."
       },
       {
         "name": "ISO 4762 socket cap screws",
@@ -76,7 +81,7 @@
       {
         "name": "ISO 2768-m general tolerances",
         "applies_to": "unbounded linear dimensions",
-        "note": "±0.1 mm on dims <30 mm; ±0.2 on 30–120 mm."
+        "note": "\u00b10.1 mm on dims <30 mm; \u00b10.2 on 30\u2013120 mm."
       }
     ],
     "output_policy": {
@@ -137,7 +142,7 @@
       "derived_parameters": {
         "edge_margin": {
           "formula": "(plate_size - nema_face_size)/2",
-          "note": "≥5 mm each side"
+          "note": "\u22655 mm each side"
         }
       },
       "main_features": [
@@ -147,9 +152,9 @@
         "optional gusset or side walls"
       ],
       "design_rules": [
-        "shaft_clearance bore must be centered and ≥ 22 mm for NEMA 17 boss",
-        "bolt holes on square pattern not circle — place at ±bolt_circle/2 in X and Y",
-        "edge margin ≥ 1.5 × bolt_hole_diameter from hole to plate edge"
+        "shaft_clearance bore must be centered and \u2265 22 mm for NEMA 17 boss",
+        "bolt holes on square pattern not circle \u2014 place at \u00b1bolt_circle/2 in X and Y",
+        "edge margin \u2265 1.5 \u00d7 bolt_hole_diameter from hole to plate edge"
       ],
       "validation_criteria": [
         "4 bolt holes subtracted using for(x=...) for(y=...)",
@@ -178,9 +183,79 @@
       "openscad_module": "$fn = 96;\n\nnema_face_size     = 42.3;\nnema_bolt_circle   = 31;\nnema_shaft_boss_d  = 22;\nnema_bolt_hole_d   = 3.4;\nplate_size         = 60;\nplate_thickness    = 5;\nedge_margin        = (plate_size - nema_face_size) / 2;\n\nmodule nema17_motor_mount() {\n  difference() {\n    cube([plate_size, plate_size, plate_thickness], center = true);\n    cylinder(h = plate_thickness + 2, d = nema_shaft_boss_d, center = true, $fn = 64);\n    for (x = [-nema_bolt_circle/2, nema_bolt_circle/2])\n      for (y = [-nema_bolt_circle/2, nema_bolt_circle/2])\n        translate([x, y, 0])\n          cylinder(h = plate_thickness + 2, d = nema_bolt_hole_d, center = true, $fn = 32);\n  }\n}\n\nnema17_motor_mount();"
     },
     {
+      "id": "nema23_l_motor_mount_bracket",
+      "category": "motor_mount_l_bracket",
+      "name": "NEMA 23 photo-style L motor mount bracket with slotted base",
+      "aliases": [
+        "nema23 l bracket motor mount",
+        "nema 23 angle motor bracket",
+        "nema23 photo style bracket",
+        "stepper motor l bracket with slots",
+        "nema23 slotted base mount"
+      ],
+      "standards": [
+        "NEMA ICS",
+        "ISO 4762"
+      ],
+      "manufacturing_processes": [
+        "3D printed",
+        "CNC machined",
+        "laser cut and bent",
+        "welded sheet metal"
+      ],
+      "family": "bracket_and_motor_mount_reference",
+      "standard_dimensions_mm": {
+        "nema23_face_size": 57.3,
+        "nema23_bolt_spacing": 47.1,
+        "motor_hole_d": 5.5,
+        "shaft_clearance_d": 38,
+        "base_length": 95,
+        "base_width": 75,
+        "face_width": 75,
+        "face_height": 82,
+        "plate_thickness": 6,
+        "base_slot_length": 55,
+        "base_slot_d": 6,
+        "base_slot_spacing": 42
+      },
+      "main_features": [
+        "horizontal base plate with two long rounded mounting slots",
+        "vertical NEMA23 motor face plate at 90 degrees",
+        "large centered shaft/boss clearance hole through vertical plate",
+        "four NEMA23 M5 mounting holes on 47.1 mm square spacing",
+        "two triangular side gussets between base and upright",
+        "chamfered top/outside corners on vertical face plate like the photo"
+      ],
+      "design_rules": [
+        "Model as an L bracket: base plate in XY with Z thickness; motor face plate in YZ with X thickness.",
+        "NEMA23 holes are a square pattern at +/-47.1/2 in Y and Z around the face center, not a circular bolt pattern.",
+        "Motor face holes and central shaft clearance pass through X using rotate([0,90,0]) cylinders.",
+        "Base slots pass through Z and must be rounded slots using hull() between two cylinders.",
+        "Side gussets are triangular prisms in XZ extruded through a small Y thickness; do not use full-width or vertical Z extrusions.",
+        "Photo-style vertical plate has chamfered top/outside corners; use a 2D polygon face extruded through plate thickness."
+      ],
+      "validation_criteria": [
+        "central shaft clearance cylinder through vertical face",
+        "four NEMA23 holes use nested y/z loops or equivalent 2x2 pattern",
+        "base slots use hull() between cylinders",
+        "vertical face holes rotate([0,90,0])",
+        "two side gussets use polygon()+linear_extrude()",
+        "face plate has chamfered polygon or equivalent clipped top corners"
+      ],
+      "failure_modes": [
+        "plain flat NEMA plate instead of L bracket with base",
+        "circular bolt pattern for NEMA23 instead of square 47.1 mm spacing",
+        "round base holes instead of long rounded slots",
+        "central shaft clearance missing or too small",
+        "gussets extruded along Z or across the full bracket width",
+        "vertical holes not rotated through X"
+      ],
+      "openscad_module": "$fn = 96;\n\nbase_length = 95;\nbase_width = 75;\nface_width = 75;\nface_height = 82;\nplate_thickness = 6;\ncorner_chamfer = 8;\n\nnema23_face_size = 57.3;\nnema23_bolt_spacing = 47.1;\nmotor_hole_d = 5.5;\nshaft_clearance_d = 38;\n\nbase_slot_length = 55;\nbase_slot_d = 6.0;\nbase_slot_spacing = 42;\ngusset_depth = 6;\ngusset_run = 48;\n\nmodule rounded_slot(length, diameter, height) {\n  hull() {\n    translate([-length/2 + diameter/2, 0, 0])\n      cylinder(h = height, d = diameter, center = true, $fn = 40);\n    translate([ length/2 - diameter/2, 0, 0])\n      cylinder(h = height, d = diameter, center = true, $fn = 40);\n  }\n}\n\nmodule chamfered_face_plate_2d(width, height, chamfer) {\n  polygon(points = [\n    [-width/2 + chamfer, 0],\n    [ width/2 - chamfer, 0],\n    [ width/2, chamfer],\n    [ width/2, height],\n    [-width/2, height],\n    [-width/2, chamfer]\n  ]);\n}\n\nmodule nema23_l_motor_mount() {\n  difference() {\n    union() {\n      // Horizontal base plate: X length, Y width, Z thickness.\n      translate([0, 0, plate_thickness/2])\n        cube([base_length, base_width, plate_thickness], center = true);\n\n      // Vertical motor face plate: X thickness, Y width, Z height.\n      translate([-base_length/2 + plate_thickness/2, 0, face_height/2])\n        rotate([90, 0, 90])\n          linear_extrude(height = plate_thickness, center = true)\n            chamfered_face_plate_2d(face_width, face_height, corner_chamfer);\n\n      // Two triangular side gussets like the photo, near the side edges.\n      for (y = [-base_width/2 + gusset_depth/2, base_width/2 - gusset_depth/2])\n        translate([-base_length/2 + plate_thickness, y, plate_thickness])\n          rotate([90, 0, 0])\n            linear_extrude(height = gusset_depth, center = true)\n              polygon(points = [[0, 0], [gusset_run, 0], [0, gusset_run]]);\n    }\n\n    // Large centered motor shaft / boss clearance through vertical face along X.\n    translate([-base_length/2 + plate_thickness/2, 0, face_height/2])\n      rotate([0, 90, 0])\n        cylinder(h = plate_thickness + 2, d = shaft_clearance_d, center = true, $fn = 96);\n\n    // NEMA23 four-hole square bolt pattern through vertical face along X.\n    for (y = [-nema23_bolt_spacing/2, nema23_bolt_spacing/2])\n      for (z = [face_height/2 - nema23_bolt_spacing/2, face_height/2 + nema23_bolt_spacing/2])\n        translate([-base_length/2 + plate_thickness/2, y, z])\n          rotate([0, 90, 0])\n            cylinder(h = plate_thickness + 2, d = motor_hole_d, center = true, $fn = 40);\n\n    // Two long rounded mounting slots through base along Z.\n    for (y = [-base_slot_spacing/2, base_slot_spacing/2])\n      translate([base_length*0.12, y, plate_thickness/2])\n        rounded_slot(base_slot_length, base_slot_d, plate_thickness + 2);\n  }\n}\n\nnema23_l_motor_mount();"
+    },
+    {
       "id": "l_bracket_equal",
       "category": "l_bracket",
-      "name": "Equal-leg L-bracket with gusset",
+      "name": "Plain equal-leg L-bracket",
       "aliases": [
         "l bracket",
         "angle bracket",
@@ -201,7 +276,11 @@
         "leg_length": 50,
         "leg_width": 30,
         "plate_thickness": 4,
-        "hole_d": 5.5
+        "hole_d": 5.5,
+        "leg_a_length": 50,
+        "leg_b_length": 50,
+        "bracket_width": 30,
+        "edge_margin": 12
       },
       "fit_guidance_mm": {
         "bolt_hole": "M5 clearance hole 5.5 mm"
@@ -220,32 +299,52 @@
         }
       },
       "derived_parameters": {
-        "gusset_height": {
-          "formula": "leg_length * 0.6",
-          "note": "triangular gusset for stiffness"
+        "edge_margin": {
+          "formula": "max(12, 1.5 * hole_d)",
+          "note": "keeps holes away from plate edges"
+        },
+        "optional_gusset_run": {
+          "formula": "min(leg_a_length, leg_b_length) * 0.6",
+          "note": "only add if user asks for gusset, rib, reinforced, heavy-duty, or load-bearing bracket"
         }
       },
       "main_features": [
-        "horizontal plate",
-        "vertical plate perpendicular to it",
-        "inside-corner gusset",
-        "mounting holes on both plates"
+        "plain base plate in XY with thickness along Z",
+        "plain upright plate in YZ with thickness along X at one base edge",
+        "four base holes through Z in a 2x2 pattern",
+        "four upright holes through X in a 2x2 pattern",
+        "no gusset by default"
       ],
       "design_rules": [
-        "both plates are solid cubes in union()",
-        "gusset is solid triangle or rotated cube",
-        "holes subtracted in difference()",
-        "edge margin ≥ 1.5 × hole diameter"
+        "Default L-bracket is plain: two perpendicular plates and mounting holes only.",
+        "Only add gussets/ribs when the prompt explicitly asks for gusset, rib, reinforced, heavy-duty, load-bearing, or shelf support.",
+        "Use one global difference(): union() contains both plates; all holes are subtractive.",
+        "Base plate coordinates: cube([leg_a_length, bracket_width, plate_thickness]) translated to z=plate_thickness/2.",
+        "Upright plate coordinates: cube([plate_thickness, bracket_width, leg_b_length]) translated to x=-leg_a_length/2+plate_thickness/2 and z=leg_b_length/2.",
+        "Base holes pass through Z using unrotated cylinders at z=plate_thickness/2.",
+        "Upright holes pass through X using rotate([0,90,0]) cylinders at x=-leg_a_length/2+plate_thickness/2.",
+        "Never use negative Z positions for upright holes; z positions must be edge_margin and leg_b_length-edge_margin.",
+        "If a gusset/rib is explicitly requested, it must be a triangular prism, not a flat rectangular block on the base.",
+        "For two requested side gussets, make two thin triangular prisms near y=+/-bracket_width/2, not two full-width overlapping extrusions.",
+        "For rounded corners, use a 2D rounded rectangle with linear_extrude; avoid 3D minkowski that doubles plate thickness."
       ],
       "validation_criteria": [
-        "two perpendicular cubes in union",
-        "gusset present",
-        "holes subtracted with for-loop or explicit placement"
+        "plain L-bracket contains two perpendicular plates without gussets unless requested",
+        "base plate and upright plate use different thickness axes",
+        "upright holes include rotate([0,90,0]) before cylinder",
+        "upright hole z positions are within 0..leg_b_length",
+        "base holes use nested x/y loops for a 2x2 pattern when four holes are requested",
+        "if gusset is requested, triangular gusset uses polygon(...) plus linear_extrude(...) or equivalent polyhedron"
       ],
       "failure_modes": [
-        "single plate not two perpendicular ones",
-        "missing gusset — structurally weak",
-        "holes not subtracted"
+        "adding gussets to a plain L-bracket prompt that did not request reinforcement",
+        "vertical plate holes use unrotated Z-axis cylinders",
+        "vertical hole loop uses [-leg_length/2 + edge_margin, leg_length/2 - edge_margin]",
+        "requested gusset is a rectangular block instead of triangular web",
+        "linear_extrude(height=bracket_width) is duplicated for front/back gussets and creates overlapping full-width webs",
+        "rounded_plate uses 3D minkowski and doubles the plate thickness",
+        "vertical plate is rotated/translated from a horizontal plate instead of explicitly modeled as YZ plate",
+        "holes use plate_length for Y positions and fall outside bracket_width"
       ],
       "constraint_checks": [
         {
@@ -255,7 +354,7 @@
           "message": "L-bracket needs two perpendicular plates."
         }
       ],
-      "openscad_module": "$fn = 96;\n\nleg_a           = 50;\nleg_b           = 50;\nleg_width       = 30;\nplate_thickness = 4;\nhole_d          = 5.5;\nedge_margin     = 8;\n\nmodule slot_cut(len, d, h) {\n  hull() {\n    translate([-len/2 + d/2, 0, 0]) cylinder(h = h, d = d, center = true, $fn = 32);\n    translate([ len/2 - d/2, 0, 0]) cylinder(h = h, d = d, center = true, $fn = 32);\n  }\n}\n\nmodule l_bracket() {\n  difference() {\n    union() {\n      cube([leg_a, leg_width, plate_thickness], center = true);\n      translate([-leg_a/2 + plate_thickness/2, 0, leg_b/2])\n        cube([plate_thickness, leg_width, leg_b], center = true);\n      translate([-leg_a/2 + plate_thickness, 0, plate_thickness/2])\n        rotate([0, 45, 0])\n          cube([plate_thickness * 1.4, leg_width, plate_thickness * 1.4], center = true);\n    }\n    for (x = [leg_a/4, -leg_a/4])\n      translate([x, 0, 0])\n        cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 32);\n    translate([-leg_a/2 + plate_thickness/2, 0, leg_b * 0.35])\n      rotate([0, 90, 0])\n        cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 32);\n  }\n}\n\nl_bracket();"
+      "openscad_module": "$fn = 96;\n\nleg_a_length    = 50;\nleg_b_length    = 50;\nbracket_width   = 30;\nplate_thickness = 4;\nhole_d          = 5.5;\nedge_margin     = 12;\n\nmodule l_bracket() {\n  difference() {\n    union() {\n      // Base plate: length along X, width along Y, thickness along Z.\n      translate([0, 0, plate_thickness/2])\n        cube([leg_a_length, bracket_width, plate_thickness], center = true);\n\n      // Upright plate: thickness along X, width along Y, height along Z.\n      translate([-leg_a_length/2 + plate_thickness/2, 0, leg_b_length/2])\n        cube([plate_thickness, bracket_width, leg_b_length], center = true);\n    }\n\n    // Four base holes pass through Z.\n    for (x = [-leg_a_length/2 + edge_margin, leg_a_length/2 - edge_margin])\n      for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])\n        translate([x, y, plate_thickness/2])\n          cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);\n\n    // Four upright holes pass through X, not Z.\n    for (z = [edge_margin, leg_b_length - edge_margin])\n      for (y = [-bracket_width/2 + edge_margin, bracket_width/2 - edge_margin])\n        translate([-leg_a_length/2 + plate_thickness/2, y, z])\n          rotate([0, 90, 0])\n            cylinder(h = plate_thickness + 2, d = hole_d, center = true, $fn = 40);\n  }\n}\n\nl_bracket();"
     }
   ]
 }
