@@ -129,21 +129,29 @@
         "4 mounting holes on top face"
       ],
       "design_rules": [
-        "rod bores are horizontal cylinders parallel to each other at rod_spacing",
-        "nut pocket is cylinder nut_od+clearance at correct depth",
-        "screw clearance is separate larger bore through full height",
-        "mounting holes on top face for payload attachment"
+        "LM8UU guide rod bores are HORIZONTAL along X — use rotate([0,90,0]) cylinder at y=±rod_spacing/2, z=0.",
+        "T8 screw clearance bore is VERTICAL (along Z) — plain unrotated cylinder through full carriage height, centered at x=0, y=0.",
+        "T8 nut pocket is VERTICAL from the top face — translate([0,0,carriage_height/2 - t8_nut_h/2]) cylinder(h=t8_nut_h+0.2, d=nut_pocket_d, center=true). Pocket diameter must be larger than screw clearance bore (22.6 vs 9.5 mm).",
+        "Nut capture bolt holes (M3 for T8) are VERTICAL (along Z) on the bolt circle — for(a=[0,90,180,270]) rotate([0,0,a]) translate([nut_bolt_circle/2,0,z_nut_center]) cylinder(h=nut_h+4, d=3.4, center=true).",
+        "Nut bolt hole diameter = nut_bolt_d + thread_clear = 3.0 + 0.4 = 3.4 mm for M3. NEVER compute as thread_clear + 1.0 (= 1.4 mm, too small for any bolt).",
+        "Optional bottom relief: translate([0,0,-carriage_height/2+pocket_depth/2]) cube([carriage_length-margin, carriage_width-margin, pocket_depth], center=true) to save material.",
+        "Do NOT use minkowski(cube, sphere) anywhere. Use plain cube for outer block and plain cube subtraction for any interior pockets."
       ],
       "validation_criteria": [
-        "two rod bore cylinders in difference",
-        "nut pocket cylinder subtracted",
-        "screw clearance bore subtracted",
-        "for-loop or explicit 4 nut bolt holes"
+        "two LM8UU rod bore cylinders use rotate([0,90,0]) at y=±rod_spacing/2",
+        "T8 screw clearance bore is unrotated vertical cylinder through full height, centered",
+        "T8 nut pocket is vertical cylinder near top face, diameter > screw clearance diameter",
+        "four nut capture bolt holes are vertical cylinders on bolt circle, d ≈ 3.4 mm",
+        "nut bolt hole diameter = nut_bolt_d + thread_clear (≈ 3.4 mm), never thread_clear + 1.0",
+        "no minkowski() used anywhere in the module"
       ],
       "failure_modes": [
-        "nut pocket same size as screw — nut cannot fit",
+        "nut pocket diameter same as or smaller than screw clearance bore — nut cannot seat",
         "rod bores missing — no linear guidance",
-        "nut bolt holes missing — nut not retained"
+        "nut bolt holes missing — nut not retained",
+        "nut bolt hole diameter = thread_clear + 1.0 = 1.4 mm — too small for any bolt",
+        "minkowski(cube, sphere) inner cavity inflates all dimensions and eats into walls",
+        "screw clearance bore rotated to X axis — screw must be vertical for this carriage type"
       ],
       "constraint_checks": [
         {
@@ -159,7 +167,7 @@
           "message": "Nut pocket must be sized for the T8 nut OD, not the screw."
         }
       ],
-      "openscad_module": "$fn = 64;\n\nrod_diameter     = 8;\nlm_od            = 15.1;\nrod_spacing      = 40;\nscrew_diameter   = 8;\nnut_od           = 22;\nnut_height       = 10;\nnut_bolt_circle  = 16;\nside_wall        = 5;\ntop_wall         = 4;\nend_wall         = 6;\n\ncar_l = 24 + 2*end_wall;\ncar_w = rod_spacing + lm_od + 2*side_wall;\ncar_h = lm_od + top_wall;\n\nmodule t8_nut_carriage() {\n  difference() {\n    cube([car_l, car_w, car_h], center = true);\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, -top_wall/2])\n        rotate([0, 90, 0])\n          cylinder(h = car_l + 2, d = lm_od, center = true, $fn = 64);\n    cylinder(h = car_h + 2, d = screw_diameter + 1.5, center = true, $fn = 48);\n    translate([0, 0, car_h/2 - nut_height/2])\n      cylinder(h = nut_height + 0.5, d = nut_od + 0.4, center = true, $fn = 64);\n    for (a = [0, 90, 180, 270])\n      rotate([0, 0, a])\n        translate([nut_bolt_circle/2, 0, car_h/2 - nut_height/2])\n          cylinder(h = nut_height + 6, d = 3.4, center = true, $fn = 32);\n  }\n}\n\nt8_nut_carriage();"
+      "openscad_module": "$fn = 96;\n\n// ── Main dimensions ──────────────────────────────────────\ncarriage_length = 40;   // X\ncarriage_width  = 70;   // Y\ncarriage_height = 30;   // Z\n\nrod_spacing     = 40;   // LM8UU centre-to-centre (Y)\nlm8uu_od        = 15;   // nominal LM8UU outer diameter\n\nt8_screw_d      = 8;\nt8_nut_od       = 22;\nt8_nut_h        = 10;\nnut_bolt_circle = 16;\nnut_bolt_d      = 3.4;  // M3 clearance for FDM\n\n// ── FDM bore allowances ───────────────────────────────────\nbearing_fit  = 15.1;  // LM8UU press-fit bore (adjust after test print)\nscrew_clear  = 9.5;   // T8 screw clearance bore (screw_d + 1.5)\nnut_pocket_d = 22.6;  // T8 nut pocket clearance (nut_od + 0.4 + 0.2)\n\n// ── Body ─────────────────────────────────────────────────\nmodule t8_nut_carriage() {\n  difference() {\n    cube([carriage_length, carriage_width, carriage_height], center = true);\n\n    // LM8UU guide rod bores — horizontal, along X\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, 0])\n        rotate([0, 90, 0])\n          cylinder(h = carriage_length + 2, d = bearing_fit, center = true);\n\n    // T8 lead screw clearance bore — vertical (Z), centred\n    cylinder(h = carriage_height + 2, d = screw_clear, center = true);\n\n    // T8 nut pocket — from top face, vertical (Z)\n    translate([0, 0, carriage_height/2 - t8_nut_h/2])\n      cylinder(h = t8_nut_h + 0.2, d = nut_pocket_d, center = true);\n\n    // Nut capture bolt holes — M3 clearance = 3.4 mm, vertical (Z)\n    for (a = [0, 90, 180, 270])\n      rotate([0, 0, a])\n        translate([nut_bolt_circle/2, 0, carriage_height/2 - t8_nut_h/2])\n          cylinder(h = t8_nut_h + 4, d = nut_bolt_d, center = true);\n\n    // Bottom material relief\n    translate([0, 0, -carriage_height/2 + 5])\n      cube([carriage_length - 8, carriage_width - 8, 8], center = true);\n  }\n}\n\nt8_nut_carriage();"
     }
   ]
 }

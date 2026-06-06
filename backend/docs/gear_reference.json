@@ -345,7 +345,7 @@
           "output_channel": "chat_after_code_only"
         }
       ],
-      "openscad_module": "include <D:/Downloads/openscad_copilot (1)/openscad_copilot/gears.scad>\n\nspur_gear(\n  modul=2,\n  tooth_number=20,\n  width=10,\n  bore=5,\n  pressure_angle=20,\n  helix_angle=0,\n  optimized=true\n);"
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 2;     // gear module (m)\ntooth_number   = 20;   // number of teeth\ngear_width     = 10;   // face width (mm)\nbore_d         = 6;    // shaft bore diameter (mm)\npressure_angle = 20;\nhelix_angle    = 0;    // 0 = spur; >0 = helical\n\npitch_diameter = module_size * tooth_number;  // = 40 mm\n\ndifference() {\n    spur_gear(\n        modul=module_size, tooth_number=tooth_number,\n        width=gear_width, bore=0,\n        pressure_angle=pressure_angle, helix_angle=helix_angle,\n        optimized=true\n    );\n    cylinder(h=gear_width+2, d=bore_d, center=true, $fn=64);\n}"
     },
     {
       "id": "worm_gear_m2_30t",
@@ -487,7 +487,7 @@
           "output_channel": "chat_after_code_only"
         }
       ],
-      "openscad_module": "include <D:/Downloads/openscad_copilot (1)/openscad_copilot/gears.scad>\n\nworm_gear(\n  modul=2,\n  tooth_number=30,\n  thread_starts=1,\n  width=22,\n  length=30,\n  worm_bore=6,\n  gear_bore=8,\n  pressure_angle=20,\n  lead_angle=7.1,\n  optimized=true,\n  together_built=true,\n  show_spur=1,\n  show_worm=1\n);"
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 2;\ntooth_number   = 30;\nthread_starts  = 1;\ngear_width     = 22;\nworm_len       = 30;\nbore_d         = 6;    // worm shaft bore\npressure_angle = 20;\nlead_angle     = 7.1;\n\npitch_diameter = module_size * tooth_number;  // = 60 mm\n\ndifference() {\n    worm_gear(\n        modul=module_size, tooth_number=tooth_number,\n        thread_starts=thread_starts, width=gear_width, length=worm_len,\n        worm_bore=0, gear_bore=0,\n        pressure_angle=pressure_angle, lead_angle=lead_angle,\n        optimized=true, together_built=true, show_spur=1, show_worm=1\n    );\n    cylinder(h=worm_len+2, d=bore_d, center=true, $fn=64);\n}"
     },
     {
       "id": "bevel_gear_pair_m2_20_20",
@@ -564,7 +564,8 @@
         "flat spur gear used for a bevel gear request",
         "face width longer than cone distance third, causing pointed weak teeth",
         "gear pair axes offset instead of intersecting at the cone apex"
-      ]
+      ],
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 2;\ntooth_number   = 20;\ngear_width     = 10;\nbore_d         = 6;\npressure_angle = 20;\n\npitch_diameter = module_size * tooth_number;  // = 40 mm\n\ndifference() {\n    bevel_gear_pair(\n        modul=module_size, tooth_number1=tooth_number, tooth_number2=tooth_number,\n        axis_angle=90, ML=gear_width, bore1=0, bore2=0,\n        pressure_angle=pressure_angle, together_built=true\n    );\n    cylinder(h=gear_width+2, d=bore_d, center=true, $fn=64);\n}"
     },
     {
       "id": "helical_spiral_gear_m2_24",
@@ -638,7 +639,8 @@
         "calling a spur gear a spiral gear without tooth twist",
         "using spur pitch diameter formula without helix correction",
         "forgetting axial thrust support in helical mesh"
-      ]
+      ],
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 2;\ntooth_number   = 24;\ngear_width     = 12;\nbore_d         = 6;\npressure_angle = 20;\nhelix_angle    = 15;\n\npitch_diameter = module_size * tooth_number;  // = 48 mm\n\ndifference() {\n    spur_gear(\n        modul=module_size, tooth_number=tooth_number,\n        width=gear_width, bore=0,\n        pressure_angle=pressure_angle, helix_angle=helix_angle,\n        optimized=true\n    );\n    cylinder(h=gear_width+2, d=bore_d, center=true, $fn=64);\n}"
     },
     {
       "id": "spiral_bevel_gear_pair_m2_16_32",
@@ -711,7 +713,8 @@
         "missing cone taper",
         "missing spiral tooth sweep",
         "using identical straight bevel logic for a spiral bevel request"
-      ]
+      ],
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 2;\ntooth_number   = 24;\ntooth_number1  = 16;\ntooth_number2  = 32;\ngear_width     = 10;\nbore_d         = 6;\npressure_angle = 20;\n\npitch_diameter = module_size * tooth_number;  // reference diameter\n\ndifference() {\n    bevel_gear_pair(\n        modul=module_size, tooth_number1=tooth_number1, tooth_number2=tooth_number2,\n        axis_angle=90, ML=gear_width, bore1=0, bore2=0,\n        pressure_angle=pressure_angle, together_built=true\n    );\n    cylinder(h=gear_width+2, d=bore_d, center=true, $fn=64);\n}"
     },
     {
       "id": "planetary_gearset_m1_18_24_66",
@@ -791,7 +794,8 @@
         "planet centers placed by eye instead of formula",
         "external ring gear teeth instead of internal annulus teeth",
         "no carrier pins, so the assembly is not a planetary gearbox"
-      ]
+      ],
+      "openscad_module": "include <gears.scad>\n\nmodule_size    = 1;\ntooth_number   = 18;   // sun teeth\nplanet_teeth   = 24;\nring_teeth     = 66;\ngear_width     = 8;\nbore_d         = 5;\npressure_angle = 20;\n\npitch_diameter = module_size * tooth_number;  // sun pitch diameter\n\ndifference() {\n    planetary_gear(\n        modul=module_size, number_planets=3,\n        number_teeth_sun=tooth_number, number_teeth_planet=planet_teeth,\n        number_teeth_ring=ring_teeth,\n        width=gear_width, bore=0,\n        pressure_angle=pressure_angle,\n        support_depth=2, together_built=true\n    );\n    cylinder(h=gear_width+2, d=bore_d, center=true, $fn=64);\n}"
     }
   ]
 }

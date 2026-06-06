@@ -22,29 +22,27 @@ PRINTED THREADS (ISO metric approximation)
   M3=0.5 mm, M4=0.7 mm, M5=0.8 mm, M6=1.0 mm, M8=1.25 mm, M10=1.5 mm, M12=1.75 mm
 
 KNOB DESIGN (thumbscrew / adjustment knob)
-───────────────────────────────────────────
-  knob_diameter       — 20–50 mm; larger = more torque
-  knob_height         — 10–20 mm
-  knurling_tooth_count— 20–40 teeth around circumference
-  knurling_depth      — 0.8–1.5 mm
-  knurling_angle      — 30–45° for diamond knurl; 0° for straight
-  bore_diameter       — M3–M8 threaded insert or through-hole
-  skirt_depth         — lower chamfer or straight section: 2–4 mm
+-------------------------------------------
+  Primary RAG reference: knurled adjustment knob with diamond knurl band,
+  smooth shoulder, and M8-like external threaded shaft.
 
-  module knurled_knob(d=30, h=15, teeth=30, knurl_depth=1.0, bore_d=3.2) {
-    difference() {
-      union() {
-        // main body
-        cylinder(h=h, d=d, $fn=128);
-        // knurling teeth (approximated as ridges)
-        for(i=[0:teeth-1])
-          rotate([0, 0, 360*i/teeth])
-            translate([d/2 - knurl_depth/2, 0, h/2])
-              cube([knurl_depth, 2*PI*d/teeth*0.3, h], center=true);
-      }
-      cylinder(h=h+2, d=bore_d, center=false, $fn=32);
-    }
-  }
+  knob_diameter       - 30 mm default; 20-50 mm normal hand knob range
+  knob_height         - 18 mm default
+  stem_diameter       - 16 mm default shoulder/stem under knob
+  stem_height         - 7 mm default
+  thread_diameter     - M8-like 8 mm nominal external thread
+  thread_pitch        - 1.25 mm for M8 coarse ISO metric thread
+  thread_height       - 20 mm threaded shaft length
+  knurl_count         - 42 repeated groove positions
+  knurl_depth         - 1.0 mm
+  knurl_angle         - 35 degrees for crossed diamond knurl
+  knurl_width         - 1.2 mm groove cutter width
+
+  Required geometry features:
+  - diamond_knurl_band() module using crossed diagonal groove cuts
+  - external_thread() module using pitch, turns, steps, and hull spheres
+  - knob body stacked above a smooth stem and threaded shaft along Z
+  - no old radial cylinder grip-ridge knob for this part
 
 SHAFT FEATURES
 ───────────────

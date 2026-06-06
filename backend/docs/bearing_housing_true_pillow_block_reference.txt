@@ -71,86 +71,96 @@ module pillow_block_bearing_housing() {
   }
 }
 
-KNOWN-GOOD VANILLA OPENSCAD SKELETON
-Use this compact UCP-style skeleton as the safest starting point and adapt dimensions.
+KNOWN-GOOD NO-FLICKER OPENSCAD SKELETON
+Use this compact no-flicker pillow block as the safest starting point and adapt dimensions.
 
-$fn = 128;
-shaft_diameter = 20;
+// No-flicker compact pillow block — 6204 default (bore 20mm, OD 47mm, width 14mm)
+$fn = 96;
+eps = 0.05;
+
+// Size
+base_len = 130;
+base_width = 30;
+base_thick = 8;
+
+center_height = 40;
+housing_od = 63;
+housing_width = 26;
+
+// Bearing — 6204: bore 20mm, OD 47mm, width 14mm
 bearing_od = 47;
+bearing_id = 20;
 bearing_width = 14;
-wall_thickness = 8;
-base_thickness = 8;
-base_length = 92;
-base_width = bearing_od + 2 * wall_thickness + 18;
-foot_pad_length = 28;
-foot_pad_width = 30;
-foot_pad_thickness = 4;
-mount_hole_diameter = 5.5;
-mount_hole_spacing = 64;
-slot_length = 18;
-shaft_clearance = 0.4;
-bearing_fit_clearance = 0.15;
-boss_diameter = bearing_od + 2 * wall_thickness;
-boss_width = bearing_width + 2 * wall_thickness;
-boss_center_z = base_thickness + boss_diameter / 2 - 4;
-pedestal_width = boss_width + 14;
-pedestal_depth = base_width - 18;
-pedestal_height = boss_center_z - base_thickness + 4;
-cap_groove_height = 1.2;
-cap_groove_z = boss_center_z + boss_diameter * 0.20;
+clearance = 0.35;
 
-module rounded_slot(length, diameter, height) {
-  hull() {
-    translate([-length / 2, 0, 0])
-      cylinder(h = height, d = diameter, center = true);
-    translate([ length / 2, 0, 0])
-      cylinder(h = height, d = diameter, center = true);
-  }
+// Bolts
+bolt_dia = 7;
+bolt_spacing = 90;
+counterbore_dia = 13;
+counterbore_depth = 3;
+
+module body() {
+    union() {
+        // Base
+        hull() {
+            translate([-base_len/2 + 10, 0, base_thick/2])
+                cylinder(d=20, h=base_thick, center=true);
+
+            translate([ base_len/2 - 10, 0, base_thick/2])
+                cylinder(d=20, h=base_thick, center=true);
+
+            translate([0, 0, base_thick/2])
+                cube([base_len-20, base_width, base_thick], center=true);
+        }
+
+        // Main upright
+        hull() {
+            translate([0, 0, center_height])
+                rotate([90, 0, 0])
+                    cylinder(d=housing_od, h=housing_width, center=true);
+
+            translate([0, 0, base_thick + 5])
+                cube([housing_od * 0.85, housing_width, 10], center=true);
+        }
+
+        // Front raised rim
+        translate([0, -housing_width/2 - 1.25, center_height])
+            rotate([90, 0, 0])
+                cylinder(d=housing_od - 8, h=2.5, center=true);
+    }
 }
 
 module pillow_block_bearing_housing() {
-  difference() {
-    union() {
-      translate([0, 0, base_thickness / 2])
-        cube([base_length, base_width, base_thickness], center = true);
+    difference() {
+        body();
 
-      for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
-        translate([x, 0, base_thickness + foot_pad_thickness / 2])
-          cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center = true);
+        // Bearing pocket
+        translate([0, 0, center_height])
+            rotate([90, 0, 0])
+                cylinder(
+                    d=bearing_od + clearance,
+                    h=bearing_width + 0.8,
+                    center=true
+                );
 
-      translate([0, 0, base_thickness + pedestal_height / 2])
-        cube([pedestal_width, pedestal_depth, pedestal_height], center = true);
+        // Shaft hole
+        translate([0, 0, center_height])
+            rotate([90, 0, 0])
+                cylinder(
+                    d=bearing_id + 1,
+                    h=housing_width + 8,
+                    center=true
+                );
 
-      // Compact cast-body blend from pedestal to bearing boss.
-      hull() {
-        translate([0, 0, base_thickness + 8])
-          cube([pedestal_width + 8, pedestal_depth, 10], center = true);
-        translate([0, 0, boss_center_z])
-          rotate([90, 0, 0])
-            cylinder(h = boss_width, d = boss_diameter, center = true);
-      }
+        // Mounting holes
+        for (x = [-bolt_spacing/2, bolt_spacing/2]) {
+            translate([x, 0, -eps])
+                cylinder(d=bolt_dia, h=base_thick + 2*eps);
 
-      translate([0, 0, boss_center_z])
-        rotate([90, 0, 0])
-          cylinder(h = boss_width, d = boss_diameter, center = true);
+            translate([x, 0, base_thick - counterbore_depth])
+                cylinder(d=counterbore_dia, h=counterbore_depth + eps);
+        }
     }
-
-    translate([0, 0, boss_center_z])
-      rotate([90, 0, 0])
-        cylinder(h = boss_width + 4, d = bearing_od + bearing_fit_clearance, center = true);
-
-    translate([0, 0, boss_center_z])
-      rotate([90, 0, 0])
-        cylinder(h = base_width + 8, d = shaft_diameter + shaft_clearance, center = true);
-
-    // Thin subtractive cap split-line groove only; never add a solid top slab.
-    translate([0, 0, cap_groove_z])
-      cube([pedestal_width + 10, boss_width + 4, cap_groove_height], center = true);
-
-    for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
-      translate([x, 0, base_thickness / 2])
-        rounded_slot(slot_length, mount_hole_diameter, base_thickness + foot_pad_thickness + 8);
-  }
 }
 
 pillow_block_bearing_housing();

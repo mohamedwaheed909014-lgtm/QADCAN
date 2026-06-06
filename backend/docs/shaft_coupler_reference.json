@@ -73,15 +73,16 @@
   },
   "parts": [
     {
-      "id": "rigid_clamp_coupler_5to8",
-      "category": "rigid_coupler",
-      "name": "Rigid clamp coupler 5 mm to 8 mm",
+      "id": "helical_beam_shaft_coupling_fixed_through_screws",
+      "category": "flexible_helical_coupling",
+      "name": "Fixed helical beam shaft coupling with through screw holes",
       "aliases": [
-        "rigid coupler",
-        "clamp coupler",
-        "5mm to 8mm coupler",
-        "nema17 to t8 coupler",
-        "shaft coupling"
+        "helical beam coupling",
+        "flexible shaft coupling",
+        "beam shaft coupler",
+        "shaft coupling",
+        "coupler with through screw holes",
+        "clamp coupling with counterbores"
       ],
       "standards": [
         "General coupler sizing"
@@ -92,12 +93,23 @@
       ],
       "family": "shaft_coupler_reference",
       "standard_dimensions_mm": {
-        "shaft_a": 5,
-        "shaft_b": 8,
-        "outer_d": 20,
-        "coupler_length": 30,
-        "clamp_gap": 1.2,
-        "screw_d": 3.2
+        "outer_diameter": 26,
+        "length": 42,
+        "bore_a": 5.2,
+        "bore_b": 8.2,
+        "bore_depth": 21,
+        "chamfer": 1.4,
+        "groove_count": 5,
+        "groove_width": 0.55,
+        "groove_pitch": 1.85,
+        "groove_depth": 1.25,
+        "screw_diameter": 5.2,
+        "counterbore_diameter": 8.4,
+        "counterbore_depth": 2.2,
+        "screw_z": [
+          -12.5,
+          12.5
+        ]
       },
       "fit_guidance_mm": {
         "bore_a": "shaft_a + 0.2 running fit",
@@ -126,28 +138,36 @@
         }
       },
       "main_features": [
-        "outer cylinder body",
-        "bore A from top half",
-        "bore B from bottom half (different diameter)",
-        "radial clamp slit through half the body",
-        "two cross clamping screw holes crossing slit"
+        "outer cylinder body with chamfered ends",
+        "bore A from bottom end (shaft_a diameter) to centre",
+        "bore B from top end (shaft_b diameter) to centre",
+        "helical beam relief grooves on OD for torsional compliance",
+        "two radial through-screw holes for shaft retention"
       ],
       "design_rules": [
-        "both bores coaxial on Z axis entering from opposite ends",
-        "clamp slit is flat cube passing through body width",
-        "slit must reach at least 1 mm past bore centre",
-        "clamping screws cross the slit — rotate 90° to slit plane",
-        "minimum wall between bore and OD ≥ 3 mm"
+        "Helical cuts use linear_extrude(height=length+2, twist=-(360*turns), slices=300, center=true). NEVER use rotate_extrude for helical cuts — it creates a torus at fixed radius, not a helix.",
+        "The outer body cylinder is the POSITIVE volume. Bore and helical slots are SUBTRACTED from it. NEVER add the bore cylinder in union() and subtract the same bore again — they cancel out.",
+        "Helical slot 2D profile: translate([slot_r, 0]) square([wall_depth+2, slot_w], center=true) where slot_r = bore_d/2 + wall_depth/2.",
+        "For a 2-start coupler: two slots offset by 180°: for(i=[0:1]) rotate([0,0,i*180]) linear_extrude(...).",
+        "bore_a is drilled from the bottom end; bore_b from the top end; both coaxial on Z axis.",
+        "Wall between each bore and OD must be >= 3 mm: (outer_d - bore_d) / 2 >= 3.",
+        "Set screw holes are radial: translate([0, outer_d/2, end_z]) rotate([90,0,0]) cylinder(...).",
+        "Do NOT declare string metadata variables like manufacturing = \"fdm\" in the OpenSCAD output."
       ],
       "validation_criteria": [
-        "two bores in difference at different Z offsets",
-        "clamp slit cube in difference",
-        "two screw holes crossing slit"
+        "bore_a cylinder from bottom end in difference",
+        "bore_b cylinder from top end in difference (different diameter)",
+        "bores do not overlap beyond centre — each shaft clamps independently",
+        "radial screw holes cut through body for shaft retention"
       ],
       "failure_modes": [
-        "bores side-by-side instead of coaxial — misaligned shafts",
-        "slit does not reach bore — clamp cannot close",
-        "screws parallel to slit instead of perpendicular — no clamping force"
+        "rotate_extrude used for helical cuts — produces a torus at fixed radius, not a helix; coupling body will look like a donut, not a coupler",
+        "bore cylinder added in union() then subtracted in difference() — they cancel out, leaving no bore and no outer body",
+        "circular_grooves() (horizontal rings) used instead of helical cuts — creates a disc coupler, not a helical beam coupler",
+        "helix_point function defined but never used — dead code that contributes no geometry",
+        "manufacturing string variable in output — violates output policy",
+        "single uniform bore — both shafts same diameter, wrong for different-size shafts",
+        "bores side-by-side instead of coaxial — misaligned shafts"
       ],
       "constraint_checks": [
         {
@@ -157,13 +177,76 @@
           "message": "Both shaft bores must be coaxial on the same central axis."
         },
         {
-          "id": "clamp_slit",
+          "id": "bore_wall_thickness",
           "severity": "error",
-          "expression": "cube slit passes through body",
-          "message": "Clamp coupler needs a radial slit that reaches the bore."
+          "expression": "(od - bore_b) / 2 >= 3",
+          "message": "Wall between bore_b and OD must be at least 3 mm to retain structural integrity."
+        },
+        {
+          "id": "stepped_bores",
+          "severity": "error",
+          "expression": "bore_a != bore_b",
+          "message": "Helical beam coupling must have two different bore sizes for the two shaft diameters."
         }
       ],
-      "openscad_module": "$fn = 96;\n\nshaft_a        = 5;\nshaft_b        = 8;\nbore_clearance = 0.2;\nouter_d        = 20;\ncoupler_l      = 30;\nclamp_gap      = 1.2;\nscrew_d        = 3.2;\n\nmodule rigid_clamp_coupler() {\n  difference() {\n    cylinder(h = coupler_l, d = outer_d, center = true);\n    translate([0, 0,  coupler_l/4])\n      cylinder(h = coupler_l/2 + 1, d = shaft_a + bore_clearance, center = true, $fn = 64);\n    translate([0, 0, -coupler_l/4])\n      cylinder(h = coupler_l/2 + 1, d = shaft_b + bore_clearance, center = true, $fn = 64);\n    cube([outer_d + 2, clamp_gap, coupler_l * 0.6], center = true);\n    for (z = [coupler_l/4, -coupler_l/4])\n      translate([0, 0, z])\n        rotate([90, 0, 0])\n          cylinder(h = outer_d + 2, d = screw_d, center = true, $fn = 32);\n  }\n}\n\nrigid_clamp_coupler();"
+      "openscad_module": " = 128;\n\n// ── Parameters ───────────────────────────────────────────\nshaft_a     = 5;     // bore A (e.g. NEMA17 motor shaft)\nshaft_b     = 8;     // bore B (e.g. T8 lead screw)\nlength      = 40;    // coupling body length\nturns       = 2;     // helical turns over length\nstarts      = 2;     // helical starts (= number of beams)\nbeam_wall   = 3.5;   // radial wall of each beam\nslot_w      = 1.5;   // helical slot width\nrunning_fit = 0.25;  // bore clearance\n\n// ── Derived ──────────────────────────────────────────────\nbore_a     = shaft_a + 2 * running_fit;         // 5.5 mm\nbore_b     = shaft_b + 2 * running_fit;         // 8.5 mm\nbore_max   = max(bore_a, bore_b);\nouter_d    = bore_max + 2 * beam_wall + 2;      // outer diameter\nwall_depth = (outer_d - bore_max) / 2;          // radial wall depth\nslot_r     = bore_max/2 + wall_depth/2;         // radial centre of helical slot\n\nmodule helical_beam_coupler() {\n    difference() {\n        // ── Outer body — positive volume ──────────────────\n        cylinder(d = outer_d, h = length, center = true);\n\n        // ── Bore A from bottom end ─────────────────────────\n        translate([0, 0, -(length/2) - 1])\n            cylinder(d = bore_a, h = length/2 + 2);\n\n        // ── Bore B from top end ────────────────────────────\n        translate([0, 0, 0])\n            cylinder(d = bore_b, h = length/2 + 2, center = false);\n\n        // ── Helical slot cuts ─────────────────────────────\n        // CORRECT: linear_extrude + twist creates true helical cuts.\n        // WRONG:   rotate_extrude — creates a torus, not a helix.\n        for (i = [0 : starts - 1])\n            rotate([0, 0, i * 360 / starts])\n            linear_extrude(height = length + 2,\n                           twist  = -(360 * turns),\n                           slices = 300,\n                           center = true)\n                translate([slot_r, 0])\n                    square([wall_depth + 2, slot_w], center = true);\n\n        // ── Set screw holes — radial, one per end boss ────\n        for (end_z = [-(length/2 - 5), length/2 - 5])\n            translate([0, outer_d/2, end_z])\n                rotate([90, 0, 0])\n                    cylinder(d = 3.4, h = outer_d/2 + 2);\n    }\n}\n\nhelical_beam_coupler();",
+      "required_features": [
+        "Solid chamfered coupling body from rotate_extrude profile",
+        "Bore A from bottom end (shaft_a + 0.2mm) to just past centre",
+        "Bore B from top end (shaft_b + 0.2mm) to just past centre",
+        "Repeated circular beam relief grooves on OD",
+        "Two radial through screw holes with counterbores on both sides"
+      ]
+    },
+    {
+      "id": "rigid_split_clamp_coupler",
+      "family": "shaft_coupler_reference",
+      "category": "shaft_coupler",
+      "name": "Rigid split-clamp shaft coupler",
+      "aliases": [
+        "clamp coupler",
+        "split clamp coupler",
+        "rigid clamp coupling",
+        "split shaft coupler",
+        "clamping coupler",
+        "clamp-style coupler",
+        "jaw clamp coupler",
+        "split hub coupler"
+      ],
+      "standard_dimensions_mm": {
+        "od": 25,
+        "length": 36,
+        "bore_a": 8,
+        "bore_b": 8,
+        "clamp_gap": 1.5,
+        "screw_diameter": 3.0
+      },
+      "required_features": [
+        "Cylindrical body with two stepped bores",
+        "Radial clamp slit through body",
+        "Clamping screw holes crossing the slit",
+        "Both bore_a and bore_b defined"
+      ],
+      "openscad_module": "$fn = 96;\n\n// Parameters\nshaft_a_d = 5;          // shaft A diameter\nshaft_b_d = 8;          // shaft B diameter\ncoupler_len = 50;       // overall length\nouter_d = 30;           // outer diameter\nsplit_gap = 1.5;        // clamp slit width\nrunning_fit = 0.25;     // bore running clearance\nthread_clear = 0.4;     // clearance added to screw diameter\nclamp_screw_d = 5 + thread_clear;\nclamp_hole_offset = 8;  // distance from each end to screw centre\nchamfer_h = 0.4;        // bottom chamfer height\n\n// Derived\nbore_a_d = shaft_a_d + running_fit;\nbore_b_d = shaft_b_d + running_fit;\nhalf_len = coupler_len / 2;\n\nmodule split_clamp_coupler() {\n    difference() {\n        // Positive body volume.\n        cylinder(d = outer_d, h = coupler_len, center = true);\n\n        // Bore A enters from the bottom and reaches just past centre.\n        translate([0, 0, -half_len - 0.5])\n            cylinder(d = bore_a_d, h = half_len + 1, center = false);\n\n        // Bore B enters from the top and reaches just past centre.\n        translate([0, 0, -0.5])\n            cylinder(d = bore_b_d, h = half_len + 1, center = false);\n\n        // Radial clamp slit: thin in X, opens from the outside to the bore.\n        translate([0, outer_d / 4, 0])\n            cube([split_gap, outer_d / 2 + 2, coupler_len + 2], center = true);\n\n        // Clamping screw holes cross the slit through solid wall material.\n        for (z = [-half_len + clamp_hole_offset, half_len - clamp_hole_offset])\n            translate([outer_d / 4, 0, z])\n                rotate([90, 0, 0])\n                    cylinder(d = clamp_screw_d, h = outer_d + 2, center = true);\n\n        // Bottom edge chamfer, subtracted from the body.\n        translate([0, 0, -half_len - 0.01])\n            cylinder(d1 = outer_d + 2 * chamfer_h,\n                     d2 = outer_d - 0.01,\n                     h = chamfer_h,\n                     center = false);\n    }\n}\n\nsplit_clamp_coupler();",
+      "design_rules": [
+        "Put the outer cylinder as the only positive body volume in difference(); bores, slit, screw holes, and chamfer are all subtractive cutters.",
+        "Bore A enters from the bottom: translate([0,0,-length/2-0.5]) cylinder(h=length/2+1, d=bore_a, center=false).",
+        "Bore B enters from the centre/top side: translate([0,0,-0.5]) cylinder(h=length/2+1, d=bore_b, center=false).",
+        "Radial slit cutter: translate([0, outer_d/4, 0]) cube([split_gap, outer_d/2+2, length+2], center=true). It is thin in X, reaches from the outside to the bore, and must be subtracted.",
+        "Clamping screw holes run along Y with rotate([90,0,0]) and are offset to x=outer_d/4 so they cross the slit through solid wall material instead of drilling down the bore axis.",
+        "Use two clamping screws, one in each shaft section, typically at z=-length/2+offset and z=length/2-offset.",
+        "Chamfer cutters must be subtracted from the edge; never translate a cone below the body and add it as positive geometry.",
+        "Do NOT declare string metadata variables (manufacturing, material, etc.) in OpenSCAD code."
+      ],
+      "failure_modes": [
+        "slit cube placed in implicit union inside body() - slit is added as solid material instead of removed",
+        "rotate([0,90,0]) on slit cube - turns the slit cutter into the wrong orientation",
+        "bore cylinders use center=true with non-zero translate - bore extents become easy to misplace",
+        "clamp holes along Z with no rotate - holes are parallel to the shaft, not crossing the slit",
+        "clamp holes at x=0 on the bore axis - holes pass through the bore void instead of clamp wall material",
+        "single clamp screw at z=0 - only one screw for the whole coupler; use one per bore section",
+        "chamfer translated below the body and added in union - adds cone outside body instead of chamfering the edge"
+      ]
     }
   ]
 }

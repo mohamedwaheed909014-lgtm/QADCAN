@@ -59,33 +59,61 @@ STANDARD SHAFT DIAMETERS (real coupler inventory)
   SFU1605 ballscrew — 16 mm
   Hobby servo       — 4–6 mm splined (25-tooth standard)
 
-OPENSCAD STRUCTURE (rigid clamp coupler)
-─────────────────────────────────────────
-  shaft_a_d = 5;
-  shaft_b_d = 8;
-  outer_d   = 20;
-  length    = 30;
-  gap       = 1.2;
-  screw_d   = 3.2;   // M3 clearance
+OPENSCAD STRUCTURE — HELICAL BEAM SHAFT COUPLING (CORRECT)
+Use this as the primary coupler code pattern when the user asks for a
+shaft coupling, flexible coupler, helical coupler, or beam coupler.
 
-  module rigid_coupler() {
-    difference() {
-      cylinder(h=length, d=outer_d, center=true, $fn=96);
-      // bore A
-      translate([0, 0,  length/4])
-        cylinder(h=length/2+1, d=shaft_a_d+0.2, center=true, $fn=64);
-      // bore B
-      translate([0, 0, -length/4])
-        cylinder(h=length/2+1, d=shaft_b_d+0.2, center=true, $fn=64);
-      // clamp slit
-      cube([outer_d+2, gap, length/2], center=true);
-      // clamping screw holes (one per bore side)
-      for(z=[length/4, -length/4])
-        translate([0, 0, z])
-          rotate([90,0,0])
-            cylinder(h=outer_d+2, d=screw_d, center=true, $fn=32);
-    }
+CRITICAL: Use linear_extrude + twist for helical cuts.
+  CORRECT: linear_extrude(height=L, twist=-360*turns, slices=300, center=true)
+  WRONG:   rotate_extrude(angle=...) — creates a torus at fixed radius, NOT a helix.
+
+CORRECT outer-body structure:
+  difference() { OUTER cylinder  ←  slots and bore subtracted FROM this }
+  NEVER add the bore cylinder in union() then subtract it again — they cancel out.
+
+  $fn = 128;
+
+  shaft_d    = 10;     // shaft nominal diameter
+  length     = 40;     // coupling body length
+  turns      = 2;      // helical turns over length
+  starts     = 2;      // number of helical cuts (= number of beams)
+  beam_wall  = 3.5;    // radial wall of each beam
+  slot_w     = 1.5;    // helical slot width
+  running_fit = 0.25;  // bore clearance
+
+  bore_d     = shaft_d + 2 * running_fit;        // 10.5 mm
+  outer_d    = bore_d  + 2 * beam_wall + 2;      // outer diameter
+  wall_depth = (outer_d - bore_d) / 2;           // radial wall depth
+  slot_r     = bore_d/2 + wall_depth/2;          // radial centre of slot
+
+  module helical_beam_coupler() {
+      difference() {
+          // Outer body — the positive volume
+          cylinder(d = outer_d, h = length, center = true);
+
+          // Shaft bore
+          cylinder(d = bore_d, h = length + 2, center = true);
+
+          // Helical slot cuts — linear_extrude + twist is the ONLY correct method
+          for (i = [0 : starts - 1]) {
+              rotate([0, 0, i * 360 / starts])
+              linear_extrude(height = length + 2,
+                             twist  = -(360 * turns),
+                             slices = 300,
+                             center = true)
+                  translate([slot_r, 0])
+                      square([wall_depth + 2, slot_w], center = true);
+          }
+
+          // Set screw holes — one per end boss, radial
+          for (end_z = [-(length/2 - 5), length/2 - 5])
+              translate([0, outer_d/2, end_z])
+                  rotate([90, 0, 0])
+                      cylinder(d = 3.4, h = outer_d/2 + 2);
+      }
   }
+
+  helical_beam_coupler();
 
 OLDHAM COUPLER STRUCTURE
 ─────────────────────────
@@ -115,21 +143,21 @@ Rule: two different shaft diameters must be coaxial and enter from opposite ends
 OpenSCAD action:
   difference() {
     cylinder(h=coupler_length, d=outer_diameter, center=true, $fn=96);
-    translate([0,0,-coupler_length/4])
-      cylinder(h=coupler_length/2+1, d=shaft_a_diameter+clearance, center=true, $fn=96);
-    translate([0,0, coupler_length/4])
-      cylinder(h=coupler_length/2+1, d=shaft_b_diameter+clearance, center=true, $fn=96);
+    translate([0,0,-coupler_length/2 - 0.5])
+      cylinder(h=coupler_length/2+1, d=shaft_a_diameter+clearance, center=false, $fn=96);
+    translate([0,0,-0.5])
+      cylinder(h=coupler_length/2+1, d=shaft_b_diameter+clearance, center=false, $fn=96);
   }
 
 Rule: clamp slit must reach the bore so the collar can flex.
 OpenSCAD action:
-  translate([outer_diameter/4, -clamp_gap/2, 0])
-    cube([outer_diameter, clamp_gap, coupler_length+2], center=true);
+  translate([0, outer_diameter/4, 0])
+    cube([clamp_gap, outer_diameter/2 + 2, coupler_length+2], center=true);
 
 Rule: clamping screws must cross the split line.
 OpenSCAD action:
   for (z=[-coupler_length/4, coupler_length/4])
-    translate([0, outer_diameter/4, z])
+    translate([outer_diameter/4, 0, z])
       rotate([90,0,0])
         cylinder(h=outer_diameter+4, d=clamp_screw_diameter, center=true, $fn=48);
 
@@ -140,12 +168,15 @@ OpenSCAD action:
       rotate([0,90,0])
         cylinder(h=outer_diameter+4, d=set_screw_diameter, center=true, $fn=48);
 
-Rule: flexible coupler slots remove material but leave torsion bridges.
+Rule: helical beam coupler slots are created with linear_extrude + twist (NOT rotate_extrude).
 OpenSCAD action:
-  for (i=[0:flex_slot_count-1])
-    rotate([0,0,360*i/flex_slot_count])
-      translate([outer_diameter/4,0,0])
-        cube([slot_length, slot_width, coupler_length*0.75], center=true);
+  for (i = [0 : starts - 1])
+    rotate([0, 0, i * 360 / starts])
+    linear_extrude(height = length + 2, twist = -(360 * turns), slices = 300, center = true)
+        translate([slot_r, 0])  // slot_r = bore_d/2 + wall_depth/2
+            square([wall_depth + 2, slot_w], center = true);
+  // rotate_extrude produces a torus at fixed radius — NEVER use it for helical cuts.
+  // The outer body CYLINDER must be the positive volume; slots and bore are subtracted from it.
 
 OPENSCAD CODE INTERPRETATION
 Mechanical meaning to code:

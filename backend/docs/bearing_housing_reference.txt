@@ -55,42 +55,75 @@ KEY PARAMETERS
   counterbore_depth       — bolt head height + 0.5 mm
 
 OPENSCAD STRUCTURE
-──────────────────
-  shaft_diameter = 20;
-  bearing_od = 47;
-  bearing_width = 14;
-  wall_thickness = 8;
-  base_thickness = 6;
-  housing_length = 70;
-  housing_width = bearing_od + 2*wall_thickness;
-  housing_height = bearing_od/2 + wall_thickness;
-  hole_spacing = housing_length - 2*edge_margin;
-  edge_margin = 10;
-  bolt_hole_d = 5.5;
+Use the no-flicker compact pillow block as the primary pillow-block code pattern.
+Default dimensions below are for a 6204 bearing (bore 20 mm, OD 47 mm, width 14 mm).
 
-  module pillow_block() {
-    difference() {
-      union() {
-        // base plate
-        cube([housing_length, housing_width, base_thickness], center=true);
-        // bearing boss
-        translate([0, 0, base_thickness/2 + housing_height/2])
-          cube([bearing_width + 2*wall_thickness, bearing_od + 2*wall_thickness,
-                housing_height], center=true);
+  // No-flicker compact pillow block — 6204 default
+  $fn = 96;
+  eps = 0.05;
+
+  base_len = 130;
+  base_width = 30;
+  base_thick = 8;
+
+  center_height = 40;
+  housing_od = 63;
+  housing_width = 26;
+
+  bearing_od = 47;   // 6204: 47 mm OD
+  bearing_id = 20;   // 6204: 20 mm bore
+  bearing_width = 14; // 6204: 14 mm width
+  clearance = 0.35;
+
+  bolt_dia = 7;
+  bolt_spacing = 90;
+  counterbore_dia = 13;
+  counterbore_depth = 3;
+
+  module body() {
+    union() {
+      hull() {
+        translate([-base_len/2 + 10, 0, base_thick/2])
+          cylinder(d=20, h=base_thick, center=true);
+        translate([ base_len/2 - 10, 0, base_thick/2])
+          cylinder(d=20, h=base_thick, center=true);
+        translate([0, 0, base_thick/2])
+          cube([base_len-20, base_width, base_thick], center=true);
       }
-      // bearing seat
-      translate([0, 0, base_thickness/2])
-        rotate([0,90,0])
-          cylinder(h=bearing_width+1, d=bearing_od+0.2, center=true, $fn=96);
-      // shaft through bore
-      rotate([0,90,0])
-        cylinder(h=housing_length+2, d=shaft_diameter+0.5, center=true, $fn=96);
-      // mounting holes
-      for(x=[-hole_spacing/2, hole_spacing/2])
-        translate([x, 0, 0])
-          cylinder(h=base_thickness+2, d=bolt_hole_d, center=true, $fn=32);
+
+      hull() {
+        translate([0, 0, center_height])
+          rotate([90, 0, 0])
+            cylinder(d=housing_od, h=housing_width, center=true);
+        translate([0, 0, base_thick + 5])
+          cube([housing_od * 0.85, housing_width, 10], center=true);
+      }
+
+      translate([0, -housing_width/2 - 1.25, center_height])
+        rotate([90, 0, 0])
+          cylinder(d=housing_od - 8, h=2.5, center=true);
     }
   }
+
+  module pillow_block_bearing_housing() {
+    difference() {
+      body();
+      translate([0, 0, center_height])
+        rotate([90, 0, 0])
+          cylinder(d=bearing_od + clearance, h=bearing_width + 0.8, center=true);
+      translate([0, 0, center_height])
+        rotate([90, 0, 0])
+          cylinder(d=bearing_id + 1, h=housing_width + 8, center=true);
+      for (x = [-bolt_spacing/2, bolt_spacing/2]) {
+        translate([x, 0, -eps])
+          cylinder(d=bolt_dia, h=base_thick + 2*eps);
+        translate([x, 0, base_thick - counterbore_depth])
+          cylinder(d=counterbore_dia, h=counterbore_depth + eps);
+      }
+    }
+  }
+
+  pillow_block_bearing_housing();
 
 DESIGN RULES
 ────────────

@@ -43,25 +43,56 @@ PRINT-IN-PLACE HINGE PARAMETERS
   gap_between_leaves   — 0.3–0.5 mm (for free swing after printing)
   opening_angle        — 180° full open; constrain with stop feature if less needed
 
-  module print_in_place_hinge(leaf_l=40, leaf_w=20, leaf_t=3,
-                               pin_d=5, knuckles=3, clearance=0.35) {
-    knuckle_l = leaf_l / (2*knuckles - 1);
-    // leaf A (knuckles at positions 1,3,5)
-    for(i=[0:knuckles-1])
-      translate([i*2*knuckle_l, 0, 0]) {
-        cube([knuckle_l, leaf_w, leaf_t]);                    // flat part
-        translate([knuckle_l/2, leaf_w/2, leaf_t])
-          rotate([90,0,0])
-            cylinder(h=leaf_w, d=pin_d, center=true, $fn=32); // pin
-      }
-    // leaf B (knuckles at positions 2,4) — barrels with clearance bore
-    for(i=[0:knuckles-2])
-      translate([(i*2+1)*knuckle_l, 0, leaf_t - clearance]) {
-        cube([knuckle_l, leaf_w, leaf_t]);
-        translate([knuckle_l/2, leaf_w/2, 0])
-          rotate([90,0,0])
-            cylinder(h=leaf_w, d=pin_d+2*clearance+2, center=true, $fn=32);
-      }
+  // ── CORRECT 5-knuckle print-in-place hinge ──
+  // Pin axis: along X. Leaves extend in ±Y. All knuckles at y=0, z=knuckle_z.
+  // Cylinders: rotate([0,90,0]) — NOT rotate([90,0,0]).
+
+  CRITICAL RULES:
+    knuckle_l = leaf_length / knuckle_count   ← CORRECT  (8 mm for 5-knuckle, 40mm span)
+    knuckle_l = leaf_length/(2*count-1)       ← WRONG    (4.4mm, creates 9 slots)
+    Leaf A loop: [0 : (count+1)/2 - 1] = [0:2] = 3 knuckles
+    Leaf B loop: [0 : (count-1)/2 - 1] = [0:1] = 2 knuckles
+    WRONG: [0:count-1]=5 for A and [0:count-2]=4 for B (9 total, not 5)
+    All cylinders share axis y=0, z=knuckle_z — NOT at different X positions.
+    Both leaf A and leaf B knuckles use difference() with bore.
+    DO NOT ADD cylinders without difference() — leaf A pin will fuse to barrel.
+    DO NOT use rotate([90,0,0]) — that makes cylinders run along Y, breaking the shared axis.
+
+  leaf_length = 40;  leaf_width = 20;  leaf_thick = 3;
+  pin_d = 5;  wall = 1.5;  knuckle_count = 5;  clearance = 0.35;
+
+  knuckle_l  = leaf_length / knuckle_count;     // 8mm — equal sections
+  knuckle_OD = pin_d + 2*wall;                  // 8mm barrel OD
+  bore_a     = pin_d + clearance;               // 5.35mm — leaf A (pin stays with A)
+  bore_b     = pin_d + 2*clearance;             // 5.70mm — leaf B (free rotation)
+  n_a        = (knuckle_count + 1) / 2;         // 3
+  n_b        = (knuckle_count - 1) / 2;         // 2
+  knuckle_z  = leaf_thick + knuckle_OD / 2;     // shared Z of all knuckle centres
+
+  module hinge_leaf_a() {
+    translate([0, clearance, 0])
+      cube([leaf_length, leaf_width, leaf_thick]);
+    for (i = [0 : n_a - 1]) {
+      x_c = (2*i) * knuckle_l + knuckle_l/2;
+      translate([x_c, 0, knuckle_z]) rotate([0, 90, 0])
+        difference() {
+          cylinder(h=knuckle_l,     d=pin_d,  center=true);
+          cylinder(h=knuckle_l+2,   d=bore_a, center=true);
+        }
+    }
+  }
+
+  module hinge_leaf_b() {
+    translate([0, -(leaf_width+clearance), 0])
+      cube([leaf_length, leaf_width, leaf_thick]);
+    for (i = [0 : n_b - 1]) {
+      x_c = (2*i+1) * knuckle_l + knuckle_l/2;
+      translate([x_c, 0, knuckle_z]) rotate([0, 90, 0])
+        difference() {
+          cylinder(h=knuckle_l-clearance, d=knuckle_OD, center=true);
+          cylinder(h=knuckle_l+2,         d=bore_b,     center=true);
+        }
+    }
   }
 
 BALL AND SOCKET JOINT

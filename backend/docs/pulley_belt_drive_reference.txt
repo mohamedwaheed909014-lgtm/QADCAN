@@ -414,10 +414,20 @@ DESIGN RULES
     No user action needed; set a global $fn only for other geometry.
 
   BELT WIDTH SELECTION:
-    GT2 2mm:  6 mm (standard), 9 mm, 15 mm
-    HTD 5mm:  9 mm, 15 mm, 25 mm
+    MXL:      3.175 mm (1/8"), 6.35 mm (1/4"), 9.525 mm (3/8")
+              Do NOT use 6 mm for MXL — nearest standard is 6.35 mm (1/4").
+    40DP:     6.35 mm, 9.525 mm
+    XL:       6.35 mm, 9.525 mm, 12.7 mm, 19.05 mm, 25.4 mm
+    T2.5:     4 mm, 6 mm, 8 mm, 10 mm
     T5:       6 mm, 10 mm, 16 mm, 25 mm
     T10:      10 mm, 16 mm, 25 mm, 32 mm, 50 mm
+    AT5:      6 mm, 10 mm, 16 mm, 25 mm
+    GT2 2mm:  6 mm (standard), 9 mm, 15 mm
+    GT2 3mm:  6 mm, 9 mm, 15 mm
+    GT2 5mm:  9 mm, 15 mm, 25 mm
+    HTD 3mm:  6 mm, 9 mm, 15 mm
+    HTD 5mm:  9 mm, 15 mm, 25 mm
+    HTD 8mm:  12 mm, 20 mm, 30 mm, 50 mm
     H:        12.7 mm, 19.05 mm, 25.4 mm, 38.1 mm
 
 

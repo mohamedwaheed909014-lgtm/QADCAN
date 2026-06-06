@@ -112,12 +112,33 @@ LEAD SCREW NUT CARRIAGE
 
 DESIGN RULES
 ────────────
-  - Rod bore = LM bearing OD + 0.0 to +0.05 mm (transition fit, slight resistance)
+  - Rod bore = LM bearing OD + 0.1 mm = 15.1 mm for LM8UU (transition/press fit for FDM)
   - For two-rod carriages: rod parallelism is critical; expose rod_spacing as parameter
   - Anti-rotation: two-rod arrangement naturally prevents rotation; single rod needs rail groove
   - Minimum bearing engagement length: ≥ 2.5 × bore_diameter for smooth motion
   - Lead nut pocket: add 0.5 mm axial clearance so nut floats slightly (reduces binding)
   - V-slot wheel: M5 eccentric nut for adjusting preload (print spacer 0.1–0.5 mm thick)
+
+BOTTOM RELIEF — CRITICAL FORMULA
+  Correct:  translate([0,0, -car_h/2 + bottom_wall + relief_depth/2])
+              cube([..., ..., relief_depth], center=true);
+  — The relief pocket starts at -car_h/2 + bottom_wall, leaving the bottom wall intact.
+
+  WRONG:    translate([0,0, -car_h/2 + wall_thickness/2])
+              cube([..., ..., wall_thickness], center=true);
+  — This centers the cube at the very bottom face, removing the entire bottom wall (open bottom).
+
+MOUNTING HOLES — CORRECT AXIS
+  For full through-holes along Z: translate([x,y,0]) cylinder(h=car_h+2, d=d, center=true)
+  WRONG: translate([x,y,car_h/2+0.1]) cylinder(h=car_h+2, d=d, center=true)
+  — The wrong form creates holes only half-depth into the carriage.
+
+HEX NUT TRAP — BOLT AND NUT MUST MATCH SAME BOLT FAMILY
+  M3: hex_nut_af=5.5 mm,  nut_d = hex_nut_af/cos(30)+0.2 = 6.55 mm,  bolt_d = 3.4 mm
+  M4: hex_nut_af=7.0 mm,  nut_d = 8.29 mm,  bolt_d = 4.5 mm
+  M5: hex_nut_af=8.0 mm,  nut_d = 9.45 mm,  bolt_d = 5.5 mm
+  M6: hex_nut_af=10.0 mm, nut_d = 11.8 mm,  bolt_d = 6.5 mm
+  NEVER pair bolt_d=3.4 mm (M3) with hex_nut_d=10 mm (M6) — bolt rattles in nut.
 
 OPENSCAD CODE INTERPRETATION
 Mechanical meaning to code:

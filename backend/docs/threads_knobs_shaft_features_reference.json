@@ -88,6 +88,9 @@
         "knob",
         "thumb knob",
         "adjustment knob",
+        "knurled adjustment knob",
+        "threaded adjustment knob",
+        "diamond knurled knob",
         "grip knob",
         "control knob"
       ],
@@ -101,13 +104,19 @@
       "family": "threads_knobs_shaft_features_reference",
       "standard_dimensions_mm": {
         "knob_d": 30,
-        "knob_h": 15,
-        "grip_count": 30,
-        "grip_d": 2.5,
-        "bore_d": 3.2
+        "knob_h": 18,
+        "stem_d": 16,
+        "stem_h": 7,
+        "thread_d": 8,
+        "thread_h": 20,
+        "thread_pitch": 1.25,
+        "knurl_depth": 1.0,
+        "knurl_count": 42,
+        "knurl_angle": 35,
+        "knurl_width": 1.2
       },
       "fit_guidance_mm": {
-        "bore": "insert bore for M3 heat set = 4.2 mm; self-tap = 2.8 mm"
+        "thread": "M8-like external threaded stem uses 8 mm nominal diameter and 1.25 mm pitch; verify final thread profile with the target nut before production."
       },
       "constraint_parameters": {
         "knob_d": {
@@ -115,47 +124,61 @@
           "min": 20
         },
         "knob_h": {
-          "default": 15
+          "default": 18
         },
-        "grip_count": {
-          "default": 30
+        "thread_d": {
+          "default": 8
+        },
+        "thread_pitch": {
+          "default": 1.25
+        },
+        "knurl_count": {
+          "default": 42
         }
       },
       "derived_parameters": {
-        "grip_radius": {
-          "formula": "knob_d/2"
+        "thread_turns": {
+          "formula": "thread_h / thread_pitch"
+        },
+        "thread_steps": {
+          "formula": "ceil(thread_turns * 32)"
         }
       },
       "main_features": [
-        "main knob cylinder on Z",
-        "repeated grip ridges around circumference",
-        "central through-bore or threaded pocket",
-        "top chamfer or dome optional"
+        "main cylindrical knob body on Z",
+        "diamond knurl band cut by crossed diagonal grooves",
+        "smooth shoulder or stem under knob",
+        "M8-like external threaded shaft",
+        "thread modeled as helical bead using repeated hull spheres"
       ],
       "design_rules": [
-        "grip ridges are small cylinders or cubes added around knob circumference in for-loop",
-        "bore is subtractive cylinder through full height",
-        "grip radius ≈ knob_d/2 so ridges just protrude from surface"
+        "diamond knurl uses two crossed groove directions around the knob circumference",
+        "external thread has core cylinder plus helical ridge segments",
+        "stem diameter should be smaller than knob diameter and larger than thread diameter",
+        "thread pitch should match intended metric fastener, for M8 coarse use 1.25 mm"
       ],
       "validation_criteria": [
-        "grip ridge for-loop present",
-        "bore subtracted",
-        "knob body cylinder in union"
+        "diamond_knurl_band module present",
+        "external_thread module present",
+        "knurl_count loop present",
+        "thread_pitch parameter present",
+        "knob, stem, and threaded shaft stacked along Z"
       ],
       "failure_modes": [
-        "no grips — smooth cylinder, not a knob",
-        "bore missing — cannot mount on shaft",
-        "grip ridges inside bore — geometry error"
+        "smooth cylinder without diamond knurl grooves",
+        "missing threaded stem",
+        "thread pitch omitted or unrelated to thread height",
+        "stem diameter larger than knob diameter"
       ],
       "constraint_checks": [
         {
-          "id": "grip_loop",
+          "id": "diamond_knurl_loop",
           "severity": "warning",
-          "expression": "for-loop for grip ridges",
-          "message": "Knob should have repeated grip features for ergonomic gripping."
+          "expression": "for-loop for crossed diamond knurl grooves",
+          "message": "Knob should have repeated crossed knurl grooves for ergonomic gripping."
         }
       ],
-      "openscad_module": "$fn = 128;\n\nknob_d       = 30;\nknob_h       = 15;\ngrip_count   = 30;\ngrip_d       = 2.5;\nbore_d       = 3.2;\n\nmodule knurled_knob() {\n  difference() {\n    union() {\n      cylinder(h = knob_h, d = knob_d, center = true);\n      for (i = [0 : grip_count - 1])\n        rotate([0, 0, 360 * i / grip_count])\n          translate([knob_d/2, 0, 0])\n            cylinder(h = knob_h * 0.8, d = grip_d, center = true, $fn = 12);\n    }\n    cylinder(h = knob_h + 2, d = bore_d, center = true, $fn = 32);\n  }\n}\n\nknurled_knob();"
+      "openscad_module": "// Knurled adjustment knob - OpenSCAD\n// Units: mm\n\n$fn = 96;\n\nknob_d = 30;\nknob_h = 18;\nstem_d = 16;\nstem_h = 7;\nthread_d = 8;\nthread_h = 20;\nthread_pitch = 1.25;\n\nbore_d = 8;         // central bore diameter for shaft or insert\ngrip_count = 42;    // number of knurl ridges\nknurl_depth = 1.0;\nknurl_count = grip_count;\nknurl_angle = 35;\nknurl_width = 1.2;\n\nmodule diamond_knurl_band(d=30, h=18) {\n    difference() {\n        cylinder(d=d, h=h);\n        for (dir = [-1, 1]) {\n            for (i = [0:grip_count-1]) {\n                rotate([0, 0, i * 360 / knurl_count])\n                    translate([d/2 - knurl_depth/2, 0, h/2])\n                        rotate([0, dir * knurl_angle, 0])\n                            cube([knurl_depth * 3, knurl_width, h * 2.0], center=true);\n            }\n        }\n    }\n}\n\nmodule external_thread(d=8, pitch=1.25, length=20, depth=0.45) {\n    turns = length / pitch;\n    steps = ceil(turns * 32);\n    union() {\n        cylinder(d=d - depth, h=length);\n        for (i = [0:steps-1]) {\n            z1 = i * length / steps;\n            z2 = (i + 1) * length / steps;\n            a1 = i * 360 / 32;\n            a2 = (i + 1) * 360 / 32;\n            hull() {\n                rotate([0, 0, a1])\n                    translate([d/2 - depth, 0, z1])\n                        sphere(r=depth, $fn=12);\n                rotate([0, 0, a2])\n                    translate([d/2 - depth, 0, z2])\n                        sphere(r=depth, $fn=12);\n            }\n        }\n    }\n}\n\nmodule knurled_adjustment_knob() {\n    difference() {\n        union() {\n            translate([0, 0, thread_h + stem_h])\n                diamond_knurl_band(knob_d, knob_h);\n            translate([0, 0, thread_h])\n                cylinder(d=stem_d, h=stem_h);\n            external_thread(thread_d, thread_pitch, thread_h);\n        }\n        // Central bore for shaft or threaded insert\n        cylinder(h=knob_h + stem_h + thread_h + 2, d=bore_d);\n    }\n}\n\nknurled_adjustment_knob();"
     }
   ]
 }

@@ -128,17 +128,25 @@
         "optional nut pocket for lead screw if combined with actuator"
       ],
       "design_rules": [
-        "rod bores horizontal along X axis, symmetric about Y=0 at rod_spacing/2",
-        "bore diameter = lm_od + 0.1 mm (transition fit)",
-        "mounting holes on top face in symmetric grid",
-        "carriage length ≥ lm_length + 2*end_wall"
+        "Rod bores: horizontal along X using rotate([0,90,0]), centered at y=±rod_spacing/2, z = -car_h/2 + bottom_wall + lm_od/2.",
+        "Bore diameter = lm_od + 0.1 mm (15.1 mm for LM8UU) for transition/press fit.",
+        "Bottom relief: translate([0,0,-car_h/2 + bottom_wall + relief_depth/2]) cube([...relief_depth], center=true). NEVER use -car_h/2 + wall_thickness/2 — that centers the cube at the bottom face and removes the entire bottom wall.",
+        "Mounting holes: center the cylinder at z=0 so it passes through the full carriage height: translate([x,y,0]) cylinder(h=car_h+2, d=mount_d, center=true). Do NOT translate to carriage_height/2+0.1 with center=true — that creates half-depth holes only.",
+        "Hex nut trap and coaxial bolt must be the SAME bolt family. M3: hex_nut_af=5.5 mm, bolt_d=3.4 mm. M4: hex_nut_af=7.0 mm, bolt_d=4.5 mm. M6: hex_nut_af=10 mm, bolt_d=6.5 mm. NEVER pair a 3.4 mm bolt hole (M3) with a 10 mm nut pocket (M6).",
+        "Hex nut pocket depth = nut_height + 0.2 mm; diameter = hex_nut_af/cos(30) + 0.2 mm with $fn=6.",
+        "Carriage length = lm_length + 2*end_wall; width = rod_spacing + lm_od + 2*side_wall."
       ],
       "validation_criteria": [
-        "two rod bores parallel in difference",
-        "mounting holes on top face",
+        "two rod bores use rotate([0,90,0]) with bore = lm_od+0.1",
+        "bottom relief translate z = -car_h/2 + bottom_wall + relief_depth/2 — NOT -car_h/2 + wall_thickness/2",
+        "mounting holes centered at z=0 (through-holes), not at z=car_h/2",
+        "hex nut pocket diameter and coaxial bolt clearance hole match the same bolt size",
         "carriage solid cube in union"
       ],
       "failure_modes": [
+        "bottom relief translate([0,0,-car_h/2 + wall_thickness/2]) with h=wall_thickness removes the entire bottom wall",
+        "mounting holes at translate([..., carriage_height/2+0.1]) with center=true — holes are only half-depth",
+        "hex_nut_d = 10 mm (M6) with hex_bolt_d = 3.4 mm (M3) — bolt will rattle loose in nut",
         "single rod bore instead of two",
         "bore too large — bearing slips",
         "no mounting holes on top"
@@ -151,7 +159,7 @@
           "message": "Dual-rod carriage needs two parallel rod bores."
         }
       ],
-      "openscad_module": "$fn = 64;\n\nrod_d       = 8;\nlm_od       = 15;\nlm_length   = 24;\nrod_spacing = 40;\nend_wall    = 6;\nside_wall   = 5;\ntop_wall    = 4;\nmount_hole_d = 4.5;\n\ncar_l = lm_length + 2*end_wall;\ncar_w = rod_spacing + lm_od + 2*side_wall;\ncar_h = lm_od + top_wall;\n\nmodule dual_rod_carriage() {\n  difference() {\n    cube([car_l, car_w, car_h], center = true);\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, -top_wall/2])\n        rotate([0, 90, 0])\n          cylinder(h = car_l + 2, d = lm_od + 0.1, center = true, $fn = 64);\n    for (x = [-car_l/4, car_l/4])\n      for (y = [-car_w/4, car_w/4])\n        translate([x, y, car_h/2])\n          cylinder(h = top_wall + 2, d = mount_hole_d, center = true, $fn = 32);\n  }\n}\n\ndual_rod_carriage();"
+      "openscad_module": "$fn = 96;\n\n// ── Parameters ───────────────────────────────────────────\nlm_od        = 15;    // LM8UU outer diameter\nlm_length    = 24;    // LM8UU length\nrod_spacing  = 40;    // rod centre-to-centre (Y)\nend_wall     = 6;     // wall beyond bearing ends (X)\nside_wall    = 5;     // wall beside bearing (Y)\ntop_wall     = 4;     // wall above bearing\nbottom_wall  = 4;     // minimum wall below bearing — MUST be ≥ wall_thickness\nrelief_depth = 8;     // depth of bottom material relief\nmount_hole_d = 4.5;   // M4 clearance hole\n\n// Hex nut trap — M3 (must match bolt family)\nhex_nut_af   = 5.5;   // M3 across-flats\nhex_nut_h    = 2.6;   // M3 nut height\nhex_bolt_d   = 3.4;   // M3 clearance (3.0 + 0.4)\n\ncar_l = lm_length + 2*end_wall;\ncar_w = rod_spacing + lm_od + 2*side_wall;\ncar_h = lm_od + top_wall + bottom_wall;\n\nrod_z = -car_h/2 + bottom_wall + lm_od/2;  // rod bore centre Z\n\nmodule dual_rod_carriage() {\n  difference() {\n    cube([car_l, car_w, car_h], center = true);\n\n    // Rod bores — along X\n    for (y = [-rod_spacing/2, rod_spacing/2])\n      translate([0, y, rod_z])\n        rotate([0, 90, 0])\n          cylinder(h = car_l + 2, d = lm_od + 0.1, center = true, $fn = 64);\n\n    // Bottom relief — bottom_wall stays solid\n    // CORRECT formula: -car_h/2 + bottom_wall + relief_depth/2\n    // WRONG formula:   -car_h/2 + wall_thickness/2  (removes bottom wall)\n    translate([0, 0, -car_h/2 + bottom_wall + relief_depth/2])\n      cube([car_l - 2*end_wall, car_w - 2*side_wall, relief_depth], center = true);\n\n    // Mounting holes — centered at z=0 for full through-height\n    for (x = [-car_l/4, car_l/4])\n      for (y = [-car_w/4, car_w/4])\n        translate([x, y, 0])\n          cylinder(h = car_h + 2, d = mount_hole_d, center = true, $fn = 32);\n\n    // Hex nut pocket — M3 (hex_nut_af=5.5 matches hex_bolt_d=3.4)\n    translate([0, 0, car_h/2 - hex_nut_h/2])\n      cylinder(h = hex_nut_h + 0.2, d = hex_nut_af / cos(30) + 0.2,\n               center = true, $fn = 6);\n\n    // Coaxial bolt clearance — same bolt family as hex nut\n    cylinder(h = car_h + 2, d = hex_bolt_d, center = true, $fn = 32);\n  }\n}\n\ndual_rod_carriage();"
     }
   ]
 }

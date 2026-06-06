@@ -14,65 +14,194 @@
     "scope": "All 14 belt profiles in pulley-generator.scad: MXL, 40DP, XL, H, T2.5, T5, T10, AT5, HTD 3mm, HTD 5mm, HTD 8mm, GT2 2mm, GT2 3mm, GT2 5mm. Also includes: GT2 2mm smooth bearing idler pulley (standalone — not from pulley-generator.scad).",
     "retrieval": {
       "primary_keywords": [
-        "smooth idler", "bearing idler", "idler pulley", "smooth idler pulley",
-        "bearing bore", "bearing seat", "bearing sleeve", "bearing press fit",
-        "free spinning pulley", "belt tensioner", "belt tensioner idler",
-        "623zz", "624zz", "625zz", "608zz",
-        "shoulder bolt", "m3 shoulder bolt", "m4 shoulder bolt", "m5 shoulder bolt",
-        "idler sleeve", "smooth pulley", "passive pulley",
-        "pulley","belt drive","timing pulley","belt pulley",
-        "gt2","gt2 2mm","gt2 3mm","gt2 5mm",
-        "htd","htd 3mm","htd 5mm","htd 8mm",
-        "mxl","xl","t2.5","t5","t10","at5","h belt","40dp",
-        "toothed pulley","flanged pulley",
-        "retainer","grub screw","captive nut","pulley base",
-        "pulley3DP","pulleyCAD","pulleyTeeth","pulleyRetainer","pulleyIdler"
+        "smooth idler",
+        "bearing idler",
+        "idler pulley",
+        "smooth idler pulley",
+        "bearing bore",
+        "bearing seat",
+        "bearing sleeve",
+        "bearing press fit",
+        "free spinning pulley",
+        "belt tensioner",
+        "belt tensioner idler",
+        "623zz",
+        "624zz",
+        "625zz",
+        "608zz",
+        "shoulder bolt",
+        "m3 shoulder bolt",
+        "m4 shoulder bolt",
+        "m5 shoulder bolt",
+        "idler sleeve",
+        "smooth pulley",
+        "passive pulley",
+        "pulley",
+        "belt drive",
+        "timing pulley",
+        "belt pulley",
+        "gt2",
+        "gt2 2mm",
+        "gt2 3mm",
+        "gt2 5mm",
+        "htd",
+        "htd 3mm",
+        "htd 5mm",
+        "htd 8mm",
+        "mxl",
+        "xl",
+        "t2.5",
+        "t5",
+        "t10",
+        "at5",
+        "h belt",
+        "40dp",
+        "toothed pulley",
+        "flanged pulley",
+        "retainer",
+        "grub screw",
+        "captive nut",
+        "pulley base",
+        "pulley3DP",
+        "pulleyCAD",
+        "pulleyTeeth",
+        "pulleyRetainer",
+        "pulleyIdler"
       ],
-      "negative_keywords": ["sprocket chain","gear","bearing housing","bracket","fan","enclosure","flange pipe"],
+      "negative_keywords": [
+        "sprocket chain",
+        "gear",
+        "bearing housing",
+        "bracket",
+        "fan",
+        "enclosure",
+        "flange pipe"
+      ],
       "min_score_threshold": 0.12
     },
     "library_modules": {
       "pulley3DP": {
         "purpose": "Simplified helper for 3D-printable pulleys with hardcoded sensible defaults.",
-        "main_parameters": ["model","teethCount","beltWidth","shaftDiameter"],
-        "optional_parameters": ["toothWidthTweak=0.2","toothDepthTweak=0"],
+        "main_parameters": [
+          "model",
+          "teethCount",
+          "beltWidth",
+          "shaftDiameter"
+        ],
+        "optional_parameters": [
+          "toothWidthTweak=0.2",
+          "toothDepthTweak=0"
+        ],
         "hardcoded_defaults": {
-          "retainerInfo": [2,1,1],
-          "idlerInfo":    [2,1,1],
-          "baseInfo":     [20,8],
-          "nutProfile":   ["hex",3.2,5.7,2.7],
-          "captiveNuts":  [1,90,1.2],
-          "autoFlip":     true
+          "retainerInfo": [
+            2,
+            1,
+            1
+          ],
+          "idlerInfo": [
+            2,
+            1,
+            1
+          ],
+          "baseInfo": [
+            20,
+            8
+          ],
+          "nutProfile": [
+            "hex",
+            3.2,
+            5.7,
+            2.7
+          ],
+          "captiveNuts": [
+            1,
+            90,
+            1.2
+          ],
+          "autoFlip": true
         }
       },
       "pulleyCAD": {
         "purpose": "CAD-representation helper. Auto-calculates retainer/idler offsets to hit exact pulleyDiameter.",
-        "main_parameters": ["model","teethCount","beltWidth","shaftDiameter","pulleyDiameter","retainerHeight","idlerHeight","baseDiameter","baseHeight"],
+        "main_parameters": [
+          "model",
+          "teethCount",
+          "beltWidth",
+          "shaftDiameter",
+          "pulleyDiameter",
+          "retainerHeight",
+          "idlerHeight",
+          "baseDiameter",
+          "baseHeight"
+        ],
         "derived_internally": {
           "retainerIdlerOffset": "(pulleyDiameter - pulleyTeethDiameter) / 2"
         }
       },
       "pulley": {
         "purpose": "Full parametric pulley — every section independently controlled.",
-        "main_parameters": ["model","teethCount","beltWidth","shaftDiameter"],
+        "main_parameters": [
+          "model",
+          "teethCount",
+          "beltWidth",
+          "shaftDiameter"
+        ],
         "structured_parameters": {
           "retainerInfo": "[offset_mm, taperedHeight_mm, flatHeight_mm]  — flange ABOVE teeth",
-          "idlerInfo":    "[offset_mm, taperedHeight_mm, flatHeight_mm]  — flange BELOW teeth",
-          "baseInfo":     "[diameter_mm, height_mm]                      — hub cylinder below idler",
-          "nutProfile":   "[type, screwDiameter, nutFaceSize, nutThickness]  — 'hex' or 'square'",
-          "captiveNuts":  "[numberOfNuts, angleBetweenNuts_deg, offsetFromShaft_mm]"
+          "idlerInfo": "[offset_mm, taperedHeight_mm, flatHeight_mm]  — flange BELOW teeth",
+          "baseInfo": "[diameter_mm, height_mm]                      — hub cylinder below idler",
+          "nutProfile": "[type, screwDiameter, nutFaceSize, nutThickness]  — 'hex' or 'square'",
+          "captiveNuts": "[numberOfNuts, angleBetweenNuts_deg, offsetFromShaft_mm]"
         },
         "optional_parameters": {
           "toothWidthTweak": "Added to belt tooth width model. 0.2 mm typical for 3D printing. Positive value makes pulley teeth narrower (looser fit).",
           "toothDepthTweak": "Added to belt tooth depth. Changes tooth shape — use sparingly.",
-          "autoFlip":        "Flips assembly if teeth+idler OD > base diameter, for flat print bed face."
+          "autoFlip": "Flips assembly if teeth+idler OD > base diameter, for flat print bed face."
         }
       },
-      "pulleyTeeth":    {"purpose":"Toothed cylinder only — no base/retainer/idler.", "parameters":["model","teeth","height","toothWidthTweak","toothDepthTweak"]},
-      "pulleyRetainer": {"purpose":"Top flange only (above teeth).", "parameters":["teeth","pulleyDiameter","retainerInfo"]},
-      "pulleyIdler":    {"purpose":"Bottom flange only (below teeth).", "parameters":["teeth","pulleyDiameter","idlerInfo"]},
-      "pulleyBase":     {"purpose":"Hub cylinder only. Auto-bevels top edge when base > upperSection by up to 1 mm.", "parameters":["diameter","height","upperSection"]},
-      "captiveGrubAndNut": {"purpose":"Nut pocket negative volume — subtract from base in difference().", "parameters":["nutProfile","captiveNuts","entranceDepth","screwLength"]}
+      "pulleyTeeth": {
+        "purpose": "Toothed cylinder only — no base/retainer/idler.",
+        "parameters": [
+          "model",
+          "teeth",
+          "height",
+          "toothWidthTweak",
+          "toothDepthTweak"
+        ]
+      },
+      "pulleyRetainer": {
+        "purpose": "Top flange only (above teeth).",
+        "parameters": [
+          "teeth",
+          "pulleyDiameter",
+          "retainerInfo"
+        ]
+      },
+      "pulleyIdler": {
+        "purpose": "Bottom flange only (below teeth).",
+        "parameters": [
+          "teeth",
+          "pulleyDiameter",
+          "idlerInfo"
+        ]
+      },
+      "pulleyBase": {
+        "purpose": "Hub cylinder only. Auto-bevels top edge when base > upperSection by up to 1 mm.",
+        "parameters": [
+          "diameter",
+          "height",
+          "upperSection"
+        ]
+      },
+      "captiveGrubAndNut": {
+        "purpose": "Nut pocket negative volume — subtract from base in difference().",
+        "parameters": [
+          "nutProfile",
+          "captiveNuts",
+          "entranceDepth",
+          "screwLength"
+        ]
+      }
     },
     "library_functions": {
       "pulleyData": {
@@ -83,12 +212,28 @@
       "calc_pulley_dia_tooth_spacing": {
         "signature": "calc_pulley_dia_tooth_spacing(teeth, tooth_pitch, pitch_line_offset)",
         "formula": "2 * ((teeth * tooth_pitch) / (PI * 2) - pitch_line_offset)",
-        "used_by": ["MXL","40DP","XL","H","T10","HTD 3mm","HTD 5mm","HTD 8mm","GT2 2mm","GT2 3mm","GT2 5mm"]
+        "used_by": [
+          "MXL",
+          "40DP",
+          "XL",
+          "H",
+          "T10",
+          "HTD 3mm",
+          "HTD 5mm",
+          "HTD 8mm",
+          "GT2 2mm",
+          "GT2 3mm",
+          "GT2 5mm"
+        ]
       },
       "calc_pulley_dia_tooth_spacing_curvefit": {
         "signature": "calc_pulley_dia_tooth_spacing_curvefit(teeth, b, c, d)",
         "formula": "((c * pow(teeth,d)) / (b + pow(teeth,d))) * teeth",
-        "used_by": ["T2.5","T5","AT5"],
+        "used_by": [
+          "T2.5",
+          "T5",
+          "AT5"
+        ],
         "note": "Curve-fit accounts for effective pitch variation with tooth count in trapezoidal profiles."
       }
     },
@@ -105,63 +250,102 @@
       "captive_nut": "Nut pocket placed at baseHeight/2 inside base cylinder. offsetFromShaft in captiveNuts[2] is added to shaftDiameter/2 internally by the library."
     },
     "constraint_checks": [
-      {"id":"base_nut_height",   "severity":"error",   "condition":"baseInfo[1] >= nutProfile[2]",                             "message":"Base height must be >= nut face size or captive nuts won't fit."},
-      {"id":"base_nut_diameter", "severity":"error",   "condition":"(baseInfo[0] - shaftDiameter) / 2 >= nutProfile[3] + 3",   "message":"Base diameter too small for nut depth — increase baseDiameter."},
-      {"id":"model_supported",   "severity":"error",   "condition":"model in supported list",                                  "message":"Unsupported model — pulleyData() returns [] and library echoes UNSUPPORTED MODEL."}
+      {
+        "id": "base_nut_height",
+        "severity": "error",
+        "condition": "baseInfo[1] >= nutProfile[2]",
+        "message": "Base height must be >= nut face size or captive nuts won't fit."
+      },
+      {
+        "id": "base_nut_diameter",
+        "severity": "error",
+        "condition": "(baseInfo[0] - shaftDiameter) / 2 >= nutProfile[3] + 3",
+        "message": "Base diameter too small for nut depth — increase baseDiameter."
+      },
+      {
+        "id": "model_supported",
+        "severity": "error",
+        "condition": "model in supported list",
+        "message": "Unsupported model — pulleyData() returns [] and library echoes UNSUPPORTED MODEL."
+      }
     ],
     "output_policy": {
       "openscad_code": "Use include <pulley-generator.scad> ONLY for toothed/timing pulleys that call pulley3DP(), pulley(), pulleyCAD(), pulleyTeeth(), pulleyRetainer(), pulleyIdler(), pulleyBase(), or captiveGrubAndNut(). DO NOT use include for smooth bearing idlers such as 623ZZ, 624ZZ, 625ZZ, or 608ZZ idlers. Smooth bearing idlers must be generated as standalone OpenSCAD primitives using cylinder(), union(), difference(), and translate().",
-      "forbidden_in_code": ["material recommendation comments","markdown fences","string metadata variables"]
-    },"generation_decision_policy": {
-  "priority_order": [
-    "If prompt contains smooth + idler, bearing idler, 624ZZ, 623ZZ, 625ZZ, 608ZZ, bearing sleeve, free spinning pulley, or belt tensioner idler, classify as smooth_bearing_idler.",
-    "If prompt contains teeth, tooth count, motor pulley, drive pulley, grub screw, set screw, captive nut, pulley3DP, pulleyCAD, or timing pulley, classify as toothed_timing_pulley.",
-    "If prompt contains both GT2 and 624ZZ/idler/smooth/bearing, smooth_bearing_idler wins."
-  ],
-  "smooth_bearing_idler": {
-    "include_required": false,
-    "forbidden_modules": [
-      "pulley3DP",
-      "pulley",
-      "pulleyCAD",
-      "pulleyTeeth",
-      "pulleyRetainer",
-      "pulleyIdler",
-      "pulleyBase"
-    ],
-    "required_method": "standalone OpenSCAD primitives"
-  },
-  "toothed_timing_pulley": {
-    "include_required": true,
-    "required_include": "include <pulley-generator.scad>",
-    "allowed_modules": [
-      "pulley3DP",
-      "pulley",
-      "pulleyCAD",
-      "pulleyTeeth",
-      "pulleyRetainer",
-      "pulleyIdler",
-      "pulleyBase",
-      "captiveGrubAndNut"
-    ]
-  }
-},
+      "forbidden_in_code": [
+        "material recommendation comments",
+        "markdown fences",
+        "string metadata variables"
+      ]
+    },
+    "generation_decision_policy": {
+      "priority_order": [
+        "If prompt contains smooth + idler, bearing idler, 624ZZ, 623ZZ, 625ZZ, 608ZZ, bearing sleeve, free spinning pulley, or belt tensioner idler, classify as smooth_bearing_idler.",
+        "If prompt contains teeth, tooth count, motor pulley, drive pulley, grub screw, set screw, captive nut, pulley3DP, pulleyCAD, or timing pulley, classify as toothed_timing_pulley.",
+        "If prompt contains both GT2 and 624ZZ/idler/smooth/bearing, smooth_bearing_idler wins."
+      ],
+      "smooth_bearing_idler": {
+        "include_required": false,
+        "forbidden_modules": [
+          "pulley3DP",
+          "pulley",
+          "pulleyCAD",
+          "pulleyTeeth",
+          "pulleyRetainer",
+          "pulleyIdler",
+          "pulleyBase"
+        ],
+        "required_method": "standalone OpenSCAD primitives"
+      },
+      "toothed_timing_pulley": {
+        "include_required": true,
+        "required_include": "include <pulley-generator.scad>",
+        "allowed_modules": [
+          "pulley3DP",
+          "pulley",
+          "pulleyCAD",
+          "pulleyTeeth",
+          "pulleyRetainer",
+          "pulleyIdler",
+          "pulleyBase",
+          "captiveGrubAndNut"
+        ]
+      }
+    },
     "material_suggestions": [
-      {"material":"6061-T6 aluminum",  "use_case":"machined pulleys, all profiles",          "notes":"Best surface finish; anodize for wear resistance."},
-      {"material":"POM (Delrin)",       "use_case":"machined idler sleeves",                  "notes":"Self-lubricating; tight tolerances; good belt contact surface."},
-      {"material":"PA12 (Nylon 12)",    "use_case":"3D-printed timing pulleys, all profiles", "notes":"Best wear resistance for printed parts. Use toothWidthTweak=0.2 and $fn=teethCount*4."},
-      {"material":"PETG",               "use_case":"3D-printed prototypes, light duty",        "notes":"Easier to print than PA12; lower wear resistance. Use toothWidthTweak=0.25."}
+      {
+        "material": "6061-T6 aluminum",
+        "use_case": "machined pulleys, all profiles",
+        "notes": "Best surface finish; anodize for wear resistance."
+      },
+      {
+        "material": "POM (Delrin)",
+        "use_case": "machined idler sleeves",
+        "notes": "Self-lubricating; tight tolerances; good belt contact surface."
+      },
+      {
+        "material": "PA12 (Nylon 12)",
+        "use_case": "3D-printed timing pulleys, all profiles",
+        "notes": "Best wear resistance for printed parts. Use toothWidthTweak=0.2 and $fn=teethCount*4."
+      },
+      {
+        "material": "PETG",
+        "use_case": "3D-printed prototypes, light duty",
+        "notes": "Easier to print than PA12; lower wear resistance. Use toothWidthTweak=0.25."
+      }
     ]
   },
-
   "parts": [
-
     {
       "id": "pulley_mxl",
       "category": "timing_pulley",
       "name": "MXL timing pulley",
       "belt_profile": "MXL",
-      "aliases": ["mxl pulley","mxl belt pulley","imperial timing pulley","2.032mm pitch"],
+      "aliases": [
+        "mxl pulley",
+        "mxl belt pulley",
+        "imperial timing pulley",
+        "2.032mm pitch"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 2.032,
         "pitch_line_offset_mm": 0.254,
@@ -172,10 +356,34 @@
         "application": "Light-duty imperial standard (~0.080\"). Precision instruments, small desktop CNC, light robotics."
       },
       "main_parameters": {
-        "model":         {"value": "\"MXL\"",  "note": "Exact string required by library"},
-        "teethCount":    {"default": 20,        "min": 10, "typical_range": "10–60"},
-        "beltWidth":     {"default": 6,         "common_mm": [3,4,6]},
-        "shaftDiameter": {"default": 5.0,       "common_mm": [3,4,5,6,6.35,8]}
+        "model": {
+          "value": "\"MXL\"",
+          "note": "Exact string required by library"
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10,
+          "typical_range": "10–60"
+        },
+        "beltWidth": {
+          "default": 6,
+          "common_mm": [
+            3,
+            4,
+            6
+          ]
+        },
+        "shaftDiameter": {
+          "default": 5.0,
+          "common_mm": [
+            3,
+            4,
+            5,
+            6,
+            6.35,
+            8
+          ]
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -183,20 +391,29 @@
           "example_20t": "≈ 12.45 mm",
           "note": "Solid cylinder OD before tooth grooves are subtracted."
         },
-        "retainerDiameter": {"formula": "pulley_OD + 2 * retainerInfo[0]"},
-        "idlerDiameter":    {"formula": "pulley_OD + 2 * idlerInfo[0]"},
-        "totalHeight":      {"formula": "baseInfo[1] + idlerInfo[1] + idlerInfo[2] + beltWidth + retainerInfo[1] + retainerInfo[2]"}
+        "retainerDiameter": {
+          "formula": "pulley_OD + 2 * retainerInfo[0]"
+        },
+        "idlerDiameter": {
+          "formula": "pulley_OD + 2 * idlerInfo[0]"
+        },
+        "totalHeight": {
+          "formula": "baseInfo[1] + idlerInfo[1] + idlerInfo[2] + beltWidth + retainerInfo[1] + retainerInfo[2]"
+        }
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"MXL\";\nteethCount    = 20;\nbeltWidth     = 6;\nshaftDiameter = 5.0;\n\n// ── TWEAKS ──\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model           = model,\n    teethCount      = teethCount,\n    beltWidth       = beltWidth,\n    shaftDiameter   = shaftDiameter,\n    toothWidthTweak = toothWidthTweak,\n    toothDepthTweak = toothDepthTweak\n);",
       "openscad_full_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"MXL\";\nteethCount    = 20;\nbeltWidth     = 6;\nshaftDiameter = 5.0;\n\n// ── STRUCTURED PARAMETERS ──\nretainerInfo = [2, 1, 1];                  // [offset_mm, taper_mm, flat_mm] above teeth\nidlerInfo    = [2, 1, 1];                  // [offset_mm, taper_mm, flat_mm] below teeth\nbaseInfo     = [20, 8];                    // [diameter_mm, height_mm]\nnutProfile   = [\"hex\", 3.2, 5.7, 2.7];   // [type, screwD, nutFace, nutThick] M3 hex\ncaptiveNuts  = [1, 90, 1.2];              // [count, angleDeg, offsetFromShaft_mm]\n\n// ── TWEAKS ──\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley(\n    model           = model,\n    teethCount      = teethCount,\n    beltWidth       = beltWidth,\n    shaftDiameter   = shaftDiameter,\n    retainerInfo    = retainerInfo,\n    idlerInfo       = idlerInfo,\n    baseInfo        = baseInfo,\n    nutProfile      = nutProfile,\n    captiveNuts     = captiveNuts,\n    toothWidthTweak = toothWidthTweak,\n    toothDepthTweak = toothDepthTweak,\n    autoFlip        = true\n);"
     },
-
     {
       "id": "pulley_40dp",
       "category": "timing_pulley",
       "name": "40DP timing pulley",
       "belt_profile": "40DP",
-      "aliases": ["40dp pulley","40 diametral pitch","inch pitch pulley"],
+      "aliases": [
+        "40dp pulley",
+        "40 diametral pitch",
+        "inch pitch pulley"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 2.07264,
         "pitch_line_offset_mm": 0.1778,
@@ -207,10 +424,20 @@
         "application": "Imperial diametral pitch. Older US CNC and precision instrument drives."
       },
       "main_parameters": {
-        "model":         {"value": "\"40DP\"", "note": "Exact string required"},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 6},
-        "shaftDiameter": {"default": 5.0}
+        "model": {
+          "value": "\"40DP\"",
+          "note": "Exact string required"
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 6
+        },
+        "shaftDiameter": {
+          "default": 5.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -220,13 +447,18 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"40DP\";\nteethCount    = 20;\nbeltWidth     = 6;\nshaftDiameter = 5.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_xl",
       "category": "timing_pulley",
       "name": "XL timing pulley",
       "belt_profile": "XL",
-      "aliases": ["xl pulley","xl belt","extra light timing belt","1/5 inch pitch","5.08mm pitch"],
+      "aliases": [
+        "xl pulley",
+        "xl belt",
+        "extra light timing belt",
+        "1/5 inch pitch",
+        "5.08mm pitch"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 5.08,
         "pitch_line_offset_mm": 0.254,
@@ -237,10 +469,24 @@
         "application": "Light-duty imperial 1/5\" pitch. Servo drives, older CNC axes, light automation."
       },
       "main_parameters": {
-        "model":         {"value": "\"XL\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 9.5, "common_mm": [6.4,9.5,12.7]},
-        "shaftDiameter": {"default": 6.35}
+        "model": {
+          "value": "\"XL\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 9.5,
+          "common_mm": [
+            6.4,
+            9.5,
+            12.7
+          ]
+        },
+        "shaftDiameter": {
+          "default": 6.35
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -249,50 +495,79 @@
         }
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"XL\";\nteethCount    = 20;\nbeltWidth     = 9.5;\nshaftDiameter = 6.35;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
-    },{
-  "id": "pulley_gt2_2mm_smooth_bearing_idler",
-  "category": "idler_pulley",
-  "name": "GT2 2mm smooth bearing idler pulley",
-  "belt_profile": "GT2 2mm",
-  "aliases": [
-    "gt2 idler pulley",
-    "gt2 smooth idler",
-    "gt2 bearing idler",
-    "dual flange idler pulley",
-    "smooth bearing pulley",
-    "belt tensioner idler"
-  ],
-  "intent_rules": [
-    "Use this record when the prompt contains idler, smooth idler, bearing bore, bearing seat, tensioner pulley, free spinning pulley, or no drive teeth.",
-    "Do not add grub screws, set screws, captive nuts, keyed bores, or motor-shaft hubs unless explicitly requested.",
-    "An idler pulley rotates freely on a bearing and should use a bearing seat instead of a motor shaft set screw."
-  ],
-  "main_parameters": {
-    "beltWidth": { "default": 6, "common_mm": [6, 9, 15] },
-    "bearing_od": { "default": 16, "note": "625 bearing OD" },
-    "bearing_id": { "default": 5, "note": "625 bearing bore" },
-    "bearing_width": { "default": 5, "note": "625 bearing width" },
-    "body_d": { "default": 18 },
-    "flange_d": { "default": 22 },
-    "flange_h": { "default": 1.5 }
-  },
-  "forbidden_features": [
-    "grub screw",
-    "set screw",
-    "captive nut",
-    "keyway",
-    "motor shaft hub",
-    "pulley() drive pulley template"
-  ],
-  "openscad_example": "$fn = 128;\n\nbelt_width = 6;\nbearing_od = 16;\nbearing_id = 5;\nbearing_width = 5;\nbody_d = 18;\nflange_d = 22;\nflange_h = 1.5;\ntotal_h = belt_width + 2 * flange_h;\n\nmodule gt2_smooth_bearing_idler() {\n    difference() {\n        union() {\n            cylinder(h = belt_width, d = body_d, center = true);\n            translate([0, 0, total_h/2 - flange_h/2])\n                cylinder(h = flange_h, d = flange_d, center = true);\n            translate([0, 0, -total_h/2 + flange_h/2])\n                cylinder(h = flange_h, d = flange_d, center = true);\n        }\n        cylinder(h = total_h + 2, d = bearing_od, center = true);\n    }\n}\n\ngt2_smooth_bearing_idler();"
-},
-
+    },
+    {
+      "id": "pulley_gt2_2mm_smooth_bearing_idler",
+      "category": "idler_pulley",
+      "name": "GT2 2mm smooth bearing idler pulley",
+      "belt_profile": "GT2 2mm",
+      "aliases": [
+        "gt2 idler pulley",
+        "gt2 smooth idler",
+        "gt2 bearing idler",
+        "dual flange idler pulley",
+        "smooth bearing pulley",
+        "belt tensioner idler"
+      ],
+      "intent_rules": [
+        "Use this record when the prompt contains idler, smooth idler, bearing bore, bearing seat, tensioner pulley, free spinning pulley, or no drive teeth.",
+        "Do not add grub screws, set screws, captive nuts, keyed bores, or motor-shaft hubs unless explicitly requested.",
+        "An idler pulley rotates freely on a bearing and should use a bearing seat instead of a motor shaft set screw."
+      ],
+      "main_parameters": {
+        "beltWidth": {
+          "default": 6,
+          "common_mm": [
+            6,
+            9,
+            15
+          ]
+        },
+        "bearing_od": {
+          "default": 16,
+          "note": "625 bearing OD"
+        },
+        "bearing_id": {
+          "default": 5,
+          "note": "625 bearing bore"
+        },
+        "bearing_width": {
+          "default": 5,
+          "note": "625 bearing width"
+        },
+        "body_d": {
+          "default": 18
+        },
+        "flange_d": {
+          "default": 22
+        },
+        "flange_h": {
+          "default": 1.5
+        }
+      },
+      "forbidden_features": [
+        "grub screw",
+        "set screw",
+        "captive nut",
+        "keyway",
+        "motor shaft hub",
+        "pulley() drive pulley template"
+      ],
+      "openscad_example": "$fn = 128;\n\nbelt_width = 6;\nbearing_od = 16;\nbearing_id = 5;\nbearing_width = 5;\nbody_d = 18;\nflange_d = 22;\nflange_h = 1.5;\ntotal_h = belt_width + 2 * flange_h;\n\nmodule gt2_smooth_bearing_idler() {\n    difference() {\n        union() {\n            cylinder(h = belt_width, d = body_d, center = true);\n            translate([0, 0, total_h/2 - flange_h/2])\n                cylinder(h = flange_h, d = flange_d, center = true);\n            translate([0, 0, -total_h/2 + flange_h/2])\n                cylinder(h = flange_h, d = flange_d, center = true);\n        }\n        cylinder(h = total_h + 2, d = bearing_od, center = true);\n    }\n}\n\ngt2_smooth_bearing_idler();",
+      "openscad_module": "// GT2 smooth belt idler — 625 bearing bore variant\n$fn = 96;\n\nteeth       = 20;      // reference tooth count for pitch formula\nbelt_pitch  = 2.0;     // GT2 belt pitch (mm)\nbelt_width  = 6.0;     // belt width (mm)\nshaft_d     = 5.0;     // 625 bearing inner diameter (mm)\nbore_d      = shaft_d;    // bore alias (used in validation)\nbearing_od  = 16.0;    // 625 bearing outer diameter (mm)\nflange_t    = 1.2;     // flange thickness (mm)\nflange_ext  = 1.5;     // flange extension past belt width (mm)\n\nPI       = 3.14159265;\npitch_d  = teeth * belt_pitch / PI;  // nominal pitch diameter\nidler_d  = bearing_od + 6;           // idler outer diameter\n\nmodule smooth_idler() {\n    difference() {\n        union() {\n            cylinder(h=belt_width, d=idler_d);\n            // Bottom flange\n            cylinder(h=flange_t, d=idler_d + 2 * flange_ext);\n            // Top flange\n            translate([0, 0, belt_width - flange_t])\n                cylinder(h=flange_t, d=idler_d + 2 * flange_ext);\n        }\n        // Bearing bore\n        cylinder(h=belt_width + 2, d=bearing_od);\n    }\n}\n\nsmooth_idler();"
+    },
     {
       "id": "pulley_h",
       "category": "timing_pulley",
       "name": "H timing pulley",
       "belt_profile": "H",
-      "aliases": ["h belt pulley","h timing belt","9.525mm pitch","3/8 inch pitch","car timing belt"],
+      "aliases": [
+        "h belt pulley",
+        "h timing belt",
+        "9.525mm pitch",
+        "3/8 inch pitch",
+        "car timing belt"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 9.525,
         "pitch_line_offset_mm": 0.381,
@@ -303,10 +578,25 @@
         "application": "Heavy-duty imperial 3/8\" pitch. Industrial machinery, large CNC routers, car timing belt drives."
       },
       "main_parameters": {
-        "model":         {"value": "\"H\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 25.4, "common_mm": [12.7,19.05,25.4,38.1]},
-        "shaftDiameter": {"default": 12.7}
+        "model": {
+          "value": "\"H\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 25.4,
+          "common_mm": [
+            12.7,
+            19.05,
+            25.4,
+            38.1
+          ]
+        },
+        "shaftDiameter": {
+          "default": 12.7
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -316,28 +606,50 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"H\";\nteethCount    = 20;\nbeltWidth     = 25.4;\nshaftDiameter = 12.7;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_t2_5",
       "category": "timing_pulley",
       "name": "T2.5 timing pulley",
       "belt_profile": "T2.5",
-      "aliases": ["t2.5 pulley","t2.5 belt","2.5mm trapezoidal","metric trapezoidal small"],
+      "aliases": [
+        "t2.5 pulley",
+        "t2.5 belt",
+        "2.5mm trapezoidal",
+        "metric trapezoidal small"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 2.5,
         "tooth_depth_mm": 0.7,
         "tooth_width_mm": 1.678,
         "tooth_shape": "trapezoidal",
         "dia_formula": "calc_pulley_dia_tooth_spacing_curvefit(teeth, 0.7467, 0.796, 1.026)",
-        "dia_formula_params": {"b": 0.7467, "c": 0.796, "d": 1.026},
+        "dia_formula_params": {
+          "b": 0.7467,
+          "c": 0.796,
+          "d": 1.026
+        },
         "dia_formula_note": "Curve-fit used; effective pitch varies with tooth count in T2.5.",
         "application": "Older metric CNC, light automation, small servo drives. Trapezoidal profile."
       },
       "main_parameters": {
-        "model":         {"value": "\"T2.5\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 6, "common_mm": [4,6,10]},
-        "shaftDiameter": {"default": 5.0}
+        "model": {
+          "value": "\"T2.5\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 6,
+          "common_mm": [
+            4,
+            6,
+            10
+          ]
+        },
+        "shaftDiameter": {
+          "default": 5.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -347,27 +659,50 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"T2.5\";\nteethCount    = 20;\nbeltWidth     = 6;\nshaftDiameter = 5.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_t5",
       "category": "timing_pulley",
       "name": "T5 timing pulley",
       "belt_profile": "T5",
-      "aliases": ["t5 pulley","t5 belt","5mm trapezoidal","metric t5"],
+      "aliases": [
+        "t5 pulley",
+        "t5 belt",
+        "5mm trapezoidal",
+        "metric t5"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 5.0,
         "tooth_depth_mm": 1.19,
         "tooth_width_mm": 3.264,
         "tooth_shape": "trapezoidal",
         "dia_formula": "calc_pulley_dia_tooth_spacing_curvefit(teeth, 0.6523, 1.591, 1.064)",
-        "dia_formula_params": {"b": 0.6523, "c": 1.591, "d": 1.064},
+        "dia_formula_params": {
+          "b": 0.6523,
+          "c": 1.591,
+          "d": 1.064
+        },
         "application": "Common metric servo drive belt. Medium-duty automation, stepper motor systems."
       },
       "main_parameters": {
-        "model":         {"value": "\"T5\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 10, "common_mm": [6,10,16,25]},
-        "shaftDiameter": {"default": 6.35}
+        "model": {
+          "value": "\"T5\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 10,
+          "common_mm": [
+            6,
+            10,
+            16,
+            25
+          ]
+        },
+        "shaftDiameter": {
+          "default": 6.35
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -377,13 +712,17 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"T5\";\nteethCount    = 20;\nbeltWidth     = 10;\nshaftDiameter = 6.35;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_t10",
       "category": "timing_pulley",
       "name": "T10 timing pulley",
       "belt_profile": "T10",
-      "aliases": ["t10 pulley","t10 belt","10mm trapezoidal","heavy trapezoidal"],
+      "aliases": [
+        "t10 pulley",
+        "t10 belt",
+        "10mm trapezoidal",
+        "heavy trapezoidal"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 10.0,
         "pitch_line_offset_mm": 0.93,
@@ -394,10 +733,26 @@
         "application": "Heavy-duty metric 10mm pitch. Industrial conveyors, large CNC gantries, heavy automation."
       },
       "main_parameters": {
-        "model":         {"value": "\"T10\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 16, "common_mm": [10,16,25,32,50]},
-        "shaftDiameter": {"default": 10.0}
+        "model": {
+          "value": "\"T10\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 16,
+          "common_mm": [
+            10,
+            16,
+            25,
+            32,
+            50
+          ]
+        },
+        "shaftDiameter": {
+          "default": 10.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -407,28 +762,51 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"T10\";\nteethCount    = 20;\nbeltWidth     = 16;\nshaftDiameter = 10.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_at5",
       "category": "timing_pulley",
       "name": "AT5 timing pulley",
       "belt_profile": "AT5",
-      "aliases": ["at5 pulley","at5 belt","asymmetric t5","modified t5"],
+      "aliases": [
+        "at5 pulley",
+        "at5 belt",
+        "asymmetric t5",
+        "modified t5"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 5.0,
         "tooth_depth_mm": 1.19,
         "tooth_width_mm": 4.268,
         "tooth_shape": "asymmetric trapezoidal",
         "dia_formula": "calc_pulley_dia_tooth_spacing_curvefit(teeth, 0.6523, 1.591, 1.064)",
-        "dia_formula_params": {"b": 0.6523, "c": 1.591, "d": 1.064},
+        "dia_formula_params": {
+          "b": 0.6523,
+          "c": 1.591,
+          "d": 1.064
+        },
         "dia_formula_note": "Identical OD formula to T5. AT5 has wider tooth (4.268 vs 3.264 mm) for higher back-tension torque capacity.",
         "application": "Higher torque than T5 at same pitch. One-directional drives, conveyors, automation with significant back-tension."
       },
       "main_parameters": {
-        "model":         {"value": "\"AT5\""},
-        "teethCount":    {"default": 20, "min": 10},
-        "beltWidth":     {"default": 10, "common_mm": [6,10,16,25]},
-        "shaftDiameter": {"default": 6.35}
+        "model": {
+          "value": "\"AT5\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 10
+        },
+        "beltWidth": {
+          "default": 10,
+          "common_mm": [
+            6,
+            10,
+            16,
+            25
+          ]
+        },
+        "shaftDiameter": {
+          "default": 6.35
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -439,13 +817,18 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"AT5\";\nteethCount    = 20;\nbeltWidth     = 10;\nshaftDiameter = 6.35;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_htd_3mm",
       "category": "timing_pulley",
       "name": "HTD 3mm timing pulley",
       "belt_profile": "HTD 3mm",
-      "aliases": ["htd 3mm pulley","htd3 pulley","3m htd","htd3m","high torque drive 3mm"],
+      "aliases": [
+        "htd 3mm pulley",
+        "htd3 pulley",
+        "3m htd",
+        "htd3m",
+        "high torque drive 3mm"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 3.0,
         "pitch_line_offset_mm": 0.381,
@@ -456,10 +839,24 @@
         "application": "HTD (High Torque Drive) 3mm pitch. Robotics, heavy 3D printers, light industrial. Rounded tooth resists tooth shear better than trapezoidal at same pitch."
       },
       "main_parameters": {
-        "model":         {"value": "\"HTD 3mm\""},
-        "teethCount":    {"default": 20, "min": 12},
-        "beltWidth":     {"default": 9, "common_mm": [6,9,15]},
-        "shaftDiameter": {"default": 5.0}
+        "model": {
+          "value": "\"HTD 3mm\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 12
+        },
+        "beltWidth": {
+          "default": 9,
+          "common_mm": [
+            6,
+            9,
+            15
+          ]
+        },
+        "shaftDiameter": {
+          "default": 5.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -469,13 +866,18 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"HTD 3mm\";\nteethCount    = 20;\nbeltWidth     = 9;\nshaftDiameter = 5.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_htd_5mm",
       "category": "timing_pulley",
       "name": "HTD 5mm timing pulley",
       "belt_profile": "HTD 5mm",
-      "aliases": ["htd 5mm pulley","htd5 pulley","5m htd","htd5m","most common htd"],
+      "aliases": [
+        "htd 5mm pulley",
+        "htd5 pulley",
+        "5m htd",
+        "htd5m",
+        "most common htd"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 5.0,
         "pitch_line_offset_mm": 0.5715,
@@ -486,10 +888,24 @@
         "application": "Most common HTD size. Heavy-duty CNC, robotics, industrial automation, 3D printer extruders."
       },
       "main_parameters": {
-        "model":         {"value": "\"HTD 5mm\""},
-        "teethCount":    {"default": 20, "min": 12},
-        "beltWidth":     {"default": 15, "common_mm": [9,15,25]},
-        "shaftDiameter": {"default": 8.0}
+        "model": {
+          "value": "\"HTD 5mm\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 12
+        },
+        "beltWidth": {
+          "default": 15,
+          "common_mm": [
+            9,
+            15,
+            25
+          ]
+        },
+        "shaftDiameter": {
+          "default": 8.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -499,13 +915,19 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"HTD 5mm\";\nteethCount    = 20;\nbeltWidth     = 15;\nshaftDiameter = 8.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_htd_8mm",
       "category": "timing_pulley",
       "name": "HTD 8mm timing pulley",
       "belt_profile": "HTD 8mm",
-      "aliases": ["htd 8mm pulley","htd8 pulley","8m htd","htd8m","heavy htd","high torque 8mm"],
+      "aliases": [
+        "htd 8mm pulley",
+        "htd8 pulley",
+        "8m htd",
+        "htd8m",
+        "heavy htd",
+        "high torque 8mm"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 8.0,
         "pitch_line_offset_mm": 0.6858,
@@ -516,10 +938,25 @@
         "application": "Heaviest HTD variant. Industrial machinery, large robots, high-torque drives requiring maximum belt load capacity."
       },
       "main_parameters": {
-        "model":         {"value": "\"HTD 8mm\""},
-        "teethCount":    {"default": 20, "min": 12},
-        "beltWidth":     {"default": 20, "common_mm": [20,30,50,85]},
-        "shaftDiameter": {"default": 12.0}
+        "model": {
+          "value": "\"HTD 8mm\""
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 12
+        },
+        "beltWidth": {
+          "default": 20,
+          "common_mm": [
+            20,
+            30,
+            50,
+            85
+          ]
+        },
+        "shaftDiameter": {
+          "default": 12.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -529,13 +966,20 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\nmodel         = \"HTD 8mm\";\nteethCount    = 20;\nbeltWidth     = 20;\nshaftDiameter = 12.0;\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model = model, teethCount = teethCount,\n    beltWidth = beltWidth, shaftDiameter = shaftDiameter,\n    toothWidthTweak = toothWidthTweak, toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_gt2_2mm",
       "category": "timing_pulley",
       "name": "GT2 2mm timing pulley",
       "belt_profile": "GT2 2mm",
-      "aliases": ["gt2 pulley","gt2 2mm","20t gt2","gt2 timing pulley","3d printer pulley","corexy pulley","2mm gt2"],
+      "aliases": [
+        "gt2 pulley",
+        "gt2 2mm",
+        "20t gt2",
+        "gt2 timing pulley",
+        "3d printer pulley",
+        "corexy pulley",
+        "2mm gt2"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 2.0,
         "pitch_line_offset_mm": 0.254,
@@ -548,10 +992,36 @@
         "tooth_geometry_note": "Grooves are subtracted from solid cylinder using curvilinear polyPoints profile. Belt rubber teeth mesh into grooves. Groove width is 1.494 mm + toothWidthTweak."
       },
       "main_parameters": {
-        "model":         {"value": "\"GT2 2mm\"", "note": "Exact string — space required between GT2 and 2mm"},
-        "teethCount":    {"default": 20, "min": 16, "typical_range": "16–80"},
-        "beltWidth":     {"default": 6, "common_mm": [6,9,15]},
-        "shaftDiameter": {"default": 5.0, "NEMA17_nominal": 5.0, "NEMA17_3dp_clearance": 5.2, "common_mm": [4,5,5.2,6,6.35,8]}
+        "model": {
+          "value": "\"GT2 2mm\"",
+          "note": "Exact string — space required between GT2 and 2mm"
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 16,
+          "typical_range": "16–80"
+        },
+        "beltWidth": {
+          "default": 6,
+          "common_mm": [
+            6,
+            9,
+            15
+          ]
+        },
+        "shaftDiameter": {
+          "default": 5.0,
+          "NEMA17_nominal": 5.0,
+          "NEMA17_3dp_clearance": 5.2,
+          "common_mm": [
+            4,
+            5,
+            5.2,
+            6,
+            6.35,
+            8
+          ]
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -603,18 +1073,39 @@
       "openscad_full_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"GT2 2mm\";\nteethCount    = 20;\nbeltWidth     = 6;\nshaftDiameter = 5.0;\n\n// ── STRUCTURED PARAMETERS ──\n// retainerInfo = [radial_offset_mm, taper_height_mm, flat_height_mm]  (flange ABOVE teeth)\nretainerInfo  = [2, 1, 1];\n// idlerInfo    = [radial_offset_mm, taper_height_mm, flat_height_mm]  (flange BELOW teeth)\nidlerInfo     = [2, 1, 1];\n// baseInfo     = [diameter_mm, height_mm]\nbaseInfo      = [20, 8];\n// nutProfile   = [\"hex\"|\"square\", screwDiameter_mm, nutFaceSize_mm, nutThickness_mm]\nnutProfile    = [\"hex\", 3.2, 5.7, 2.7];  // M3 hex nut\n// captiveNuts  = [numberOfNuts, angleBetween_deg, offsetFromShaft_mm]\ncaptiveNuts   = [1, 90, 1.2];\n\n// ── OPTIONAL TWEAKS ──\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley(\n    model           = model,\n    teethCount      = teethCount,\n    beltWidth       = beltWidth,\n    shaftDiameter   = shaftDiameter,\n    retainerInfo    = retainerInfo,\n    idlerInfo       = idlerInfo,\n    baseInfo        = baseInfo,\n    nutProfile      = nutProfile,\n    captiveNuts     = captiveNuts,\n    toothWidthTweak = toothWidthTweak,\n    toothDepthTweak = toothDepthTweak,\n    autoFlip        = true\n);",
       "openscad_cad_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"GT2 2mm\";\nteethCount    = 60;\nbeltWidth     = 6;\nshaftDiameter = 8.0;\n\n// ── CAD PARAMETERS ──\n// pulleyDiameter = desired total outer diameter of the assembled pulley\npulleyDiameter = 42.0;    // mm — library calculates retainerIdlerOffset automatically\nretainerHeight = 1.0;     // mm — flat height of retainer above teeth\nidlerHeight    = 1.0;     // mm — flat height of idler below teeth\nbaseDiameter   = 20.0;    // mm\nbaseHeight     = 6.0;     // mm\n\npulleyCAD(\n    model          = model,\n    teethCount     = teethCount,\n    beltWidth      = beltWidth,\n    shaftDiameter  = shaftDiameter,\n    pulleyDiameter = pulleyDiameter,\n    retainerHeight = retainerHeight,\n    idlerHeight    = idlerHeight,\n    baseDiameter   = baseDiameter,\n    baseHeight     = baseHeight\n);",
       "constraint_checks": [
-        {"id":"nut_height",   "severity":"error",   "expression":"baseInfo[1] >= nutProfile[2]",                             "message":"Base height must be >= nut face size (5.7mm for M3 hex)."},
-        {"id":"nut_depth",    "severity":"error",   "expression":"(baseInfo[0] - shaftDiameter) / 2 >= nutProfile[3] + 3",  "message":"Base diameter too small for nut depth — increase baseDiameter."},
-        {"id":"min_teeth",    "severity":"warning", "expression":"teethCount >= 16",                                          "message":"Minimum 16 teeth for GT2 2mm reliable engagement."}
-      ]
+        {
+          "id": "nut_height",
+          "severity": "error",
+          "expression": "baseInfo[1] >= nutProfile[2]",
+          "message": "Base height must be >= nut face size (5.7mm for M3 hex)."
+        },
+        {
+          "id": "nut_depth",
+          "severity": "error",
+          "expression": "(baseInfo[0] - shaftDiameter) / 2 >= nutProfile[3] + 3",
+          "message": "Base diameter too small for nut depth — increase baseDiameter."
+        },
+        {
+          "id": "min_teeth",
+          "severity": "warning",
+          "expression": "teethCount >= 16",
+          "message": "Minimum 16 teeth for GT2 2mm reliable engagement."
+        }
+      ],
+      "openscad_module": "// GT2 2 mm pitch timing pulley — parametric, pure OpenSCAD\n$fn = 96;\n\nteeth       = 20;      // tooth count\nbelt_pitch  = 2.0;     // GT2 belt pitch (mm)\nbelt_width  = 6.0;     // belt width (mm)\nshaft_d     = 5.0;     // shaft bore diameter (mm)\nbore_d      = shaft_d;    // bore alias (used in validation)\nhub_h       = 8.0;     // hub height below belt groove (mm)\nhub_d       = 11.0;    // hub outer diameter (mm)\nflange_t    = 1.0;     // belt retention flange thickness (mm)\nset_screw_d = 3.0;     // M3 set-screw hole diameter (mm)\n\nPI       = 3.14159265;\npitch_d  = teeth * belt_pitch / PI;  // pitch diameter\ntip_d    = pitch_d - 1.5;            // tip circle (tooth bottom)\ntotal_h  = belt_width;\n\nmodule gt2_pulley() {\n    difference() {\n        union() {\n            // Belt groove body\n            cylinder(h=total_h, d=tip_d);\n            // Flanges\n            cylinder(h=flange_t, d=tip_d + 3);\n            translate([0, 0, total_h - flange_t])\n                cylinder(h=flange_t, d=tip_d + 3);\n            // Hub\n            translate([0, 0, -hub_h])\n                cylinder(h=hub_h, d=hub_d);\n        }\n        // Shaft bore\n        translate([0, 0, -(hub_h + 1)])\n            cylinder(h=total_h + hub_h + flange_t + 2, d=shaft_d);\n        // Tooth spaces\n        for (i = [0:teeth-1])\n            rotate([0, 0, i * 360 / teeth])\n                translate([pitch_d / 2 - 0.75, 0, -0.5])\n                    cylinder(h=total_h + 1, r=0.85);\n        // Set screw\n        rotate([90, 0, 0])\n            translate([0, -hub_h / 2, 0])\n                cylinder(h=hub_d + 2, d=set_screw_d, center=true);\n    }\n}\n\ngt2_pulley();"
     },
-
     {
       "id": "pulley_gt2_3mm",
       "category": "timing_pulley",
       "name": "GT2 3mm timing pulley",
       "belt_profile": "GT2 3mm",
-      "aliases": ["gt2 3mm pulley","3mm gt2","gt3 pulley","gt2 3mm pitch","heavy gt2"],
+      "aliases": [
+        "gt2 3mm pulley",
+        "3mm gt2",
+        "gt3 pulley",
+        "gt2 3mm pitch",
+        "heavy gt2"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 3.0,
         "pitch_line_offset_mm": 0.381,
@@ -625,10 +1116,25 @@
         "application": "Higher torque than GT2 2mm. Heavy 3D printers, medium-duty CNC, robots needing GT2 anti-backlash with higher power."
       },
       "main_parameters": {
-        "model":         {"value": "\"GT2 3mm\"", "note": "Space between GT2 and 3mm required"},
-        "teethCount":    {"default": 20, "min": 12},
-        "beltWidth":     {"default": 9, "common_mm": [6,9,15]},
-        "shaftDiameter": {"default": 5.0}
+        "model": {
+          "value": "\"GT2 3mm\"",
+          "note": "Space between GT2 and 3mm required"
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 12
+        },
+        "beltWidth": {
+          "default": 9,
+          "common_mm": [
+            6,
+            9,
+            15
+          ]
+        },
+        "shaftDiameter": {
+          "default": 5.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -638,13 +1144,18 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"GT2 3mm\";\nteethCount    = 20;\nbeltWidth     = 9;\nshaftDiameter = 5.0;\n\n// ── TWEAKS ──\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model           = model,\n    teethCount      = teethCount,\n    beltWidth       = beltWidth,\n    shaftDiameter   = shaftDiameter,\n    toothWidthTweak = toothWidthTweak,\n    toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "pulley_gt2_5mm",
       "category": "timing_pulley",
       "name": "GT2 5mm timing pulley",
       "belt_profile": "GT2 5mm",
-      "aliases": ["gt2 5mm pulley","5mm gt2","gt5 pulley","gt2 5mm pitch","heavy gt2 5"],
+      "aliases": [
+        "gt2 5mm pulley",
+        "5mm gt2",
+        "gt5 pulley",
+        "gt2 5mm pitch",
+        "heavy gt2 5"
+      ],
       "belt_profile_data": {
         "tooth_pitch_mm": 5.0,
         "pitch_line_offset_mm": 0.5715,
@@ -655,10 +1166,25 @@
         "application": "High-torque GT2 variant. Heavy robot arms, large CNC axes, industrial synchronous drives with GT2 anti-backlash at high power."
       },
       "main_parameters": {
-        "model":         {"value": "\"GT2 5mm\"", "note": "Space between GT2 and 5mm required"},
-        "teethCount":    {"default": 20, "min": 12},
-        "beltWidth":     {"default": 15, "common_mm": [9,15,25]},
-        "shaftDiameter": {"default": 8.0}
+        "model": {
+          "value": "\"GT2 5mm\"",
+          "note": "Space between GT2 and 5mm required"
+        },
+        "teethCount": {
+          "default": 20,
+          "min": 12
+        },
+        "beltWidth": {
+          "default": 15,
+          "common_mm": [
+            9,
+            15,
+            25
+          ]
+        },
+        "shaftDiameter": {
+          "default": 8.0
+        }
       },
       "derived_parameters": {
         "pulley_OD": {
@@ -668,40 +1194,97 @@
       },
       "openscad_3dp_example": "include <pulley-generator.scad>\n\n// ── MAIN PARAMETERS ──\nmodel         = \"GT2 5mm\";\nteethCount    = 20;\nbeltWidth     = 15;\nshaftDiameter = 8.0;\n\n// ── TWEAKS ──\ntoothWidthTweak = 0.2;\ntoothDepthTweak = 0.0;\n\npulley3DP(\n    model           = model,\n    teethCount      = teethCount,\n    beltWidth       = beltWidth,\n    shaftDiameter   = shaftDiameter,\n    toothWidthTweak = toothWidthTweak,\n    toothDepthTweak = toothDepthTweak\n);"
     },
-
     {
       "id": "gt2_2mm_smooth_bearing_idler",
       "category": "idler_pulley",
       "name": "GT2 2mm smooth bearing idler pulley — 6 mm belt",
       "aliases": [
-        "smooth idler", "smooth idler pulley", "bearing idler", "idler pulley",
-        "gt2 idler", "gt2 smooth idler", "gt2 2mm idler", "6mm belt idler",
-        "624zz idler", "623zz idler", "625zz idler",
-        "belt tensioner", "belt tensioner idler", "passive pulley",
-        "free spinning pulley", "idler sleeve", "bearing sleeve"
+        "smooth idler",
+        "smooth idler pulley",
+        "bearing idler",
+        "idler pulley",
+        "gt2 idler",
+        "gt2 smooth idler",
+        "gt2 2mm idler",
+        "6mm belt idler",
+        "624zz idler",
+        "623zz idler",
+        "625zz idler",
+        "belt tensioner",
+        "belt tensioner idler",
+        "passive pulley",
+        "free spinning pulley",
+        "idler sleeve",
+        "bearing sleeve"
       ],
       "family": "pulley_belt_drive_reference",
       "library_note": "STANDALONE — does NOT use pulley-generator.scad. This part is a smooth sleeve pressed onto a standard radial ball bearing and mounted on a shoulder bolt or screw. No teeth. No library include required.",
       "description": "A smooth cylindrical sleeve pressed onto a ball bearing outer race. The belt runs on the smooth outer surface, which has two raised shoulder flanges to retain the belt axially. The bearing spins freely on a fixed shoulder bolt through the inner bore. Used as a belt guide, tensioner, or direction-change idler in GT2 2mm belt drives.",
       "belt_profile": "GT2 2mm (smooth contact — no teeth)",
       "standard_bearings": {
-        "623ZZ": {"bore_mm": 3, "OD_mm": 10, "width_mm": 4, "axle_bolt": "M3 shoulder bolt"},
-        "624ZZ": {"bore_mm": 4, "OD_mm": 13, "width_mm": 5, "axle_bolt": "M4 shoulder bolt", "note": "Most common for GT2 6mm belt desktop CNC and 3D printers"},
-        "625ZZ": {"bore_mm": 5, "OD_mm": 16, "width_mm": 5, "axle_bolt": "M5 shoulder bolt"},
-        "608ZZ": {"bore_mm": 8, "OD_mm": 22, "width_mm": 7, "axle_bolt": "M8 bolt", "note": "Large idler for wide belts or high load"}
+        "623ZZ": {
+          "bore_mm": 3,
+          "OD_mm": 10,
+          "width_mm": 4,
+          "axle_bolt": "M3 shoulder bolt"
+        },
+        "624ZZ": {
+          "bore_mm": 4,
+          "OD_mm": 13,
+          "width_mm": 5,
+          "axle_bolt": "M4 shoulder bolt",
+          "note": "Most common for GT2 6mm belt desktop CNC and 3D printers"
+        },
+        "625ZZ": {
+          "bore_mm": 5,
+          "OD_mm": 16,
+          "width_mm": 5,
+          "axle_bolt": "M5 shoulder bolt"
+        },
+        "608ZZ": {
+          "bore_mm": 8,
+          "OD_mm": 22,
+          "width_mm": 7,
+          "axle_bolt": "M8 bolt",
+          "note": "Large idler for wide belts or high load"
+        }
       },
       "recommended_bearing": "624ZZ — bore 4 mm, OD 13 mm, width 5 mm, M4 shoulder bolt",
       "main_parameters": {
-        "bearing_OD_mm":    {"default": 13.0,  "note": "624ZZ outer diameter — sleeve is pressed onto this"},
-        "bearing_bore_mm":  {"default": 4.0,   "note": "624ZZ inner bore — shoulder bolt passes through"},
-        "bearing_width_mm": {"default": 5.0,   "note": "624ZZ axial width — sleeve height matches this"},
-        "belt_width_mm":    {"default": 6.0,   "note": "GT2 standard 6 mm belt"}
+        "bearing_OD_mm": {
+          "default": 13.0,
+          "note": "624ZZ outer diameter — sleeve is pressed onto this"
+        },
+        "bearing_bore_mm": {
+          "default": 4.0,
+          "note": "624ZZ inner bore — shoulder bolt passes through"
+        },
+        "bearing_width_mm": {
+          "default": 5.0,
+          "note": "624ZZ axial width — sleeve height matches this"
+        },
+        "belt_width_mm": {
+          "default": 6.0,
+          "note": "GT2 standard 6 mm belt"
+        }
       },
       "secondary_parameters": {
-        "wall_thickness_mm":   {"default": 1.5,  "note": "Sleeve wall over bearing OD. Min 1.0 mm; 1.5 mm recommended for PA12/PETG"},
-        "flange_overhang_mm":  {"default": 1.0,  "note": "Radial height of belt-retention shoulder above belt contact surface"},
-        "flange_thickness_mm": {"default": 1.2,  "note": "Axial thickness of each retention shoulder disc"},
-        "press_fit_tol_mm":    {"default": -0.05, "note": "Sleeve inner bore = bearing_OD + press_fit_tol. Negative = interference fit onto bearing OD. For 3D printing use -0.1 to -0.15 mm (plastic expands on cooling)"}
+        "wall_thickness_mm": {
+          "default": 1.5,
+          "note": "Sleeve wall over bearing OD. Min 1.0 mm; 1.5 mm recommended for PA12/PETG"
+        },
+        "flange_overhang_mm": {
+          "default": 1.0,
+          "note": "Radial height of belt-retention shoulder above belt contact surface"
+        },
+        "flange_thickness_mm": {
+          "default": 1.2,
+          "note": "Axial thickness of each retention shoulder disc"
+        },
+        "press_fit_tol_mm": {
+          "default": -0.05,
+          "note": "Sleeve inner bore = bearing_OD + press_fit_tol. Negative = interference fit onto bearing OD. For 3D printing use -0.1 to -0.15 mm (plastic expands on cooling)"
+        }
       },
       "derived_parameters": {
         "sleeve_OD": {
@@ -787,8 +1370,8 @@
         "sleeve height > bearing width + 2 mm — sleeve bottoms on frame before bearing seats; sleeve appears loose axially"
       ],
       "mounting_note": "Use a shoulder bolt whose shoulder diameter = bearing inner bore (4 mm for 624ZZ) and whose shoulder length = bearing_width_mm. Add one flat washer (OD > sleeve_OD) between bolt head and sleeve face, and one between sleeve face and nut/frame, to prevent bolt head/nut from gripping sleeve and locking it.",
-      "openscad_example": "// GT2 2mm smooth bearing idler pulley — 624ZZ bearing, 6 mm belt\n// STANDALONE — no include required\n\n// ── MAIN PARAMETERS ──\nbearing_OD    = 13.0;   // mm — 624ZZ outer diameter\nbearing_bore  = 4.0;    // mm — 624ZZ inner bore (M4 shoulder bolt passes through)\nbearing_width = 5.0;    // mm — 624ZZ axial width\nbelt_width    = 6.0;    // mm — GT2 standard belt width\n\n// ── SECONDARY PARAMETERS ──\nwall          = 1.5;    // mm — sleeve wall over bearing OD\nflange_h      = 1.0;    // mm — radial overhang of retention shoulder above belt surface\nflange_t      = 1.2;    // mm — axial thickness of each retention shoulder\nbore_tol      = -0.10;  // mm — interference: sleeve bore = bearing_OD + bore_tol\n                        //      use -0.10 for 3D print; 0.00 for machined press fit\n\n// ── DERIVED PARAMETERS ──\nsleeve_OD      = bearing_OD + 2 * wall;           // = 16.0 mm  belt contact diameter\nsleeve_bore    = bearing_OD + bore_tol;           // = 12.9 mm  press fit onto bearing OD\nflange_OD      = sleeve_OD + 2 * flange_h;        // = 18.0 mm  retention shoulder OD\ntotal_h        = belt_width + 2 * flange_t;       // = 8.4 mm   total sleeve height\n\n$fn = 128;\n\nmodule gt2_smooth_idler_624zz() {\n    difference() {\n        union() {\n            // Belt contact zone — smooth cylinder, no teeth\n            cylinder(h = belt_width, d = sleeve_OD, center = true);\n\n            // Bottom retention flange — prevents belt falling off downward\n            translate([0, 0, -(belt_width/2 + flange_t/2)])\n                cylinder(h = flange_t, d = flange_OD, center = true);\n\n            // Top retention flange — prevents belt riding off upward\n            translate([0, 0, belt_width/2 + flange_t/2])\n                cylinder(h = flange_t, d = flange_OD, center = true);\n        }\n\n        // Inner bore — press fit onto bearing OD\n        // sleeve_bore < bearing_OD: negative tolerance gives interference fit\n        cylinder(h = total_h + 2, d = sleeve_bore, center = true, $fn = 96);\n    }\n}\n\ngt2_smooth_idler_624zz();"
+      "openscad_example": "// GT2 2mm smooth bearing idler pulley — 624ZZ bearing, 6 mm belt\n// STANDALONE — no include required\n\n// ── MAIN PARAMETERS ──\nbearing_OD    = 13.0;   // mm — 624ZZ outer diameter\nbearing_bore  = 4.0;    // mm — 624ZZ inner bore (M4 shoulder bolt passes through)\nbearing_width = 5.0;    // mm — 624ZZ axial width\nbelt_width    = 6.0;    // mm — GT2 standard belt width\n\n// ── SECONDARY PARAMETERS ──\nwall          = 1.5;    // mm — sleeve wall over bearing OD\nflange_h      = 1.0;    // mm — radial overhang of retention shoulder above belt surface\nflange_t      = 1.2;    // mm — axial thickness of each retention shoulder\nbore_tol      = -0.10;  // mm — interference: sleeve bore = bearing_OD + bore_tol\n                        //      use -0.10 for 3D print; 0.00 for machined press fit\n\n// ── DERIVED PARAMETERS ──\nsleeve_OD      = bearing_OD + 2 * wall;           // = 16.0 mm  belt contact diameter\nsleeve_bore    = bearing_OD + bore_tol;           // = 12.9 mm  press fit onto bearing OD\nflange_OD      = sleeve_OD + 2 * flange_h;        // = 18.0 mm  retention shoulder OD\ntotal_h        = belt_width + 2 * flange_t;       // = 8.4 mm   total sleeve height\n\n$fn = 128;\n\nmodule gt2_smooth_idler_624zz() {\n    difference() {\n        union() {\n            // Belt contact zone — smooth cylinder, no teeth\n            cylinder(h = belt_width, d = sleeve_OD, center = true);\n\n            // Bottom retention flange — prevents belt falling off downward\n            translate([0, 0, -(belt_width/2 + flange_t/2)])\n                cylinder(h = flange_t, d = flange_OD, center = true);\n\n            // Top retention flange — prevents belt riding off upward\n            translate([0, 0, belt_width/2 + flange_t/2])\n                cylinder(h = flange_t, d = flange_OD, center = true);\n        }\n\n        // Inner bore — press fit onto bearing OD\n        // sleeve_bore < bearing_OD: negative tolerance gives interference fit\n        cylinder(h = total_h + 2, d = sleeve_bore, center = true, $fn = 96);\n    }\n}\n\ngt2_smooth_idler_624zz();",
+      "openscad_module": "// GT2 smooth belt idler — 625 bearing bore variant\n$fn = 96;\n\nteeth       = 20;      // reference tooth count for pitch formula\nbelt_pitch  = 2.0;     // GT2 belt pitch (mm)\nbelt_width  = 6.0;     // belt width (mm)\nshaft_d     = 5.0;     // 625 bearing inner diameter (mm)\nbore_d      = shaft_d;    // bore alias (used in validation)\nbearing_od  = 16.0;    // 625 bearing outer diameter (mm)\nflange_t    = 1.2;     // flange thickness (mm)\nflange_ext  = 1.5;     // flange extension past belt width (mm)\n\nPI       = 3.14159265;\npitch_d  = teeth * belt_pitch / PI;  // nominal pitch diameter\nidler_d  = bearing_od + 6;           // idler outer diameter\n\nmodule smooth_idler() {\n    difference() {\n        union() {\n            cylinder(h=belt_width, d=idler_d);\n            // Bottom flange\n            cylinder(h=flange_t, d=idler_d + 2 * flange_ext);\n            // Top flange\n            translate([0, 0, belt_width - flange_t])\n                cylinder(h=flange_t, d=idler_d + 2 * flange_ext);\n        }\n        // Bearing bore\n        cylinder(h=belt_width + 2, d=bearing_od);\n    }\n}\n\nsmooth_idler();"
     }
-
   ]
 }

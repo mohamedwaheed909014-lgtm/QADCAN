@@ -72,24 +72,35 @@ COMPLETE T8 Z-AXIS MODULE PARAMETERS
 
 OPENSCAD STRUCTURE
 ───────────────────
-  module leadscrew_nut_carriage() {
+T8 NUT CARRIAGE — correct structure (cross-axis design):
+  • LM8UU guide rod bores  — HORIZONTAL along X: rotate([0,90,0]) at y=±rod_spacing/2
+  • T8 screw clearance bore — VERTICAL (Z):       plain unrotated cylinder through full height
+  • T8 nut pocket            — VERTICAL from top:  translate([0,0,h/2-nut_h/2]) cylinder(...)
+  • Nut capture bolt holes  — VERTICAL (Z):       for(a=[...]) cylinder on bolt circle
+  • Nut bolt d = 3.4 mm (M3 clearance = 3.0 + 0.4) — NEVER thread_clear + 1.0 = 1.4 mm
+  • Do NOT use minkowski() anywhere — use plain cubes and cylinders only.
+
+  module t8_nut_carriage() {
     difference() {
       cube([carriage_length, carriage_width, carriage_height], center=true);
-      // two rod bores (LM8UU: OD 15 mm)
+      // LM8UU rod bores — horizontal along X
       for(y=[-rod_spacing/2, rod_spacing/2])
         translate([0, y, 0])
           rotate([0,90,0])
-            cylinder(h=carriage_length+2, d=15.1, center=true, $fn=64);
-      // T8 nut pocket
-      translate([0, 0, carriage_height/2 - nut_height])
-        cylinder(h=nut_height+0.5, d=nut_od+0.4, $fn=64);
-      // nut bolt holes
+            cylinder(h=carriage_length+2, d=bearing_fit, center=true);
+      // T8 screw clearance bore — vertical (Z)
+      cylinder(h=carriage_height+2, d=screw_clear, center=true);
+      // T8 nut pocket — from top, vertical
+      translate([0,0,carriage_height/2 - t8_nut_h/2])
+        cylinder(h=t8_nut_h+0.2, d=nut_pocket_d, center=true);
+      // Nut capture bolts — M3 clearance 3.4 mm, vertical
       for(a=[0,90,180,270])
         rotate([0,0,a])
-          translate([nut_bolt_circle/2, 0, carriage_height/2-nut_height-3])
-            cylinder(h=nut_height+8, d=3.3, $fn=32);
-      // leadscrew through bore
-      cylinder(h=carriage_height+2, d=screw_diameter+1.0, center=true, $fn=64);
+          translate([nut_bolt_circle/2, 0, carriage_height/2 - t8_nut_h/2])
+            cylinder(h=t8_nut_h+4, d=nut_bolt_d, center=true);
+      // Bottom material relief
+      translate([0,0,-carriage_height/2+5])
+        cube([carriage_length-8, carriage_width-8, 8], center=true);
     }
   }
 

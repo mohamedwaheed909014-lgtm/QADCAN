@@ -252,4 +252,3 @@ Every real-life mechanical example should include:
 - Correct axes: rotating parts use a shared centerline; frames use endpoint alignment.
 - Clearances: bores and seats use named clearance parameters.
 - Final module call exactly once.
-

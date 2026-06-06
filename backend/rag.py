@@ -185,6 +185,8 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
     "bearing_housing_reference": [
         "bearing housing", "pillow block", "bearing block", "6204", "bearing seat",
         "plummer block", "pedestal bearing", "ucp", "ucf", "ucfl", "uct",
+        "shaft housing", "shaft support housing", "transmission shaft housing",
+        "counter shaft housing", "countershaft housing", "gear shaft housing",
     ],
     "bracket_and_motor_mount_reference": [
         "bracket", "motor mount", "nema", "mounting bracket", "angle bracket",
@@ -252,8 +254,9 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "belt width", "toothWidthTweak",
     ],
     "robotics_servo_reference": [
-        "servo", "mg996r", "servo bracket", "robotics", "servo mount",
-        "servo horn", "servo arm",
+        "servo", "mg996r", "sg90", "servo bracket", "robotics", "servo mount",
+        "servo horn", "servo arm", "u-bracket", "u bracket", "servo frame",
+        "servo holder", "servo u bracket",
     ],
     "shaft_coupler_reference": [
         "shaft coupler", "coupler", "clamping slit", "split clamp coupler",
@@ -272,6 +275,10 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "truss", "roof truss", "bridge truss", "king post", "king-post truss",
         "king post truss", "queen post", "queen-post truss", "queen post truss",
         "pratt truss", "howe truss", "warren truss", "fink truss",
+        "standard fink", "w-web roof", "w web roof", "pitched roof truss",
+        "parallel chord bridge", "inward diagonal", "tension diagonal",
+        "compression diagonal", "alternating triangle", "triangular web",
+        "zig zag truss", "display rig", "k web",
         "k truss", "k-truss", "bowstring truss", "scissor truss",
         "gusset plate", "top chord", "bottom chord", "web member",
         "diagonal member", "vertical member", "straining beam",
@@ -282,6 +289,10 @@ PRIMARY_FAMILY_KEYWORDS: dict[str, list[str]] = {
         "king post", "king-post truss", "king post truss",
         "queen post", "queen-post truss", "queen post truss",
         "pratt truss", "howe truss", "warren truss", "fink truss",
+        "standard fink", "w-web roof", "w web roof", "pitched roof truss",
+        "parallel chord bridge", "inward diagonal", "tension diagonal",
+        "compression diagonal", "alternating triangle", "triangular web",
+        "zig zag truss", "display rig", "k web",
         "k truss", "k-truss", "bowstring truss", "scissor truss",
         "top chord", "bottom chord", "web member", "truss web",
         "diagonal member", "vertical member", "panel point", "truss node",
@@ -316,12 +327,6 @@ SUPPORT_DOC_KEYWORDS: dict[str, list[str]] = {
         "shaft support", "cnc leadscrew", "conveyor", "robot axle",
         "saddle", "pedestal", "cap split",
     ],
-    "research_paper_modeling_gap_corrections_reference": [
-        "i-beam", "i section", "h-beam", "queen post", "queen-post truss",
-        "king post", "king-post truss", "pratt truss", "howe truss",
-        "warren truss", "fink truss", "k truss", "truss",
-        "spatial reasoning",
-    ],
     "research_paper_few_shot_examples_reference": [
         "example", "few shot", "few-shot", "reference design",
         "baseline",
@@ -333,6 +338,12 @@ SUPPORT_DOC_KEYWORDS: dict[str, list[str]] = {
         "chain wheel", "chain sprocket", "keyway sprocket",
         "set screw sprocket", "roller pockets", "pitch radius",
         "circular flank tooth", "sprocket_plate",
+    ],
+    "research_paper_modeling_gap_corrections_reference": [
+        "i-beam", "i section", "h-beam", "queen post", "queen-post truss",
+        "king post", "king-post truss", "pratt truss", "howe truss",
+        "warren truss", "fink truss", "k truss", "truss",
+        "spatial reasoning",
     ],
 }
 
@@ -351,9 +362,8 @@ PART_DATABASE_DOC_FAMILY: dict[str, str]       = {}
 # produce blocky, unrealistic gears. Keep the family router, but do not load
 # those documents into RAG now that gears-master is the authoritative source.
 DISABLED_RAG_DOC_STEMS: set[str] = {
-    "gear_reference",
-    "sprocket_chain_reference",
-    "sprocket_exact_openscad_reference",
+    "bearing_housing_true_pillow_block_reference",
+    "bearing_housing_grabcad_real_examples_reference",
 }
 
 
@@ -906,6 +916,7 @@ class KnowledgeBase:
     def family_schema(self, family_id: str | None = None) -> dict:
         records    = [i for i in self.part_records() if family_id is None or i.get("family") == family_id]
         features:   list[str]       = []
+        main_params: dict[str, Any]  = {}
         constraints: dict[str, dict] = {}
         derived:    dict[str, dict]  = {}
         materials:  list[dict]       = []
@@ -923,6 +934,13 @@ class KnowledgeBase:
             for f in rec.get("main_features", []) or rec.get("required_features", []):
                 if f not in features:
                     features.append(f)
+            raw_main = rec.get("main_parameters") or {}
+            if isinstance(raw_main, dict):
+                main_params.update(raw_main)
+            elif isinstance(raw_main, list):
+                for value in raw_main:
+                    if isinstance(value, str):
+                        main_params.setdefault(value, "main design parameter")
             constraints.update(rec.get("constraint_parameters") or {})
             derived.update(rec.get("derived_parameters") or {})
             for s in rec.get("standards_used", []):
@@ -948,6 +966,7 @@ class KnowledgeBase:
             "label":               FAMILY_ID_TO_LABEL.get(family_id or GENERAL_RAG_ID, GENERAL_RAG_LABEL),
             "record_count":        len(records),
             "main_features":       features,
+            "main_parameters":      main_params,
             "constraint_parameters": constraints,
             "derived_parameters":  derived,
             "standards_used":      standards,
@@ -1022,7 +1041,7 @@ class KnowledgeBase:
 
         for doc, raw in zip(docs, scores):
             if (
-                "gear_reference" in family_ids
+                family_ids[:1] == ["gear_reference"]
                 and doc.id != PRIMARY_SUPPORT_DOC_BY_FAMILY.get("gear_reference")
                 and doc.family != "gear_reference"
             ):

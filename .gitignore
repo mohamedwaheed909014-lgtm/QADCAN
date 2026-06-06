@@ -3,3 +3,11 @@ backend/logs/
 backend/accepted_history.jsonl
 __pycache__/
 *.pyc
+*.log
+server*.log
+cloudflared*.log
+backend/*.log
+backend/users.db
+node_modules/
+dist/
+build/

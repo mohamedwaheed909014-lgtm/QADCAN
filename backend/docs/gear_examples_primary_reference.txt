@@ -88,9 +88,16 @@ Bevel gear:
   include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
   bevel_gear(modul=1, tooth_number=30, partial_cone_angle=45, tooth_width=5, bore=4, pressure_angle=20, helix_angle=20);
 
-Bevel gear pair:
+Bevel gear pair (straight bevel):
   include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
-  bevel_gear_pair(modul=1, gear_teeth=30, pinion_teeth=11, axis_angle=100, tooth_width=5, gear_bore=4, pinion_bore=4, pressure_angle=20, helix_angle=20, together_built=true);
+  bevel_gear_pair(modul=1, gear_teeth=30, pinion_teeth=11, axis_angle=100, tooth_width=5, gear_bore=4, pinion_bore=4, pressure_angle=20, helix_angle=0, together_built=true);
+
+Spiral bevel gear pair (nonzero helix_angle):
+  include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
+  bevel_gear_pair(modul=2, gear_teeth=32, pinion_teeth=16, axis_angle=90, tooth_width=10, gear_bore=8, pinion_bore=8, pressure_angle=20, helix_angle=30, together_built=true);
+  // gear_teeth=32 is the LARGER wheel; pinion_teeth=16 is the SMALLER pinion (fewer teeth).
+  // helix_angle=30 makes this a spiral bevel pair. The library negates helix_angle for the pinion automatically.
+  // gear_bore and pinion_bore are subtracted internally — do NOT pass 0 and subtract manually.
 
 Bevel herringbone gear:
   include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
@@ -102,7 +109,16 @@ Bevel herringbone gear pair:
 
 Planetary gear:
   include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
-  planetary_gear(modul=1, sun_teeth=16, planet_teeth=9, number_planets=5, width=5, rim_width=3, bore=4, pressure_angle=20, helix_angle=30, together_built=true, optimized=true);
+  planetary_gear(modul=1, sun_teeth=16, planet_teeth=9, number_planets=3, width=5, rim_width=3, bore=4, pressure_angle=20, helix_angle=0, together_built=true, optimized=true);
+  // planetary_gear() renders ALL THREE components in a single call:
+  //   • sun gear  (herringbone, at centre)
+  //   • planet gears (herringbone, number_planets of them, orbiting the sun)
+  //   • ring / annulus gear (herringbone_ring_gear, surrounding everything)
+  // NEVER simulate a planetary gear by writing a for-loop of spur_gear() or
+  // herringbone_gear() calls — that produces only loose planet shapes with no
+  // sun gear and no ring gear, which is wrong.
+  // ring_teeth is implicit: ring_teeth = sun_teeth + 2 * planet_teeth
+  // together_built=true meshes all gears assembled; false lays them out flat for printing.
 
 Worm:
   include <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>
@@ -124,7 +140,9 @@ TYPE MAPPING FOR USER PROMPTS
 - "bevel pair", "miter gear", "right angle gear pair" -> bevel_gear_pair
 - "spiral bevel gear" -> spiral_bevel_gear for single gear, or bevel_gear_pair with nonzero helix_angle for pair-style output
 - "bevel herringbone" -> bevel_herringbone_gear or bevel_herringbone_gear_pair
-- "planetary gear" -> planetary_gear
+- "planetary gear", "epicyclic gear", "sun and planet gear", "planet gear assembly" ->
+    planetary_gear(modul, sun_teeth, planet_teeth, number_planets, width, rim_width, bore, together_built=true)
+    ONE call renders sun + planets + ring. NEVER use a for-loop of spur_gear() calls.
 - "worm" -> worm
 - "worm gear", "worm drive", "worm and wheel" -> worm_gear
 
@@ -137,9 +155,24 @@ FORMULA AND PLACEMENT GUIDANCE
 - For bevel pairs, use axis_angle and matching cone geometry; do not render two flat spur gears.
 - For worm drives, use thread_starts, lead_angle, length, worm_bore, and gear_bore as explicit parameters.
 
+BEVEL / SPIRAL BEVEL GEAR PAIR — CRITICAL RULES
+- gear_teeth is the LARGER wheel (more teeth); pinion_teeth is the SMALLER pinion (fewer teeth).
+  Example: user says "16:32" → pinion_teeth=16, gear_teeth=32.
+- A spiral bevel gear pair uses bevel_gear_pair with a nonzero helix_angle (e.g. 30°).
+  The library automatically negates helix_angle for the pinion to achieve proper hand matching.
+- gear_bore and pinion_bore are subtracted INSIDE the library. Pass the real bore values directly.
+  NEVER pass gear_bore=0 or pinion_bore=0 and then subtract cylinders manually in a difference() block.
+- OpenSCAD modules do NOT return values. NEVER write: body = bevel_gear_pair(...); — that is invalid.
+  Call the module directly: bevel_gear_pair(modul=..., gear_teeth=..., ...);
+
 OUTPUT GUIDANCE
 - If the generated OpenSCAD can depend on the external library, write a short file that includes gears.scad and calls the correct module.
 - For a plain spur gear, do not use helix_angle=20 or any nonzero helix_angle; that creates a helical/slanted gear shape.
 - Do not hand-build spur teeth from rectangular cubes when gears.scad is available; use spur_gear(...) for a clean involute-style gear.
 - If the output must be standalone, implement simplified but faithful equivalents while preserving gears-master parameter names, proportions, and formulas.
 - Never ignore the requested gear type. A bevel gear must be conical. A worm gear must include a worm screw and wheel. A planetary gear must include sun, planets, ring, and carrier or at least their correct spatial relationship.
+- For planetary gears: call planetary_gear() ONCE. Do NOT write a for-loop that translates
+  individual spur_gear() or herringbone_gear() calls around a circle — that renders only
+  planet shapes without a sun gear or ring gear and is always wrong.
+- planetary_gear() internally calls herringbone_gear() for all parts. The rendered output
+  will always have herringbone (double-helical) teeth regardless of helix_angle value.

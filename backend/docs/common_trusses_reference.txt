@@ -84,15 +84,35 @@ COMMON TRUSS TYPES
   straining beam between the queen-post tops, and rafters that pass through the
   queen-post top nodes to the apex. Do not add diagonal internal braces unless
   the user explicitly asks for bracing.
-- Pratt truss: verticals plus diagonals sloping toward span center.
-- Howe truss: verticals plus diagonals sloping away from span center.
+- Pratt truss: verticals plus diagonals sloping down and inward from the outer top-chord nodes (left half: top-left to bottom-right; right half: bottom-left to top-right).
+- Howe truss: verticals plus diagonals sloping up and inward from the outer bottom-chord nodes (left half: bottom-left to top-right; right half: top-left to bottom-right).
 - Warren truss: alternating triangular web members.
 - Fink truss: pitched roof truss with W-shaped web layout.
 - K-truss: each panel split into shorter K-shaped web members.
 
 OPENSCAD PATTERN
 ----------------
-Use an endpoint member helper:
+Use an endpoint member helper.
+
+CRITICAL — member module must be plain rod + nodes. NO minkowski, NO fillet_r:
+
+  // CORRECT — plain cylinder rod
+  module rod(p1, p2, d=4) {
+    v = p2 - p1;  L = norm(v);
+    translate(p1) rotate([0, acos(v[2]/L), atan2(v[1],v[0])]) cylinder(d=d, h=L);
+  }
+  module node(p) { translate(p) sphere(d=joint_d); }
+  module member(p1, p2, d=4) { rod(p1, p2, d); node(p1); node(p2); }
+
+  // WRONG — minkowski bloats cross-section and kills render performance
+  // module member(p1, p2, d=4) { minkowski() { rod(p1,p2,d); sphere(r=fillet_r); } ... }
+
+Do NOT define fillet_r or apply minkowski() to any truss member.
+Truss rods are plain prismatic cylinders. Minkowski on a cylinder with a
+sphere kernel produces a capsule that is (d/2 + fillet_r) wide everywhere,
+distorts node sphere sizes, and makes render time 10–100× slower.
+
+Alternative 2-D slab style member_between (cube-based, no minkowski):
 
 module member_between(p1, p2, w, d) {
   dx = p2[0] - p1[0];
@@ -112,3 +132,104 @@ module gusset_at(p, r, t, bolt_d) {
     translate([p[0], 0, p[1]]) cylinder(h=t+1, d=bolt_d, center=true, $fn=32);
   }
 }
+
+K-TRUSS REFERENCE UPDATE
+------------------------
+Primary K-truss geometry now uses a 3D node-and-cylinder model:
+- span = 160 mm, height = 55 mm, bays = 4, bay_w = span / bays
+- top and bottom chord node arrays contain bays + 1 panel points
+- each bay has one mid-height node at x = (i + 0.5) * bay_w, z = height / 2
+- each K bay has four web members meeting at that mid node
+- end verticals connect bottom[0]-top[0] and bottom[bays]-top[bays]
+- internal panel points use center verticals from bottom[i] to top[i]
+- spherical joints are shown at every member end
+
+FINK ROOF TRUSS REFERENCE UPDATE
+--------------------------------
+Primary Fink roof truss geometry now uses a 3D node-and-cylinder model:
+- span = 200 mm, rise = 70 mm
+- chord_d = 6 mm, web_d = 4 mm, joint_d = 8 mm
+- A = left bearing [-span/2, 0, 0]
+- B = right bearing [span/2, 0, 0]
+- C = ridge [0, 0, rise]
+- D = left roof midpoint [-span/4, 0, rise/2]
+- E = right roof midpoint [span/4, 0, rise/2]
+- F = bottom center [0, 0, 0]
+- bottom chord: A-B
+- top rafters: A-C and C-B
+- central web: C-F
+- Fink web members: D-F, E-F, D-A, E-B
+- short ridge braces: D-C and C-E
+- joints are spheres at every member endpoint
+
+WARREN TRUSS REFERENCE UPDATE
+-----------------------------
+Primary Warren truss geometry now uses a 3D node-and-cylinder model:
+- span = 260 mm, height = 70 mm, bays = 8, bay_w = span / bays
+- chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- bottom chord is split into 8 bay segments along z = 0
+- top chord is split into 8 bay segments along z = height
+- alternating triangular Warren web uses i % 2:
+  - even panels connect bottom-left b1 to top-right t2
+  - odd panels connect top-left t1 to bottom-right b2
+- end verticals connect the left and right support nodes
+- joints are spheres at every member endpoint
+
+HOWE TRUSS REFERENCE UPDATE
+---------------------------
+Primary Howe bridge/roof truss geometry now uses a 3D node-and-cylinder model:
+- span = 280 mm, height = 70 mm, bays = 8, bay_w = span / bays
+- chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- bottom chord is split into 8 bay segments along z = 0
+- top chord is split into 8 bay segments along z = height
+- vertical posts are placed at every panel point from i = 0 to bays
+- Howe diagonals use floor(bays/2) as the split boundary
+- left-half diagonals connect bottom-left to top-right
+- right-half diagonals connect top-left to bottom-right
+- joints are spheres at every member endpoint
+
+PRATT TRUSS REFERENCE UPDATE
+----------------------------
+Primary Pratt bridge/roof truss geometry now uses a 3D node-and-cylinder model:
+- span = 280 mm, height = 70 mm, bays = 8, bay_w = span / bays
+- chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- bottom chord is split into 8 bay segments along z = 0
+- top chord is split into 8 bay segments along z = height
+- vertical posts are placed at every panel point from i = 0 to bays
+- Pratt diagonals use floor(bays/2) as the split boundary
+- left-half diagonals connect top-left to bottom-right
+- right-half diagonals connect bottom-left to top-right
+- joints are spheres at every member endpoint
+
+KING AND QUEEN POST TRUSS REFERENCE UPDATE
+------------------------------------------
+King-post roof truss primary geometry ($fn = 96):
+- span = 240 mm, rise = 80 mm, chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- A = [-span/2, 0,      0]   left bearing
+- B = [ span/2, 0,      0]   right bearing
+- C = [       0, 0,  rise]   ridge / apex
+- D = [       0, 0,     0]   king-post foot / tie-beam centre
+- E = [-span/4, 0, rise/2]   left strut node  — midpoint of rafter A→C
+- F = [ span/4, 0, rise/2]   right strut node — midpoint of rafter C→B
+- bottom tie beam: A-D and D-B  (chord_d)
+- left rafter SPLIT  at E: A-E then E-C  (chord_d)   ← NOT a single A-C span
+- right rafter SPLIT at F: C-F then F-B  (chord_d)   ← NOT a single C-B span
+- king post:        C-D  (web_d)
+- diagonal struts:  D-E and D-F  (web_d)
+- joints are spheres at every node; rods are plain cylinders between 3D points
+CRITICAL: member(A,C) and member(C,B) as single spans are a FAILURE MODE
+  — they hide the strut-to-rafter node; always split at E and F.
+CRITICAL: do NOT wrap rod() or member() in minkowski(). Do NOT add fillet_r.
+  member module = rod(p1,p2,d) + node(p1) + node(p2) — nothing more.
+
+Queen-post roof truss primary geometry:
+- span = 260 mm, rise = 80 mm, chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- A/B are bearings, C is roof peak
+- D/E are bottom queen-post points at +/-span/4
+- F/G are upper queen-post points at +/-span/4 and rise/2
+- bottom tie beam: A-D, D-E, E-B
+- rafters: A-C and C-B
+- queen posts: D-F and E-G
+- straining beam: F-G
+- diagonal struts: F-C and G-C
+- joints are spheres; members are cylinders between 3D points

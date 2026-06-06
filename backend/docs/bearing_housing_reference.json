@@ -111,13 +111,16 @@
       "id": "bearing_housing_pillow_block_6204",
       "family": "bearing_housing_reference",
       "category": "pillow_block",
-      "name": "Pillow block bearing housing for 6204 bearing",
+      "name": "Compact no-flicker pillow block bearing housing",
       "aliases": [
         "pillow block",
         "plummer block",
         "bearing block",
         "shaft support block",
-        "6204 bearing housing"
+        "6204 bearing housing",
+        "compact pillow block",
+        "no-flicker pillow block",
+        "P002 pillow block"
       ],
       "standards": [
         "Deep groove bearing 6204 dimensions",
@@ -129,15 +132,19 @@
         "3D printed prototype"
       ],
       "standard_dimensions_mm": {
-        "shaft_diameter": 20,
+        "bearing_id": 20,
         "bearing_od": 47,
         "bearing_width": 14,
-        "base_length": 74,
-        "base_width": 63,
-        "base_thickness": 7,
-        "wall_thickness": 8,
-        "mount_hole_spacing": 54,
-        "mount_hole_diameter": 5.5
+        "base_length": 130,
+        "base_width": 30,
+        "base_thickness": 8,
+        "housing_od": 63,
+        "housing_width": 26,
+        "center_height": 40,
+        "mount_hole_spacing": 90,
+        "mount_hole_diameter": 7,
+        "counterbore_diameter": 13,
+        "counterbore_depth": 3
       },
       "main_features": [
         "low footed mounting base with two raised foot pads",
@@ -309,7 +316,7 @@
           "family_pattern": "polymer pillow block bearing"
         }
       ],
-      "openscad_module": "$fn = 128;\nshaft_diameter = 20;\nbearing_od = 47;\nbearing_width = 14;\nwall_thickness = 8;\nbase_thickness = 8;\nbase_length = 92;\nbase_width = bearing_od + 2 * wall_thickness + 18;\nfoot_pad_length = 28;\nfoot_pad_width = 30;\nfoot_pad_thickness = 4;\nmount_hole_diameter = 5.5;\nmount_hole_spacing = 64;\nslot_length = 18;\nshaft_clearance = 0.4;\nbearing_fit_clearance = 0.15;\nboss_diameter = bearing_od + 2 * wall_thickness;\nboss_width = bearing_width + 2 * wall_thickness;\nboss_center_z = base_thickness + boss_diameter / 2 - 4;\npedestal_width = boss_width + 14;\npedestal_depth = base_width - 18;\npedestal_height = boss_center_z - base_thickness + 4;\ncap_groove_height = 1.2;\ncap_groove_z = boss_center_z + boss_diameter * 0.20;\n\nmodule rounded_slot(length, diameter, height) {\n  hull() {\n    translate([-length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n    translate([ length / 2, 0, 0]) cylinder(h = height, d = diameter, center = true);\n  }\n}\n\nmodule pillow_block_bearing_housing() {\n  difference() {\n    union() {\n      translate([0, 0, base_thickness / 2]) cube([base_length, base_width, base_thickness], center = true);\n      for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])\n        translate([x, 0, base_thickness + foot_pad_thickness / 2]) cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center = true);\n\n      translate([0, 0, base_thickness + pedestal_height / 2]) cube([pedestal_width, pedestal_depth, pedestal_height], center = true);\n      hull() {\n        translate([0, 0, base_thickness + 8]) cube([pedestal_width + 8, pedestal_depth, 10], center = true);\n        translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width, d = boss_diameter, center = true);\n      }\n      translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width, d = boss_diameter, center = true);\n    }\n\n    translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = boss_width + 4, d = bearing_od + bearing_fit_clearance, center = true);\n    translate([0, 0, boss_center_z]) rotate([90, 0, 0]) cylinder(h = base_width + 8, d = shaft_diameter + shaft_clearance, center = true);\n    translate([0, 0, cap_groove_z]) cube([pedestal_width + 10, boss_width + 4, cap_groove_height], center = true);\n    for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])\n      translate([x, 0, base_thickness / 2]) rounded_slot(slot_length, mount_hole_diameter, base_thickness + foot_pad_thickness + 8);\n  }\n}\n\npillow_block_bearing_housing();",
+      "openscad_module": "// No-flicker compact pillow block (6204: bore 20mm, OD 47mm, width 14mm)\n$fn = 96;\neps = 0.05;\n\n// Size\nbase_len = 130;\nbase_width = 30;\nbase_thick = 8;\n\ncenter_height = 40;\nhousing_od = 63;\nhousing_width = 26;\n\n// Bearing — 6204: bore 20mm, OD 47mm, width 14mm\nbearing_od = 47;\nbearing_id = 20;\nbearing_width = 14;\nclearance = 0.35;\n\n// Bolts\nbolt_dia = 7;\nbolt_spacing = 90;\ncounterbore_dia = 13;\ncounterbore_depth = 3;\n\nmodule body() {\n    union() {\n        // Base\n        hull() {\n            translate([-base_len/2 + 10, 0, base_thick/2])\n                cylinder(d=20, h=base_thick, center=true);\n\n            translate([ base_len/2 - 10, 0, base_thick/2])\n                cylinder(d=20, h=base_thick, center=true);\n\n            translate([0, 0, base_thick/2])\n                cube([base_len-20, base_width, base_thick], center=true);\n        }\n\n        // Main upright\n        hull() {\n            translate([0, 0, center_height])\n                rotate([90, 0, 0])\n                    cylinder(d=housing_od, h=housing_width, center=true);\n\n            translate([0, 0, base_thick + 5])\n                cube([housing_od * 0.85, housing_width, 10], center=true);\n        }\n\n        // Front raised rim\n        translate([0, -housing_width/2 - 1.25, center_height])\n            rotate([90, 0, 0])\n                cylinder(d=housing_od - 8, h=2.5, center=true);\n    }\n}\n\nmodule pillow_block_bearing_housing() {\n    difference() {\n        body();\n\n        // Bearing pocket\n        translate([0, 0, center_height])\n            rotate([90, 0, 0])\n                cylinder(\n                    d=bearing_od + clearance,\n                    h=bearing_width + 0.8,\n                    center=true\n                );\n\n        // Shaft hole\n        translate([0, 0, center_height])\n            rotate([90, 0, 0])\n                cylinder(\n                    d=bearing_id + 1,\n                    h=housing_width + 8,\n                    center=true\n                );\n\n        // Mounting holes\n        for (x = [-bolt_spacing/2, bolt_spacing/2]) {\n            translate([x, 0, -eps])\n                cylinder(d=bolt_dia, h=base_thick + 2*eps);\n\n            translate([x, 0, base_thick - counterbore_depth])\n                cylinder(d=counterbore_dia, h=counterbore_depth + eps);\n        }\n    }\n}\n\npillow_block_bearing_housing();",
       "standards_used": [
         {
           "name": "6204 deep groove bearing catalog dimensions",
@@ -618,15 +625,77 @@
       ]
     },
     {
+      "id": "transmission_shaft_support_housing",
+      "family": "bearing_housing_reference",
+      "category": "shaft_support_housing",
+      "name": "Transmission shaft housing",
+      "aliases": [
+        "transmission shaft housing",
+        "shaft housing",
+        "shaft support housing"
+      ],
+      "standards": [
+        "mounted bearing housing practice",
+        "gearbox shaft support practice"
+      ],
+      "manufacturing_processes": [
+        "machined",
+        "cast then machined",
+        "3D printed prototype"
+      ],
+      "standard_dimensions_mm": {
+        "shaft_len": 200,
+        "shaft_diameter": 25,
+        "bearing_od": 20,
+        "bearing_len": 30,
+        "wall_thk": 3,
+        "clearance": 0.3,
+        "base_thk": 10
+      },
+      "main_features": [
+        "central cylindrical housing body",
+        "simple lower base cylinder",
+        "two subtractive bearing seat cavities",
+        "subtractive shaft bore"
+      ],
+      "required_features": [
+        "Central cylinder housing",
+        "Base cylinder below shaft axis",
+        "Two bearing seat cavities",
+        "Shaft bore through the housing"
+      ],
+      "design_rules": [
+        "Use the simple central cylindrical housing pattern when the user asks for this transmission shaft housing form.",
+        "Create the solid housing as a union of the lower base cylinder and the central cylinder housing.",
+        "Subtract two bearing seat cavities at the derived bearing positions.",
+        "Subtract the shaft bore after the solid housing union.",
+        "Do not add extra mounting slots, raised pillow-block bosses, bridge webs, ribs, cap split grooves, or gear features unless the user explicitly asks for them.",
+        "Do not assign geometry to variables. OpenSCAD geometry statements cannot be stored in variables.",
+        "Do not declare string metadata variables such as manufacturing = \"fdm\" in OpenSCAD code."
+      ],
+      "failure_modes": [
+        "extra pillow-block features added when the user asked for the simple cylindrical transmission shaft housing",
+        "mounting slots, ribs, bridge webs, or cap grooves added without being requested",
+        "bearing seats not subtracted from the housing body",
+        "shaft bore missing from the housing body",
+        "geometry assigned to variables instead of emitted directly in modules"
+      ],
+      "openscad_module": "$fn = 128;\n\n// Parameters\nshaft_len      = 200;   // total length (mm)\nshaft_diameter = 25;    // main shaft diameter (mm)\nbearing_od     = 20;    // bearing outer diameter (mm)\nbearing_len    = 30;    // bearing seat length (mm)\nwall_thk       = 3;     // housing wall thickness (mm)\nclearance      = 0.3;   // shaft bore clearance (mm)\nbase_thk       = 10;    // base thickness (mm)\n\n// Derived dimensions\nouter_d   = shaft_diameter + 2*wall_thk;\nbore_d    = shaft_diameter + clearance;\npos1      = (shaft_len - 2*bearing_len)/2;       // start of first bearing seat\npos2      = pos1 + bearing_len;                  // end of first bearing seat\npos3      = pos2 + (shaft_len - 2*bearing_len);  // start of second bearing seat\npos4      = pos3 + bearing_len;                  // end of second bearing seat\n\nmodule transmission_shaft_housing() {\n    difference() {\n        // Solid housing body: base plate + central cylinder\n        union() {\n            // Base plate (below shaft axis)\n            translate([0, 0, -base_thk])\n                cylinder(h = base_thk, d = outer_d, center = false);\n            // Central cylinder housing (aligned with shaft axis)\n            cylinder(h = shaft_len, d = outer_d, center = false);\n        }\n        // Bearing seat cavities (subtractive)\n        translate([0, 0, pos1])\n            cylinder(h = bearing_len, d = bearing_od, center = false);\n        translate([0, 0, pos3])\n            cylinder(h = bearing_len, d = bearing_od, center = false);\n        // Shaft bore (through)\n        translate([0, 0, -shaft_len/2])\n            cylinder(h = shaft_len + 2, d = bore_d, center = false);\n    }\n}\n\ntransmission_shaft_housing();"
+    },
+    {
       "id": "bearing_housing_square_flange_ucf204",
       "family": "bearing_housing_reference",
       "category": "square_flange",
-      "name": "Square flanged bearing housing UCF204 style",
+      "name": "Square flanged bearing housing for 6204 bearing",
       "aliases": [
         "UCF204",
         "square flange bearing",
         "four bolt flange housing",
-        "wall mounted bearing housing"
+        "wall mounted bearing housing",
+        "square flanged bearing housing",
+        "rounded square flange bearing",
+        "UCF style flange bearing",
+        "6204 square flange bearing"
       ],
       "standards": [
         "UCF-style mounted bearing practice"
@@ -637,13 +706,18 @@
         "printed prototype"
       ],
       "standard_dimensions_mm": {
-        "shaft_diameter": 20,
+        "bearing_id": 20,
         "bearing_od": 47,
         "bearing_width": 14,
         "flange_size": 86,
-        "flange_thickness": 12,
-        "bolt_circle_square": 64,
-        "mount_hole_diameter": 10.5
+        "flange_thickness": 10,
+        "corner_radius": 8,
+        "boss_outer_diameter": 66,
+        "boss_height": 20,
+        "bolt_hole_diameter": 8,
+        "bolt_spacing": 68,
+        "counterbore_diameter": 14,
+        "counterbore_depth": 4
       },
       "main_features": [
         "square flange plate",
@@ -738,7 +812,7 @@
           "family_pattern": "square flange pillow block"
         }
       ],
-      "openscad_module": "$fn = 128;\nshaft_diameter = 20;\nbearing_od = 47;\nbearing_width = 14;\nflange_size = 86;\nflange_thickness = 12;\nwall_thickness = 8;\nmount_hole_diameter = 10.5;\nbolt_square = 64;\nboss_diameter = bearing_od + 2 * wall_thickness;\n\nmodule square_flanged_bearing_housing() {\n  difference() {\n    union() {\n      cube([flange_size, flange_size, flange_thickness], center = true);\n      cylinder(h = flange_thickness + bearing_width, d = boss_diameter, center = true);\n    }\n    cylinder(h = flange_thickness + bearing_width + 4, d = bearing_od + 0.15, center = true);\n    cylinder(h = flange_thickness + bearing_width + 6, d = shaft_diameter + 0.4, center = true);\n    for (x = [-bolt_square / 2, bolt_square / 2]) for (y = [-bolt_square / 2, bolt_square / 2]) translate([x, y, 0]) cylinder(h = flange_thickness + 4, d = mount_hole_diameter, center = true);\n  }\n}\n\nsquare_flanged_bearing_housing();",
+      "openscad_module": "// Square flanged bearing housing\n// For 6204 bearing: 20mm ID, 47mm OD, 14mm width\n\n$fn = 120;\neps = 0.05;\n\n// Bearing\nbearing_od = 47;\nbearing_id = 20;\nbearing_width = 14;\nclearance = 0.35;\n\n// Flange\nflange_size = 86;\nflange_thick = 10;\ncorner_radius = 8;\n\n// Bearing boss\nboss_od = 66;\nboss_height = 20;\n\n// Bolt holes\nbolt_dia = 8;\nbolt_spacing = 68;\ncounterbore_dia = 14;\ncounterbore_depth = 4;\n\nmodule rounded_square(size, r, h) {\n    hull() {\n        for (x = [-size/2+r, size/2-r])\n        for (y = [-size/2+r, size/2-r])\n            translate([x, y, 0])\n                cylinder(r=r, h=h);\n    }\n}\n\nmodule square_flanged_bearing_housing() {\n    difference() {\n        union() {\n            // Square flange plate\n            rounded_square(flange_size, corner_radius, flange_thick);\n\n            // Center bearing boss\n            translate([0, 0, flange_thick])\n                cylinder(d=boss_od, h=boss_height);\n\n            // Raised front rim\n            translate([0, 0, flange_thick + boss_height])\n                cylinder(d=boss_od - 6, h=3);\n        }\n\n        // Bearing pocket\n        translate([0, 0, flange_thick + boss_height - bearing_width])\n            cylinder(\n                d=bearing_od + clearance,\n                h=bearing_width + 3 + eps\n            );\n\n        // Shaft through hole\n        translate([0, 0, -eps])\n            cylinder(\n                d=bearing_id + 1,\n                h=flange_thick + boss_height + 4\n            );\n\n        // Four mounting holes\n        for (x = [-bolt_spacing/2, bolt_spacing/2])\n        for (y = [-bolt_spacing/2, bolt_spacing/2]) {\n            translate([x, y, -eps])\n                cylinder(d=bolt_dia, h=flange_thick + 2*eps);\n\n            translate([x, y, flange_thick - counterbore_depth])\n                cylinder(d=counterbore_dia, h=counterbore_depth + eps);\n        }\n    }\n}\n\nsquare_flanged_bearing_housing();",
       "standards_used": [
         {
           "name": "UCF square-flange mounted-bearing practice",

@@ -80,7 +80,9 @@
         "servo bracket",
         "mg996r bracket",
         "standard servo mount",
-        "servo holder"
+        "servo u bracket",
+        "servo holder",
+        "servo frame"
       ],
       "standards": [
         "MG996R servo body dimensions"
@@ -93,69 +95,98 @@
       "standard_dimensions_mm": {
         "servo_body_l": 40.5,
         "servo_body_w": 20.5,
-        "servo_body_h": 44,
-        "tab_span": 49,
-        "hole_d": 3.4,
-        "bracket_t": 4
+        "servo_body_h": 44.0,
+        "tab_span": 49.0,
+        "tab_hole_z": 9.5,
+        "hole_d": 3.8,
+        "bracket_t": 4.0,
+        "cable_hole_d": 6.0
       },
       "fit_guidance_mm": {
-        "servo_pocket": "servo body + 0.5 mm clearance each side"
+        "tab_hole": "M3 clearance 3.8 mm (3.4 + 0.4 FDM)",
+        "servo_gap": "servo body clears wing inner face by ≥2 mm each side in X"
       },
       "constraint_parameters": {
-        "servo_body_l": {
-          "default": 40.5
-        },
         "tab_span": {
-          "default": 49
+          "default": 49.0,
+          "note": "center-to-center of MG996R mounting holes along X"
         },
         "bracket_t": {
-          "default": 4,
-          "min": 3
+          "default": 4.0,
+          "min": 3.0,
+          "note": "wall thickness; wing centered on tab hole so hole drills through full thickness"
+        },
+        "tab_hole_z": {
+          "default": 9.5,
+          "note": "MG996R mounting hole height above servo body base"
         }
       },
       "derived_parameters": {
+        "wing_w": {
+          "formula": "servo_body_w + 2 * bracket_t",
+          "note": "wing Y-span = servo width + two wall thicknesses = 28.5 mm"
+        },
+        "wing_h": {
+          "formula": "servo_body_h + bracket_t",
+          "note": "wing height above base plate = 48 mm; servo top sits flush or below wing top"
+        },
         "plate_l": {
-          "formula": "tab_span + 10",
-          "note": "extends 5 mm past each tab"
+          "formula": "tab_span + bracket_t",
+          "note": "base plate X-length; outer wing face at ±(tab_span/2 + bracket_t/2) = ±26.5 mm"
         }
       },
       "main_features": [
-        "base mounting plate",
-        "two side walls with servo body clearance pocket",
-        "servo mounting tab holes through side walls",
-        "cable relief hole"
+        "horizontal base plate (bottom of U)",
+        "two vertical wing plates centered at x = ±tab_span/2 — hold the servo mounting tabs",
+        "servo mounting tab holes through wings along X axis at tab_hole_z above base",
+        "cable relief hole in base plate center",
+        "four base mounting holes in 2×2 pattern for attaching bracket to robot frame"
       ],
       "design_rules": [
-        "servo body pocket is rectangular cutout in side walls",
-        "mounting tab holes align with tab_span distance",
-        "side walls thick enough for M3 bolt: ≥4 mm",
-        "plate extends past tabs for rigidity"
+        "Wings are centered at x = ±tab_span/2 (±24.5 mm). Each wing is bracket_t thick, wing_w wide in Y, wing_h tall in Z (above base plate). The servo body slides into the open top of the U between the two wings.",
+        "Tab holes pass through wings along the X axis: use rotate([0,90,0]) cylinder at translate([±tab_span/2, 0, bracket_t + tab_hole_z]).",
+        "Base plate: plate_l × wing_w × bracket_t, centered at z = bracket_t/2. plate_l = tab_span + bracket_t so the plate reaches the outer faces of both wings.",
+        "Wings sit on top of the base plate — translate wing cube to z = bracket_t + wing_h/2 so wing bottom edge is at z = bracket_t.",
+        "No servo pocket cutout is needed. The servo body (servo_l=40.5 mm) fits in the open space between the wing inner faces (gap = tab_span − bracket_t = 45 mm). The servo slides in from the top.",
+        "Do NOT place tab holes as vertical cylinders through the base plate — that drills in the wrong direction.",
+        "Do NOT put wing plates along Y (front/back of servo) — wings must be at x = ±tab_span/2 so the holes align with the servo's mounting tabs.",
+        "Do NOT center the servo pocket at z = 0 — it will destroy the base plate."
       ],
       "validation_criteria": [
-        "servo body pocket subtracted from side walls",
-        "two tab holes subtracted through side walls",
-        "plate is solid base"
+        "two wing cubes, each centered at x = ±tab_span/2, with Z translation = bracket_t + wing_h/2",
+        "tab holes use rotate([0,90,0]) cylinder — NOT rotate([90,0,0]) and NOT unrotated Z cylinders",
+        "tab hole Z position = bracket_t + tab_hole_z ≈ 13.5 mm above ground",
+        "base plate cube in union with Z translation = bracket_t/2",
+        "no minkowski() or subtracted servo pocket cube"
       ],
       "failure_modes": [
-        "pocket too tight — servo does not fit",
-        "holes missing — servo not retained",
-        "single flat plate without walls — no pocket"
+        "tab holes drilled vertically through base plate (wrong axis) — servo cannot be bolted in",
+        "wing plates placed at y = ±(servo_w/2 + bracket_t/2) along Y — holes do not align with MG996R tabs",
+        "servo pocket centered at z = 0 — destroys base plate",
+        "wings placed at outer extremes of plate as thin end-caps (base_extend trick) — no structural hold on servo",
+        "tab holes at z = 0 — holes below base plate surface"
       ],
       "constraint_checks": [
         {
-          "id": "servo_pocket",
+          "id": "wing_axis",
           "severity": "error",
-          "expression": "servo body cutout cube in difference",
-          "message": "Servo bracket must have a rectangular servo body pocket."
+          "expression": "wing cube centered at x = ±tab_span/2",
+          "message": "Wings must be at x = ±tab_span/2 so tab holes align with MG996R mounting holes."
         },
         {
-          "id": "tab_holes",
+          "id": "tab_hole_direction",
           "severity": "error",
-          "expression": "two tab mounting holes present",
-          "message": "Servo bracket needs two mounting holes matching tab span."
+          "expression": "rotate([0,90,0]) before cylinder for tab holes",
+          "message": "Tab holes must drill along X, not Z."
+        },
+        {
+          "id": "tab_hole_height",
+          "severity": "error",
+          "expression": "tab hole Z = bracket_t + tab_hole_z",
+          "message": "Tab holes must be at the correct height above the base plate."
         }
       ],
-      "openscad_module": "$fn = 64;\n\nservo_l    = 40.5;\nservo_w    = 20.5;\nservo_h    = 44;\ntab_span   = 49;\nhole_d     = 3.4;\nbracket_t  = 4;\nclearance  = 0.5;\n\nplate_l    = tab_span + 10;\n\nmodule mg996r_bracket() {\n  difference() {\n    union() {\n      cube([plate_l, servo_w + 2*bracket_t, bracket_t], center = true);\n      for (s = [-1, 1])\n        translate([0, s * (servo_w/2 + bracket_t/2), servo_h/2])\n          cube([plate_l, bracket_t, servo_h], center = true);\n    }\n    cube([servo_l + clearance, servo_w + clearance + 2, servo_h + clearance], center = true);\n    for (x = [-tab_span/2, tab_span/2])\n      translate([x, 0, 0])\n        rotate([90, 0, 0])\n          cylinder(h = servo_w + 2*bracket_t + 2, d = hole_d, center = true, $fn = 32);\n  }\n}\n\nmg996r_bracket();"
+      "openscad_module": "$fn = 64;\n\nservo_l      = 40.5;\nservo_w      = 20.5;\nservo_h      = 44.0;\ntab_span     = 49.0;   // center-to-center of MG996R mounting holes along X\nhole_d       = 3.8;    // M3 + FDM clearance\nbracket_t    = 4.0;\ntab_hole_z   = 9.5;    // MG996R: mounting tab hole height above servo body base\ncable_hole_d = 6.0;\nbase_hole_d  = 3.8;\n\nwing_w  = servo_w + 2 * bracket_t;  // 28.5 mm\nwing_h  = servo_h + bracket_t;      // 48 mm\nplate_l = tab_span + bracket_t;     // 53 mm\n\nmodule mg996r_u_bracket() {\n  difference() {\n    union() {\n      // Base plate (bottom of U)\n      translate([0, 0, bracket_t / 2])\n        cube([plate_l, wing_w, bracket_t], center = true);\n      // Left wing — centered on tab hole x-position\n      translate([-(tab_span / 2), 0, bracket_t + wing_h / 2])\n        cube([bracket_t, wing_w, wing_h], center = true);\n      // Right wing\n      translate([ (tab_span / 2), 0, bracket_t + wing_h / 2])\n        cube([bracket_t, wing_w, wing_h], center = true);\n    }\n    // Servo mounting tab holes through wings along X\n    for (x = [-tab_span / 2, tab_span / 2])\n      translate([x, 0, bracket_t + tab_hole_z])\n        rotate([0, 90, 0])\n          cylinder(h = bracket_t + 2, d = hole_d, center = true, $fn = 32);\n    // Cable relief hole in base plate\n    translate([0, 0, bracket_t / 2])\n      cylinder(h = bracket_t + 2, d = cable_hole_d, center = true, $fn = 32);\n    // Base mounting holes — 2x2 pattern\n    for (xi = [-(plate_l / 2 - 6), plate_l / 2 - 6])\n      for (yi = [-(wing_w / 2 - 6), wing_w / 2 - 6])\n        translate([xi, yi, bracket_t / 2])\n          cylinder(h = bracket_t + 2, d = base_hole_d, center = true, $fn = 32);\n  }\n}\n\nmg996r_u_bracket();"
     }
   ]
 }

@@ -185,7 +185,7 @@
         "depth_default": {
           "formula": "span / 10",
           "note": "visual default for simple bridge trusses"
-        },
+      },
         "diagonal_length": {
           "formula": "sqrt(panel_length^2 + depth^2)",
           "note": "single panel diagonal length"
@@ -225,7 +225,9 @@
         "Do not model a truss as one filled triangular plate.",
         "Keep span, rise or depth, panel_count, member size, gusset size, and bolt diameter as named parameters.",
         "Place gusset plates at nodes where members meet.",
-        "Use support pads at left and right bearing points when realistic detail is requested."
+        "Use support pads at left and right bearing points when realistic detail is requested.",
+        "Do NOT wrap rod() or member() in minkowski(). Minkowski bloats every member by the kernel radius, produces capsule shapes instead of cylinders, and multiplies render time by orders of magnitude.",
+        "Do NOT add fillet_r or any sphere-convolution to truss member rods. Truss members are plain prismatic cylinders or rectangular bars."
       ],
       "validation_criteria": [
         "separate visible members between node points",
@@ -248,8 +250,10 @@
       "name": "King-post roof truss",
       "aliases": [
         "king post",
-        "king-post truss",
+        "king post roof truss",
         "king post truss",
+        "king-post truss",
+        "king_post_truss",
         "simple roof truss"
       ],
       "standards": [
@@ -264,13 +268,11 @@
       ],
       "family": "common_trusses_reference",
       "standard_dimensions_mm": {
-        "span": 160,
-        "rise": 48,
-        "member_width": 6,
-        "member_depth": 8,
-        "gusset_radius": 9,
-        "gusset_thickness": 2,
-        "bolt_diameter": 2.5
+        "span": 240,
+        "rise": 80,
+        "chord_d": 5,
+        "web_d": 4,
+        "joint_d": 8
       },
       "main_parameters": {
         "span": "support-to-support distance",
@@ -315,37 +317,54 @@
         "The CAD model shows geometry and connection intent only."
       ],
       "main_features": [
-        "bottom tie beam",
-        "left and right rafters",
-        "central king post",
-        "left and right angled struts from bottom center to rafter midpoint nodes",
-        "gusset plates at supports, apex, midpoint, and strut-to-rafter nodes",
-        "support pads at both bearing points"
+        "left and right bearing nodes A and B",
+        "ridge node C at roof apex",
+        "center bottom node D (king-post foot)",
+        "strut attachment nodes E = [-span/4, 0, rise/2] and F = [span/4, 0, rise/2] — midpoints on the rafters",
+        "bottom tie beam split into A-D and D-B",
+        "left rafter split at E into A-E and E-C; right rafter split at F into C-F and F-B",
+        "single central king post C-D",
+        "two diagonal struts D-E and D-F",
+        "spherical nodes at all member endpoints; cylindrical members between 3D points"
       ],
       "design_rules": [
-        "Use two sloped rafters from supports to apex.",
-        "Split each rafter at the strut-to-rafter node: left support to left strut node, left strut node to apex, apex to right strut node, and right strut node to right support.",
-        "Add one vertical post from bottom midpoint to apex.",
-        "Add two angled struts from the bottom-center joint to midpoint nodes on the rafters.",
-        "Do not add a horizontal straining beam, collar beam, or crossbar between rafters unless explicitly requested.",
-        "Keep support, apex, center, and strut-to-rafter nodes connected with gussets."
+        "Use A and B at +/-span/2 on the bottom chord.",
+        "Use C at [0, 0, rise] as the ridge/apex.",
+        "Use D at [0, 0, 0] as the king-post foot (center of tie beam).",
+        "Define strut nodes E = [-span/4, 0, rise/2] and F = [span/4, 0, rise/2] as midpoints on the rafters.",
+        "Split each rafter at its strut node: left rafter is A-E then E-C; right rafter is C-F then F-B.",
+        "Do NOT use single unsplit rafters member(A,C) and member(C,B) — that skips the strut-to-rafter node.",
+        "Add struts D-E and D-F using web_d.",
+        "Use chord_d for tie beam and rafter segments; use web_d for king post and struts.",
+        "The member module body must be exactly: rod(p1, p2, d); node(p1); node(p2); — nothing else.",
+        "Do NOT wrap rod() or member() in minkowski(). Minkowski on a cylinder bloats the cross-section by the kernel radius in every direction, produces capsule geometry instead of a rod, and makes render times 100× slower.",
+        "Do NOT add a fillet_r parameter or sphere-convolution to truss members. Truss rods are plain cylinders with no fillet.",
+        "Use indexed vector access v[0], v[1], v[2] in OpenSCAD."
       ],
       "validation_criteria": [
-        "triangular roof outline with bottom chord",
-        "rafters are segmented through the left and right strut nodes",
-        "single central vertical post",
-        "two diagonal struts rising from bottom center to the rafters",
-        "no horizontal member between the rafters",
-        "gusset at apex"
+        "rod module uses norm() for member length",
+        "node module uses sphere()",
+        "member module body is exactly rod(p1,p2,d) + node(p1) + node(p2) — no minkowski() call present",
+        "no fillet_r variable defined anywhere in the truss code",
+        "king_post_truss module present",
+        "strut nodes E = [-span/4, 0, rise/2] and F = [span/4, 0, rise/2] defined",
+        "bottom tie split A-D and D-B present",
+        "left rafter split as member(A,E) and member(E,C) — not a single member(A,C)",
+        "right rafter split as member(C,F) and member(F,B) — not a single member(C,B)",
+        "king post C-D present",
+        "struts D-E and D-F present using web_d"
       ],
       "failure_modes": [
         "missing center post",
-        "missing angled struts",
-        "one long rafter hides or skips the strut-to-rafter joint",
+        "missing angled struts D-E and D-F",
+        "one long unsplit rafter member(A,C) or member(C,B) that hides the strut-to-rafter node",
+        "strut nodes E and F not defined — struts have no attachment point on the rafter",
+        "wrapping rod() or member() in minkowski() — produces bloated capsule cross-section, wrong geometry, extremely slow render",
+        "adding fillet_r parameter and sphere convolution to truss members — rods are plain cylinders",
         "horizontal straining beam added to a default king-post truss",
         "filled triangular plate instead of separate members"
       ],
-      "openscad_module": "$fn = 48;\nspan = 160;\nrise = 48;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) {\n  dx = p2[0] - p1[0]; dz = p2[1] - p1[1]; L = sqrt(dx*dx + dz*dz); a = atan2(dz, dx);\n  translate([(p1[0]+p2[0])/2, 0, (p1[1]+p2[1])/2]) rotate([0, -a, 0]) cube([L, d, w], center=true);\n}\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule king_post_truss() { left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; mid=[0,0]; left_strut_node=[-span/4,rise/2]; right_strut_node=[span/4,rise/2]; union() { member_between(left,right); member_between(left,left_strut_node); member_between(left_strut_node,apex); member_between(apex,right_strut_node); member_between(right_strut_node,right); member_between(mid,apex); member_between(mid,left_strut_node); member_between(mid,right_strut_node); for(p=[left,right,apex,mid,left_strut_node,right_strut_node]) gusset_at(p); support_pad(-span/2); support_pad(span/2); } }\nking_post_truss();"
+      "openscad_module": "$fn = 96;\n\n// ── Parameters ───────────────────────────────────────────\nspan    = 240;   // support-to-support distance (mm)\nrise    =  80;   // height from tie beam to ridge (mm)\nchord_d =   5;   // diameter — tie beam and rafter segments\nweb_d   =   4;   // diameter — king post and struts\njoint_d =   8;   // diameter — node spheres\n\n// ── Nodes ────────────────────────────────────────────────\nA = [-span/2, 0,      0];   // left bearing\nB = [ span/2, 0,      0];   // right bearing\nC = [       0, 0,  rise];   // ridge / apex\nD = [       0, 0,     0];   // king-post foot (tie-beam centre)\n\n// Strut attachment nodes — midpoints of the two rafters\nE = [-span/4, 0, rise/2];   // midpoint of rafter A→C\nF = [ span/4, 0, rise/2];   // midpoint of rafter C→B\n\n// ── Helpers ──────────────────────────────────────────────\nmodule rod(p1, p2, d = 4) {\n    v = p2 - p1;\n    L = norm(v);\n    translate(p1)\n        rotate([0, acos(v[2] / L), atan2(v[1], v[0])])\n            cylinder(d = d, h = L);\n}\n\nmodule node(p) { translate(p) sphere(d = joint_d); }\n\nmodule member(p1, p2, d = 4) {\n    rod(p1, p2, d);\n    node(p1);\n    node(p2);\n}\n\n// ── King-post truss ──────────────────────────────────────\nmodule king_post_truss() {\n    // Bottom tie beam (split at king-post foot D)\n    member(A, D, chord_d);\n    member(D, B, chord_d);\n\n    // Left rafter — split at strut node E\n    member(A, E, chord_d);\n    member(E, C, chord_d);\n\n    // Right rafter — split at strut node F\n    member(C, F, chord_d);\n    member(F, B, chord_d);\n\n    // King post\n    member(C, D, web_d);\n\n    // Diagonal struts (king-post foot → rafter midpoints)\n    member(D, E, web_d);\n    member(D, F, web_d);\n}\n\nking_post_truss();"
     },
     {
       "id": "queen_post_roof_truss",
@@ -353,8 +372,11 @@
       "name": "Queen-post roof truss",
       "aliases": [
         "queen post",
-        "queen-post truss",
+        "queen post roof truss",
         "queen post truss",
+        "queen-post truss",
+        "queen_post_truss",
+        "qween post truss",
         "straining beam truss"
       ],
       "standards": [
@@ -369,13 +391,13 @@
       ],
       "family": "common_trusses_reference",
       "standard_dimensions_mm": {
-        "span": 180,
-        "rise": 54,
-        "member_width": 6,
-        "member_depth": 8,
-        "gusset_radius": 9,
-        "gusset_thickness": 2,
-        "bolt_diameter": 2.5
+        "span": 260,
+        "rise": 80,
+        "chord_d": 5,
+        "web_d": 4,
+        "joint_d": 8,
+        "queen_post_x": "span / 4",
+        "queen_post_top_z": "rise / 2"
       },
       "main_parameters": {
         "span": "support-to-support distance",
@@ -411,26 +433,31 @@
         "OpenSCAD geometry is visual, not a structural certification."
       ],
       "main_features": [
-        "bottom tie beam",
-        "two sloped rafters",
-        "two queen posts",
-        "straining beam between queen posts",
-        "rafter joints at the tops of the queen posts",
-        "gusset plates at supports, post feet, post tops, and apex"
+        "left and right bearing nodes A and B",
+        "roof peak C",
+        "bottom queen-post nodes D and E at +/-span/4",
+        "upper queen-post nodes F and G at +/-span/4 and rise/2",
+        "bottom tie beam split into A-D, D-E, and E-B",
+        "two rafters A-C and C-B",
+        "two vertical queen posts D-F and E-G",
+        "straining beam F-G",
+        "diagonal struts F-C and G-C",
+        "spherical nodes at member endpoints and cylindrical members between 3D points"
       ],
       "design_rules": [
-        "Place queen posts symmetrically at +/- span/4.",
-        "Connect post tops with a horizontal straining beam.",
-        "Build rafters as four connected segments: left support to left post top, left post top to apex, apex to right post top, and right post top to right support.",
-        "Do not add diagonal internal braces, V braces, or floating members unless explicitly requested."
+        "Place queen posts symmetrically at +/-span/4.",
+        "Use F and G as queen-post tops at rise/2.",
+        "Use chord_d for tie beam, rafters, and straining beam; use web_d for posts and struts.",
+        "Use indexed vector access v[0], v[1], v[2] in OpenSCAD."
       ],
       "validation_criteria": [
-        "two vertical queen posts",
-        "straining beam between post tops",
-        "continuous bottom chord",
-        "rafters pass through both queen-post top nodes",
-        "no floating member above or away from the truss",
-        "no diagonal internal braces in the default queen-post layout"
+        "rod module uses norm() for member length",
+        "node module uses sphere()",
+        "queen_post_truss module present",
+        "bottom tie split into three segments present",
+        "two queen posts D-F and E-G present",
+        "straining beam F-G present",
+        "diagonal struts F-C and G-C present"
       ],
       "failure_modes": [
         "only one central post, which is a king-post truss",
@@ -439,17 +466,23 @@
         "collapsed narrow truss instead of a wide span",
         "unrequested diagonal internal braces"
       ],
-      "openscad_module": "$fn = 48;\nspan = 180;\nrise = 54;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule queen_post_truss() { left=[-span/2,0]; right=[span/2,0]; apex=[0,rise]; ql=[-span/4,0]; qr=[span/4,0]; qlt=[-span/4,rise/2]; qrt=[span/4,rise/2]; union() { member_between(left,right); member_between(left,qlt); member_between(qlt,apex); member_between(apex,qrt); member_between(qrt,right); member_between(ql,qlt); member_between(qr,qrt); member_between(qlt,qrt); for(p=[left,right,apex,ql,qr,qlt,qrt]) gusset_at(p); support_pad(-span/2); support_pad(span/2); } }\nqueen_post_truss();"
+      "openscad_module": "// Queen-Post Roof Truss\n// OpenSCAD\n// Units: mm\n\n$fn = 40;\n\nspan = 260;\nrise = 80;\n\nchord_d = 5;\nweb_d = 4;\njoint_d = 8;\n\nA = [-span/2, 0, 0];\nB = [ span/2, 0, 0];\nC = [0, 0, rise];\n\nD = [-span/4, 0, 0];\nE = [ span/4, 0, 0];\nF = [-span/4, 0, rise/2];\nG = [ span/4, 0, rise/2];\n\nmodule rod(p1, p2, d=4) {\n    v = p2 - p1;\n    L = norm(v);\n    translate(p1)\n        rotate([0, acos(v[2] / L), atan2(v[1], v[0])])\n            cylinder(d=d, h=L);\n}\n\nmodule node(p) {\n    translate(p)\n        sphere(d=joint_d);\n}\n\nmodule member(p1, p2, d=4) {\n    rod(p1, p2, d);\n    node(p1);\n    node(p2);\n}\n\nmodule queen_post_truss() {\n    member(A, D, chord_d);\n    member(D, E, chord_d);\n    member(E, B, chord_d);\n\n    member(A, C, chord_d);\n    member(C, B, chord_d);\n\n    member(D, F, web_d);\n    member(E, G, web_d);\n\n    member(F, G, chord_d);\n\n    member(F, C, web_d);\n    member(G, C, web_d);\n}\n\nqueen_post_truss();"
     },
     {
       "id": "pratt_howe_bridge_truss",
       "category": "bridge_truss",
       "name": "Pratt and Howe bridge truss family",
       "aliases": [
-        "pratt truss",
+        "Howe bridge truss",
+        "Howe roof truss",
+        "Pratt bridge truss",
+        "Pratt roof truss",
         "howe truss",
-        "vertical and diagonal bridge truss",
-        "panel bridge truss"
+        "howe_truss",
+        "panel bridge truss",
+        "pratt truss",
+        "pratt_truss",
+        "vertical and diagonal bridge truss"
       ],
       "standards": [
         "general truss design practice",
@@ -463,14 +496,13 @@
       ],
       "family": "common_trusses_reference",
       "standard_dimensions_mm": {
-        "span": 180,
-        "depth": 36,
-        "panel_count": 6,
-        "member_width": 6,
-        "member_depth": 8,
-        "gusset_radius": 9,
-        "gusset_thickness": 2,
-        "bolt_diameter": 2.5
+        "span": 280,
+        "height": 70,
+        "bays": 8,
+        "bay_w": "span / bays",
+        "chord_d": 5,
+        "web_d": 4,
+        "joint_d": 8
       },
       "main_parameters": {
         "span": "support-to-support distance",
@@ -502,45 +534,65 @@
       },
       "assumptions": [
         "Verticals are included at panel points.",
-        "Pratt diagonals slope toward the span center in the usual gravity-load convention.",
-        "Howe diagonals slope away from the span center.",
+        "Pratt diagonals slope down and inward from the outer top-chord nodes toward the span center (left half: top-left to bottom-right; right half: bottom-left to top-right).",
+        "Howe diagonals slope up and inward from the outer bottom-chord nodes toward the span center (left half: bottom-left to top-right; right half: top-left to bottom-right).",
         "The generated OpenSCAD model is a layout model, not an analysis model."
       ],
       "main_features": [
-        "parallel top and bottom chords",
-        "vertical posts at panel points",
-        "directional diagonals",
-        "gusset plates at all panel nodes",
-        "support pads at bearing points"
+        "Pratt bridge/roof truss reference code",
+        "bottom chord split into equal bay segments",
+        "top chord split into equal bay segments",
+        "vertical posts at every panel point",
+        "Pratt left-half diagonals slope downward from top-left to bottom-right",
+        "Pratt right-half diagonals slope upward from bottom-left to top-right",
+        "spherical nodes at every member endpoint",
+        "round chord and web members modeled as cylinders between 3D points"
       ],
       "design_rules": [
-        "Use Pratt when diagonals should slope toward center.",
-        "Use Howe when diagonals should slope away from center.",
-        "Keep panel_count even for symmetric center behavior."
+        "Use bay_w = span / bays for all panel spacing.",
+        "Use floor(bays/2) as the diagonal split boundary.",
+        "Left-half Pratt diagonals connect top-left to bottom-right.",
+        "Right-half Pratt diagonals connect bottom-left to top-right.",
+        "Use chord_d for top and bottom chords; use web_d for verticals and diagonals.",
+        "Use indexed vector access v[0], v[1], v[2] in OpenSCAD."
       ],
       "validation_criteria": [
-        "top chord and bottom chord are continuous",
-        "verticals exist at panel points",
-        "diagonals have the requested Pratt or Howe direction"
+        "rod module uses norm() for member length",
+        "node module uses sphere()",
+        "pratt_truss module present",
+        "bottom chord loop present",
+        "top chord loop present",
+        "vertical post loop includes bays + 1 panel points",
+        "two diagonal loops split by floor(bays/2)"
       ],
       "failure_modes": [
         "diagonals reversed for the requested truss type",
         "missing verticals",
         "single solid web plate"
       ],
-      "openscad_module": "$fn = 48;\nspan = 180;\ndepth = 36;\npanel_count = 6;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\nuse_pratt = true;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule pratt_howe_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { x0=-span/2+i*pl; x1=x0+pl; member_between([x0,0],[x1,0]); member_between([x0,depth],[x1,depth]); pratt_left = i < panel_count/2; if(use_pratt) { if(pratt_left) member_between([x0,0],[x1,depth]); else member_between([x0,depth],[x1,0]); } else { if(pratt_left) member_between([x0,depth],[x1,0]); else member_between([x0,0],[x1,depth]); } } for(i=[0:panel_count]) { x=-span/2+i*pl; member_between([x,0],[x,depth]); gusset_at([x,0]); gusset_at([x,depth]); } support_pad(-span/2); support_pad(span/2); } }\npratt_howe_truss();"
+      "openscad_module": "// Pratt Bridge / Roof Truss\n// OpenSCAD\n// Units: mm\n\n$fn = 40;\n\nspan = 280;\nheight = 70;\nbays = 8;\n\nchord_d = 5;\nweb_d = 4;\njoint_d = 8;\n\nbay_w = span / bays;\n\nmodule rod(p1, p2, d=4) {\n    v = p2 - p1;\n    L = norm(v);\n    translate(p1)\n        rotate([0, acos(v[2] / L), atan2(v[1], v[0])])\n            cylinder(d=d, h=L);\n}\n\nmodule node(p) {\n    translate(p)\n        sphere(d=joint_d);\n}\n\nmodule member(p1, p2, d=4) {\n    rod(p1, p2, d);\n    node(p1);\n    node(p2);\n}\n\nmodule pratt_truss() {\n    for (i = [0:bays-1])\n        member(\n            [-span/2 + i * bay_w, 0, 0],\n            [-span/2 + (i + 1) * bay_w, 0, 0],\n            chord_d\n        );\n\n    for (i = [0:bays-1])\n        member(\n            [-span/2 + i * bay_w, 0, height],\n            [-span/2 + (i + 1) * bay_w, 0, height],\n            chord_d\n        );\n\n    for (i = [0:bays])\n        member(\n            [-span/2 + i * bay_w, 0, 0],\n            [-span/2 + i * bay_w, 0, height],\n            web_d\n        );\n\n    for (i = [0:floor(bays/2)-1])\n        member(\n            [-span/2 + i * bay_w, 0, height],\n            [-span/2 + (i + 1) * bay_w, 0, 0],\n            web_d\n        );\n\n    for (i = [floor(bays/2):bays-1])\n        member(\n            [-span/2 + i * bay_w, 0, 0],\n            [-span/2 + (i + 1) * bay_w, 0, height],\n            web_d\n        );\n}\n\npratt_truss();"
     },
     {
       "id": "warren_fink_k_truss_patterns",
       "category": "truss_patterns",
       "name": "Warren, Fink, and K-truss web patterns",
       "aliases": [
-        "warren truss",
+        "Fink roof truss",
+        "K truss",
+        "K-truss",
+        "Warren display truss",
+        "Warren truss",
         "fink truss",
-        "k-truss",
+        "fink_roof_truss",
+        "industrial K truss",
         "k truss",
+        "k-truss",
+        "k_truss",
+        "standard Fink truss",
         "triangular web truss",
-        "w web roof truss"
+        "w web roof truss",
+        "warren truss",
+        "warren_truss"
       ],
       "standards": [
         "general truss design practice",
@@ -562,7 +614,25 @@
         "member_depth": 8,
         "gusset_radius": 9,
         "gusset_thickness": 2,
-        "bolt_diameter": 2.5
+        "bolt_diameter": 2.5,
+        "k_truss_span": 160,
+        "k_truss_height": 55,
+        "k_truss_bays": 4,
+        "k_truss_chord_d": 6,
+        "k_truss_web_d": 4,
+        "k_truss_joint_d": 8,
+        "fink_span": 200,
+        "fink_rise": 70,
+        "fink_chord_d": 6,
+        "fink_web_d": 4,
+        "fink_joint_d": 8,
+        "fink_roof_midpoints": "D = [-span/4,0,rise/2], E = [span/4,0,rise/2]",
+        "warren_span": 260,
+        "warren_height": 70,
+        "warren_bays": 8,
+        "warren_chord_d": 5,
+        "warren_web_d": 4,
+        "warren_joint_d": 8
       },
       "main_parameters": {
         "span": "support-to-support distance",
@@ -604,11 +674,11 @@
         "OpenSCAD output is a parametric geometry pattern, not a load rating."
       ],
       "main_features": [
-        "Warren: alternating triangular web",
-        "Fink: pitched rafters with W-web below",
-        "K-truss: mid-height nodes and K-shaped web members",
-        "gusset plates at all major nodes",
-        "support pads at both ends"
+        "Warren/Fink/K family web-pattern reference",
+        "Warren truss uses top and bottom chord node rows",
+        "Warren truss has alternating triangular web diagonals controlled by i % 2",
+        "Warren truss includes end verticals at both support ends",
+        "Spherical joints and cylindrical rods make node connectivity explicit"
       ],
       "design_rules": [
         "Use Warren for alternating bridge triangles.",
@@ -627,7 +697,7 @@
         "Fink truss without W-web",
         "K-truss without mid-panel nodes"
       ],
-      "openscad_module": "$fn = 48;\nspan = 180;\ndepth = 36;\npanel_count = 6;\nmember_width = 6;\nmember_depth = 8;\ngusset_radius = 9;\ngusset_thickness = 2;\nbolt_diameter = 2.5;\n\nmodule member_between(p1, p2, w=member_width, d=member_depth) { dx=p2[0]-p1[0]; dz=p2[1]-p1[1]; L=sqrt(dx*dx+dz*dz); a=atan2(dz,dx); translate([(p1[0]+p2[0])/2,0,(p1[1]+p2[1])/2]) rotate([0,-a,0]) cube([L,d,w], center=true); }\nmodule gusset_at(p) { difference() { translate([p[0],0,p[1]]) cylinder(h=gusset_thickness, r=gusset_radius, center=true); translate([p[0],0,p[1]]) cylinder(h=gusset_thickness+1, d=bolt_diameter, center=true); } }\nmodule support_pad(x) { translate([x,0,-member_width]) cube([20, member_depth+10, 3], center=true); }\nmodule warren_truss() { pl=span/panel_count; union() { for(i=[0:panel_count-1]) { x0=-span/2+i*pl; x1=x0+pl; member_between([x0,0],[x1,0]); member_between([x0,depth],[x1,depth]); if(i%2==0) member_between([x0,0],[x1,depth]); else member_between([x0,depth],[x1,0]); } for(i=[0:panel_count]) { x=-span/2+i*pl; gusset_at([x,0]); gusset_at([x,depth]); } support_pad(-span/2); support_pad(span/2); } }\nwarren_truss();"
+      "openscad_module": "// Warren Truss\n// OpenSCAD\n// Units: mm\n\n$fn = 40;\n\nspan = 260;\nheight = 70;\nbays = 8;\n\nchord_d = 5;\nweb_d = 4;\njoint_d = 8;\n\nbay_w = span / bays;\n\nmodule rod(p1, p2, d=4) {\n    v = p2 - p1;\n    L = norm(v);\n    translate(p1)\n        rotate([0, acos(v[2] / L), atan2(v[1], v[0])])\n            cylinder(d=d, h=L);\n}\n\nmodule node(p) {\n    translate(p)\n        sphere(d=joint_d);\n}\n\nmodule member(p1, p2, d=4) {\n    rod(p1, p2, d);\n    node(p1);\n    node(p2);\n}\n\nmodule warren_truss() {\n    for (i = [0:bays-1]) {\n        p1 = [-span/2 + i * bay_w, 0, 0];\n        p2 = [-span/2 + (i + 1) * bay_w, 0, 0];\n        member(p1, p2, chord_d);\n    }\n\n    for (i = [0:bays-1]) {\n        p1 = [-span/2 + i * bay_w, 0, height];\n        p2 = [-span/2 + (i + 1) * bay_w, 0, height];\n        member(p1, p2, chord_d);\n    }\n\n    for (i = [0:bays-1]) {\n        b1 = [-span/2 + i * bay_w, 0, 0];\n        b2 = [-span/2 + (i + 1) * bay_w, 0, 0];\n        t1 = [-span/2 + i * bay_w, 0, height];\n        t2 = [-span/2 + (i + 1) * bay_w, 0, height];\n\n        if (i % 2 == 0)\n            member(b1, t2, web_d);\n        else\n            member(t1, b2, web_d);\n    }\n\n    member([-span/2, 0, 0], [-span/2, 0, height], chord_d);\n    member([ span/2, 0, 0], [ span/2, 0, height], chord_d);\n}\n\nwarren_truss();"
     }
   ]
 }

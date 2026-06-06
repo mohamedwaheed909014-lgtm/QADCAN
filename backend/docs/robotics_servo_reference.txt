@@ -57,27 +57,56 @@ MOBILE ROBOT WHEEL PARAMETERS
   tyre_groove_depth     — 1–2 mm V-groove or flat; for o-ring tyre: groove = o_ring_d × 0.9
   o_ring_sizes          : ø3 mm cord common; outer track = wheel_d − 2×1.5 mm recess
 
-ROBOT ARM JOINT
-────────────────
-  module servo_bracket(body_l, body_w, tab_span, hole_d, thickness) {
-    plate_l = tab_span + 10;    // extend past mounting holes
+ROBOT ARM JOINT — MG996R U-BRACKET (CORRECT WING DESIGN)
+──────────────────────────────────────────────────────────
+  Wings at x = ±tab_span/2 hold the servo mounting tabs.
+  Holes through wings are along X axis (rotate([0,90,0])).
+  No servo body pocket needed — servo slides into the open top of the U.
+
+  $fn = 64;
+  servo_l      = 40.5;  servo_w = 20.5;  servo_h = 44.0;
+  tab_span     = 49.0;  // MG996R hole-to-hole distance along X
+  hole_d       = 3.8;   // M3 + FDM clearance
+  bracket_t    = 4.0;
+  tab_hole_z   = 9.5;   // MG996R: mounting hole height above servo body base
+  cable_hole_d = 6.0;
+  wing_w  = servo_w + 2 * bracket_t;  // 28.5 mm
+  wing_h  = servo_h + bracket_t;      // 48 mm
+  plate_l = tab_span + bracket_t;     // 53 mm
+
+  module mg996r_u_bracket() {
     difference() {
       union() {
-        cube([plate_l, body_w + 2*thickness, thickness]);
-        // side walls
-        for(side=[-1, 1])
-          translate([(plate_l-body_l)/2, side*(body_w/2+thickness/2), 0])
-            cube([body_l, thickness, body_l*0.5]);
+        // Base plate (bottom of U)
+        translate([0, 0, bracket_t / 2])
+          cube([plate_l, wing_w, bracket_t], center = true);
+        // Left wing — centered on tab hole x-position
+        translate([-(tab_span / 2), 0, bracket_t + wing_h / 2])
+          cube([bracket_t, wing_w, wing_h], center = true);
+        // Right wing
+        translate([ (tab_span / 2), 0, bracket_t + wing_h / 2])
+          cube([bracket_t, wing_w, wing_h], center = true);
       }
-      // servo body cutout
-      translate([(plate_l-body_l)/2, thickness, -1])
-        cube([body_l+0.5, body_w+0.5, thickness+2]);
-      // mounting holes
-      for(x=[(plate_l-tab_span)/2, (plate_l+tab_span)/2])
-        translate([x, thickness/2, -1])
-          cylinder(h=thickness+2, d=hole_d+0.2, $fn=32);
+      // Tab holes through wings along X (NOT vertical Z cylinders)
+      for (x = [-tab_span / 2, tab_span / 2])
+        translate([x, 0, bracket_t + tab_hole_z])
+          rotate([0, 90, 0])
+            cylinder(h = bracket_t + 2, d = hole_d, center = true, $fn = 32);
+      // Cable relief hole in base plate
+      translate([0, 0, bracket_t / 2])
+        cylinder(h = bracket_t + 2, d = cable_hole_d, center = true, $fn = 32);
+      // Base mounting holes — 2x2 pattern
+      for (xi = [-(plate_l/2 - 6), plate_l/2 - 6])
+        for (yi = [-(wing_w/2 - 6), wing_w/2 - 6])
+          translate([xi, yi, bracket_t / 2])
+            cylinder(h = bracket_t + 2, d = 3.8, center = true, $fn = 32);
     }
   }
+
+  COMMON FAILURES TO AVOID:
+  - Do NOT drill tab holes as vertical Z cylinders through base plate.
+  - Do NOT place wings along Y axis (front/back of servo body).
+  - Do NOT center a servo pocket cube at z=0 — it destroys the base plate.
 
 ROBOT CHASSIS KEY DIMENSIONS
 ──────────────────────────────
@@ -139,9 +168,15 @@ OpenSCAD action:
   for (r=[hole_pitch:hole_pitch:arm_length])
     translate([r,0,0]) cylinder(h=horn_thickness+2, d=linkage_hole_diameter, center=true, $fn=32);
 
-Rule: servo bracket pocket removes the rectangular servo body.
+Rule: MG996R U-bracket — wings at ±tab_span/2 hold the servo tabs; no pocket needed.
 OpenSCAD action:
-  cube([servo_body_length+clearance, servo_body_width+clearance, servo_body_height+clearance], center=true);
+  // Two wing plates, each centered at x = ±tab_span/2:
+  translate([-(tab_span/2), 0, bracket_t + wing_h/2]) cube([bracket_t, wing_w, wing_h], center=true);
+  translate([ (tab_span/2), 0, bracket_t + wing_h/2]) cube([bracket_t, wing_w, wing_h], center=true);
+  // Tab holes through wings along X axis:
+  for (x = [-tab_span/2, tab_span/2])
+    translate([x, 0, bracket_t + tab_hole_z]) rotate([0,90,0])
+      cylinder(h=bracket_t+2, d=hole_d, center=true, $fn=32);
 
 Rule: cable relief is a small channel through bracket wall.
 OpenSCAD action:

@@ -23,7 +23,8 @@ from typing import Literal
 
 import numpy as np
 import requests
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from openai import OpenAI
@@ -36,6 +37,22 @@ from validation_and_logging import (
     HARD_FAIL_LABELS as _VAL_HARD_FAIL_LABELS,
     score_validation as _val_score,
 )
+
+from auth import (
+    init_db,
+    create_user,
+    authenticate_user,
+    update_user,
+    make_token,
+    get_current_user,
+)
+
+from mechanical_intent import analyze_intent, format_intent_summary
+from constraint_solver import solve_constraints, format_constraint_summary
+from tolerance_engine import generate_tolerance_block, get_tolerance_table_html
+from physics_engine import analyze_physics, format_physics_summary
+from design_failure_detector import detect_failures, format_failure_report
+from manufacturing_rules import format_mfg_context, check_dfm
 
 from rag import (
     DOCS_DIR,
@@ -86,6 +103,21 @@ def _load_windows_user_env(names: list[str]) -> None:
         return
 
 
+def _load_dotenv(path: Path) -> None:
+    if not path.exists():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        name, value = line.split("=", 1)
+        name = name.strip()
+        if not name or os.getenv(name):
+            continue
+        os.environ[name] = value.strip().strip('"').strip("'")
+
+
+_load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 _load_windows_user_env(
     [
         "OPENAI_API_KEY",
@@ -103,12 +135,12 @@ OPENAI_MODELS = [
 ]
 OPENROUTER_BASE_URL = os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
 OPENROUTER_APP_TITLE = os.getenv("OPENROUTER_APP_TITLE", "Mechanical OpenSCAD Copilot")
-OPENROUTER_DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "google/gemma-4-31b-it:free")
+OPENROUTER_DEFAULT_MODEL = os.getenv("OPENROUTER_MODEL", "openai/gpt-oss-120b:free")
 OPENROUTER_MODELS = [
     item.strip()
     for item in os.getenv(
         "OPENROUTER_MODELS",
-        "google/gemma-4-31b-it:free,openai/gpt-oss-120b:free",
+        "openai/gpt-oss-120b:free,google/gemma-4-31b-it:free,qwen/qwen3-coder:free",
     ).split(",")
     if item.strip()
 ]
@@ -138,7 +170,6 @@ OLLAMA_GENERATE_TIMEOUT_SEC = int(os.getenv("OLLAMA_GENERATE_TIMEOUT_SEC", "900"
 OLLAMA_MAX_TOKENS = int(os.getenv("OLLAMA_MAX_TOKENS", "2400"))
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "4096"))
 MAX_REPAIR_ATTEMPTS = int(os.getenv("MAX_REPAIR_ATTEMPTS", "2"))
-CLARIFICATION_ENABLED = os.getenv("ENABLE_CLARIFICATION", "false").strip().lower() in {"1", "true", "yes", "on"}
 
 OLLAMA_DISABLED_MODELS = {
     item.strip()
@@ -270,6 +301,11 @@ minkowski(convexity=...)
 LISTS
 list = [a, b, c];
 value = list[2];
+// WARNING: Slice notation l[1:], l[0:n], l[a:b] is NOT valid OpenSCAD — it will cause a syntax error.
+// For recursive list summation use index-based recursion:
+//   function list_sum(l, n) = (n <= 0) ? 0 : l[n-1] + list_sum(l, n-1);
+//   Call full sum: list_sum(my_list, len(my_list))
+//   Call partial sum of first i elements: list_sum(my_list, i)
 
 BOOLEAN OPERATIONS
 union()
@@ -355,6 +391,17 @@ OUTPUT RULES FOR THIS APP
 - Use millimeters throughout.
 - Keep coaxial bores aligned to the main axis.
 - Repeated holes should come from for-loops or explicit symmetric placement.
+- CRITICAL — OpenSCAD modules produce geometry but do NOT return values and CANNOT be assigned to variables.
+  The following patterns are ALL INVALID and silently produce nothing:
+    outer   = minkowski() { cube(...); sphere(...); };
+    cavity  = hull()       { ... };
+    body    = some_module(...);
+    shafts  = union()      { ... };
+    bolts   = difference() { ... };
+  Write every CSG operation (union, difference, intersection, hull, minkowski) DIRECTLY
+  nested inside a module body or at the top level — never pre-computed into a named variable.
+  This applies equally to built-in operations AND user-defined module calls.
+- OpenSCAD does NOT support list slicing. l[1:], l[0:n], and l[a:b] are SYNTAX ERRORS that crash the parser. For cumulative list summation always use index-based recursion: function list_sum(l, n) = (n <= 0) ? 0 : l[n-1] + list_sum(l, n-1); and call it as list_sum(arr, i) for the first i elements, or list_sum(arr, len(arr)) for the full sum.
 - Bearing seats, shaft bores, flange bores, and mounting holes are functional features, not decoration.
 - Preserve user dimensions and design intent over visual detail.
 - For pillow blocks/plummer blocks: do not create only a circular tube or hollow ring on a flat plate.
@@ -364,47 +411,17 @@ OUTPUT RULES FOR THIS APP
 
 SYSTEM_PROMPT = "\n\n".join(
     [
-        "You are  a responsive senior mechanical design copilot specialized in parametric OpenSCAD code generation for mechanical components. You have deep expertise in standard mechanical design practices and design intent. Your goal is to generate correct, editable, and standards-aligned OpenSCAD code based on user prompts describing mechanical design needs. You should ask for clarification when essential parameters are missing, but you should not ask for secondary details that can be reasonably assumed from standards or typical engineering practice. Always prioritize functional design features and user dimensions over visual detail.",
+        "You are  a responsive senior mechanical design copilot specialized in parametric OpenSCAD code generation for mechanical components. You have deep expertise in standard mechanical design practices and design intent. Your goal is to generate correct, editable, and standards-aligned OpenSCAD code based on user prompts describing mechanical design needs. Generate directly; when parameters are missing, choose reasonable mechanical defaults and make them editable named parameters. Always prioritize functional design features and user dimensions over visual detail.",
         "Generate one complete .scad file with no markdown, no prose, and no language labels.",
         "The .scad file must contain geometry parameters only. Do not create string metadata variables such as usage, standard_used, material, or notes.",
         "Avoid explanatory section comments about user parameters, catalog defaults, standards, or materials inside the code.",
-        "Before generation, ask for clarification when a truly essential main parameter is missing for the requested mechanical family.",
-        "When main parameters are present, assume secondary dimensions from relevant mechanical design practice and clearly encode them as named OpenSCAD parameters.",
+        "Before generation, do not stop for questions; infer missing main parameters from the active mechanical family when possible and use conservative editable defaults.",
+        "When main parameters are present, assume only missing secondary dimensions from relevant mechanical design practice and clearly encode them as named OpenSCAD parameters. Never override or replace secondary parameters explicitly stated by the user.",
         "Keep material suggestions and standard explanations out of the OpenSCAD file; the backend chat response will report them after code generation.",
         
         OPENSCAD_CHEATSHEET
     ]
 )
-
-MAIN_PARAMETER_QUESTIONS: dict[str, list[tuple[str, str, list[str]]]] = {
-   
-    "bearing_housing_reference": [
-        ("usage", "What will this bearing housing be used for? Example: 3D printer shaft support, CNC leadscrew, conveyor roller, robot axle, or belt tensioner.", [r"\b(3d printer|printer|cnc|leadscrew|lead screw|conveyor|roller|robot|axle|belt|chain|tension|industrial|fixture|machine|motor|fan)\b"]),
-        ("shaft diameter", "Please specify the shaft diameter in mm.", [r"\bshaft\s*(diameter|d)?\s*=?\s*\d+(\.\d+)?\s*mm\b", r"\b\d+(\.\d+)?\s*mm\s+shaft\b"]),
-        ("bearing size", "Please specify the bearing series, or bearing outside diameter and width. Example: 6204, 20 mm shaft with 47 mm OD and 14 mm width.", [r"\b(608|6001|6200|6201|6202|6203|6204|6205|6206|6207|6208|6305|ucf\s*\d+|ucfl\s*\d+)\b", r"\bbearing[_ -]?(od|outer|width)\b", r"\b\d+(\.\d+)?\s*mm\s*od\b"]),
-        ("housing type", "What housing style do you need: pillow block, square flange, two-bolt flange, take-up/slotted, or simple support block?", [r"\b(pillow|plummer|flange|flanged|ucf|ucfl|take[- ]?up|slotted|support block|bearing block)\b"]),
-    ],
-    "flange_pipe_fitting_reference": [
-        ("central bore", "Please specify the pipe or bore diameter in mm.", [r"\b(bore|pipe|inner)\b", r"\b\d+(\.\d+)?\s*mm\b"]),
-        ("bolt pattern", "Please specify the bolt count and bolt-circle diameter.", [r"\bbolt[_ -]?circle\b", r"\bbolt[_ -]?count\b", r"\b\d+\s*(holes|bolts)\b"]),
-        ("clearance preference", "Do you want close-fit bolt holes or extra assembly clearance?", [r"\b(clearance|fit)\b"]),
-    ],
-    "shaft_coupler_reference": [
-        ("shaft A diameter", "Please specify the first shaft diameter in mm.", [r"\b\d+(\.\d+)?\s*mm\b.*\bshaft\b", r"\bshaft[_ -]?a\b"]),
-        ("shaft B diameter", "Please specify the second shaft diameter in mm.", [r"\bto\b.*\b\d+(\.\d+)?\s*mm\b", r"\bshaft[_ -]?b\b"]),
-        ("clearance preference", "Do you want a standard slip-fit bore or a tighter bore clearance?", [r"\b(clearance|slip fit|tight fit|fit)\b"]),
-    ],
-    "gear_reference": [
-        ("gear size", "Please specify module and tooth count, or give pitch diameter and tooth count.", [r"\bmodule\b", r"\bteeth\b", r"\btooth[_ -]?count\b"]),
-        ("bore", "Please specify the bore diameter in mm.", [r"\bbore\b", r"\bshaft\b"]),
-        ("clearance preference", "Do you want standard backlash or tighter meshing?", [r"\b(backlash|clearance|mesh)\b"]),
-    ],
-    "enclosure_box_reference": [
-        ("overall size", "Please specify enclosure length, width, and height in mm.", [r"\b(length|width|height)\b", r"\b\d+(\.\d+)?\s*x\s*\d+(\.\d+)?\s*x\s*\d+(\.\d+)?\b"]),
-        ("wall thickness", "Please specify wall thickness in mm, or ask me to choose a default.", [r"\bwall[_ -]?thickness\b"]),
-        ("clearance preference", "Do you want extra internal clearance for electronics and cables?", [r"\b(clearance|cable|electronics|pcb)\b"]),
-    ],
-}
 
 ENGINEERING_FAMILY_PROFILES: dict[str, dict] = {
    
@@ -531,6 +548,14 @@ DEFAULT_ENGINEERING_PROFILE = {
 
 app = FastAPI(title="Mechanical OpenSCAD Copilot")
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 @app.exception_handler(Exception)
 async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -553,9 +578,10 @@ class ChatRequest(BaseModel):
     temperature: float = Field(default=0.2, ge=0.0, le=1.2)
     top_k: int = Field(default=4, ge=1, le=8)
     selected_doc_ids: list[str] = Field(default_factory=list)
+    disable_rag: bool = False
     allow_fallback: bool = True
     history: list[ChatMessage] = Field(default_factory=list)
-    enable_clarification: bool = False
+    manufacturing: str = "fdm"   # fdm | resin | cnc | laser
 
 
 class AcceptRequest(BaseModel):
@@ -669,139 +695,13 @@ def conversation_user_memory(history: list[ChatMessage], current_prompt: str) ->
     return "\n".join(user_turns)
 
 
-def build_clarification_request(prompt: str, family_id: str | None) -> dict | None:
-    if not CLARIFICATION_ENABLED:
-        return None
-    if not family_id or family_id not in MAIN_PARAMETER_QUESTIONS:
-        return None
+def _is_generation_intent(prompt: str) -> bool:
+    return bool(re.search(
+        r"\b(generate|create|design|make|model|build|draw|give me code|openscad|scad|cad)\b",
+        prompt,
+        re.IGNORECASE,
+    ))
 
-    questions = []
-    if family_id == "bearing_housing_reference":
-        lowered = prompt.lower()
-        has_usage = bool(re.search(r"\b(3d printer|printer|cnc|leadscrew|lead screw|conveyor|roller|robot|axle|belt|chain|tension|industrial|fixture|machine|motor|fan)\b", lowered))
-        has_bearing = bool(re.search(r"\b(608|6001|6200|6201|6202|6203|6204|6205|6206|6207|6208|6305|ucf\s*\d+|ucfl\s*\d+)\b", lowered)) or bool(re.search(r"\bbearing[_ -]?(od|outer|width)\b|\b\d+(\.\d+)?\s*mm\s*od\b", lowered))
-        has_shaft = bool(re.search(r"\bshaft\s*(diameter|d)?\s*=?\s*\d+(\.\d+)?\s*mm\b|\b\d+(\.\d+)?\s*mm\s+shaft\b", lowered))
-        has_type = bool(re.search(r"\b(pillow|plummer|flange|flanged|ucf|ucfl|take[- ]?up|slotted|support block|bearing block)\b", lowered))
-
-        if not has_usage:
-            questions.append({"field": "usage", "question": MAIN_PARAMETER_QUESTIONS[family_id][0][1]})
-        elif not has_bearing and not has_shaft:
-            questions.append({"field": "bearing size", "question": MAIN_PARAMETER_QUESTIONS[family_id][2][1]})
-        elif has_shaft and not has_bearing:
-            questions.append({"field": "bearing size", "question": "Which bearing series should I use, or should I choose a standard bearing from the shaft diameter?"})
-        elif not has_type:
-            questions.append({"field": "housing type", "question": MAIN_PARAMETER_QUESTIONS[family_id][3][1]})
-    else:
-        for field_name, question, patterns in MAIN_PARAMETER_QUESTIONS.get(family_id, []):
-            if not any(re.search(pattern, prompt, re.IGNORECASE) for pattern in patterns):
-                questions.append({"field": field_name, "question": question})
-
-    if not questions:
-        return None
-
-    return {
-        "family_id": family_id,
-        "family_label": FAMILY_ID_TO_LABEL.get(family_id, "Mechanical Part"),
-        "message": "I need one main mechanical parameter before generating a correct design. I will assume secondary values from mechanical standards after the essentials are known.",
-        "questions": questions[:1],
-        "assumptions_after_clarification": [
-            "reasonable wall thickness from load/use case",
-            "hole, bore, and fit clearances from standard mechanical practice",
-            "symmetric feature placement where appropriate",
-            "material suggestion from usage and duty level",
-        ],
-    }
-
-
-def _extract_json_object(raw: str) -> dict | None:
-    cleaned = raw.strip()
-    cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r"\s*```$", "", cleaned)
-    try:
-        data = json.loads(cleaned)
-        return data if isinstance(data, dict) else None
-    except json.JSONDecodeError:
-        pass
-
-    match = re.search(r"\{[\s\S]*\}", cleaned)
-    if not match:
-        return None
-    try:
-        data = json.loads(match.group(0))
-        return data if isinstance(data, dict) else None
-    except json.JSONDecodeError:
-        return None
-
-
-def generate_llm_clarification(
-    request: ChatRequest,
-    user_prompt: str,
-    conversation_context: str,
-    rule_clarification: dict,
-    engineering_profile: dict,
-) -> tuple[dict, str | None, str | None, bool]:
-    family_schema = knowledge_base.family_schema(rule_clarification.get("family_id"))
-    required_fields = [item.get("field", "unknown") for item in rule_clarification.get("questions", [])]
-    material_options = engineering_profile.get("material_suggestions", [])
-
-    messages = [
-        {
-            "role": "system",
-            "content": (
-                "You are  a senior mechanical design engineer specialized in parametric OpenSCAD code generation for mechanical components. "
-                "Generate clarification questions before CAD generation. Be concise, practical, and reasonable. "
-                "Ask exactly one question: the single most important missing main parameter. "
-                "Do not ask for secondary parameters that can be assumed from standards. "
-                "Use the conversation context as memory, so do not ask for anything already answered. "
-                "Return JSON only with keys: message, questions, assumptions_after_clarification, material_suggestions. "
-                "questions must be an array containing exactly one object with field and question."
-            ),
-        },
-        {
-            "role": "user",
-            "content": json.dumps(
-                {
-                    "latest_user_message": user_prompt,
-                    "conversation_context_user_messages_only": conversation_context,
-                    "active_family": family_schema.get("label"),
-                    "missing_main_fields": required_fields,
-                    "available_database_features": family_schema.get("main_features", [])[:12],
-                    "material_options_from_rules": material_options,
-                    "rule_based_questions_to_improve": rule_clarification.get("questions", []),
-                    "instruction": (
-                        "Rewrite the one rule-based question into a more natural engineering clarification. "
-                        "Mention what you can infer or assume after the user answers. "
-                        "Ask one question only. If usage is missing, ask for it because material and wall thickness depend on it."
-                    ),
-                },
-                ensure_ascii=False,
-            ),
-        },
-    ]
-
-    raw, actual_provider, actual_model, used_fallback = generate_with_fallback(request, messages)
-    parsed = _extract_json_object(raw) or {}
-    questions = parsed.get("questions")
-    if not isinstance(questions, list) or not questions:
-        parsed["questions"] = rule_clarification.get("questions", [])
-    else:
-        allowed_field = (rule_clarification.get("questions") or [{}])[0].get("field")
-        first_question = questions[0] if isinstance(questions[0], dict) else {}
-        if allowed_field:
-            first_question["field"] = allowed_field
-        if not first_question.get("question"):
-            first_question["question"] = (rule_clarification.get("questions") or [{}])[0].get("question", "")
-        parsed["questions"] = [first_question]
-    parsed.setdefault("message", rule_clarification.get("message", "I need a few main parameters before generating this mechanical part."))
-    parsed.setdefault(
-        "assumptions_after_clarification",
-        rule_clarification.get("assumptions_after_clarification", []),
-    )
-    parsed.setdefault("material_suggestions", material_options)
-    parsed["family_id"] = rule_clarification.get("family_id")
-    parsed["family_label"] = rule_clarification.get("family_label")
-    parsed["generated_by"] = "llm"
-    return parsed, actual_provider, actual_model, used_fallback
 
 def detect_pulley_subtype(prompt: str) -> str | None:
     p = prompt.lower()
@@ -847,36 +747,128 @@ def _material_scope_for_family(family_id: str | None) -> str:
 def suggest_materials(prompt: str, family_id: str | None = None) -> list[dict]:
     lowered = prompt.lower()
     scope = _material_scope_for_family(family_id)
-    bearing_housing = family_id == "bearing_housing_reference"
 
-    def item(material: str, reason: str) -> dict:
+    def item(material: str, reason: str, standard: str, duty: str = "general") -> dict:
         return {
             "material": material,
             "applies_to": scope,
             "reason": reason,
+            "standard_basis": standard,
+            "duty": duty,
         }
 
+    printed = bool(re.search(r"\b(print|printed|3d|prototype|pla|petg|nylon|pa-cf)\b", lowered))
+    heavy = bool(re.search(r"\b(industrial|heavy|conveyor|production|shock|load-bearing|walkway|bridge)\b", lowered))
+    light = bool(re.search(r"\b(cnc|robot|lightweight|aluminum|aluminium|fixture|display|rig)\b", lowered))
+    timber = bool(re.search(r"\b(timber|wood|roof|residential)\b", lowered))
+
+    family_materials: dict[str, list[dict]] = {
+        "structural_profiles_reference": [
+            item("S275JR / S355JR structural steel", "standard welded/bolted structural member material for frames and trusses", "EN 10025; Eurocode 3 design basis", "structural"),
+            item("ASTM A36 or ASTM A500 Grade B/C steel", "common North American structural plate, angle, channel, and tube baseline", "ASTM A36 / ASTM A500; AISC steel design basis", "structural"),
+            item("C24 timber or GL24h glulam", "appropriate baseline for timber roof truss concepts", "EN 338 / EN 14080; Eurocode 5 design basis", "timber roof"),
+        ],
+        "common_trusses_reference": [
+            item("C24 timber or GL24h glulam", "standard timber roof-truss baseline for residential Fink, king-post, and queen-post concepts", "EN 338 / EN 14080; Eurocode 5 design basis", "timber roof"),
+            item("S275JR / S355JR structural steel", "standard welded or bolted truss member material for bridge/walkway and industrial frames", "EN 10025; Eurocode 3 design basis", "structural"),
+            item("ASTM A36 or ASTM A500 Grade B/C steel", "common North American steel baseline for truss plates, angles, and tube members", "ASTM A36 / ASTM A500; AISC steel design basis", "structural"),
+            item("6061-T6 / 6082-T6 aluminum tube", "lightweight truss material for display rigs, staging prototypes, and low-load architectural models", "ASTM B221 / EN AW-6082 T6", "lightweight"),
+        ],
+        "shaft_reference": [
+            item("AISI 1045 / C45 medium-carbon steel", "standard machinable shaft material with better strength than mild steel", "AISI 1045 / EN C45; ISO shaft fit practice", "rotating shaft"),
+            item("AISI 4140 / 42CrMo4 alloy steel", "higher strength shaft material for torque, fatigue, and threaded ends", "AISI 4140 / EN 42CrMo4", "high load"),
+            item("AISI 304 stainless steel", "corrosion-resistant shaft option where strength demands are moderate", "ASTM A276 Type 304", "corrosion resistant"),
+        ],
+        "shaft_coupler_reference": [
+            item("6061-T6 aluminum", "common clamp coupler body material for light torque and low inertia", "ASTM B221 / EN AW-6061 T6", "light duty"),
+            item("AISI 1215 or 1045 steel", "stronger coupler body for higher clamp force and torque transfer", "AISI 1215 / AISI 1045", "medium duty"),
+            item("AISI 303/304 stainless steel", "corrosion-resistant coupler body for exposed machinery", "ASTM A582 / ASTM A276", "corrosion resistant"),
+        ],
+        "gear_reference": [
+            item("POM/acetal", "low-friction plastic gear material for quiet light-duty prototypes", "ISO 1874 material designation practice", "light duty"),
+            item("C45 / AISI 1045 steel", "machinable steel gear blank for moderate loaded gears", "EN C45 / AISI 1045; ISO 6336 design checks", "medium duty"),
+            item("16MnCr5 / 8620 case-hardening steel", "case-hardening gear material for wear-resistant power transmission", "EN 10084 / AISI 8620; ISO 6336 design checks", "high duty"),
+        ],
+        "sprocket_chain_reference": [
+            item("AISI 1045 steel", "common machined sprocket material for ANSI roller chain drives", "ANSI B29.1 chain geometry; AISI 1045 material practice", "chain drive"),
+            item("4140 steel, hardened teeth", "better wear resistance for high-load or high-cycle sprockets", "ANSI B29.1; AISI 4140 heat-treated", "heavy duty"),
+            item("7075-T6 aluminum", "lightweight sprocket option for low-load robotics or prototypes", "ASTM B221 / EN AW-7075 T6", "lightweight"),
+        ],
+        "pulley_belt_drive_reference": [
+            item("6061-T6 aluminum", "machinable timing pulley or idler body with good dimensional stability", "ASTM B221 / EN AW-6061 T6; ISO metric fit practice", "general"),
+            item("POM/acetal", "low-friction pulley/idler material for quiet light belt drives", "ISO 1874 material designation practice", "light duty"),
+            item("PA-CF nylon", "functional printed pulley/idler material with better heat and creep resistance than PLA", "ISO 16396 material designation practice", "printed prototype"),
+        ],
+        "bracket_and_motor_mount_reference": [
+            item("6061-T6 aluminum plate", "good default for machined motor brackets and lightweight mounts", "ASTM B209/B221 / EN AW-6061 T6", "machined"),
+            item("S275 / ASTM A36 steel plate", "robust welded or bent bracket material for higher loads", "EN 10025 / ASTM A36", "heavy duty"),
+            item("PA-CF nylon", "functional printed bracket material for prototypes with improved stiffness", "ISO 16396 material designation practice", "printed prototype"),
+        ],
+        "robotics_servo_reference": [
+            item("6061-T6 aluminum", "stiff servo bracket material with good tapped-hole strength", "ASTM B209/B221 / EN AW-6061 T6", "robotics"),
+            item("PA-CF nylon", "good printed servo bracket option when layer direction and screw bosses are designed carefully", "ISO 16396 material designation practice", "printed prototype"),
+            item("PETG", "acceptable fit-check material for light servo loads", "ISO 19063 material designation practice", "fit check"),
+        ],
+        "flange_pipe_fitting_reference": [
+            item("ASTM A105 forged carbon steel", "standard forged flange material for many pressure-piping services", "ASME B16.5 geometry; ASTM A105 material", "pressure flange"),
+            item("ASTM A182 F304/F316 stainless steel", "corrosion-resistant flange material", "ASME B16.5 geometry; ASTM A182", "corrosion resistant"),
+            item("EN 1.0038/S235JR or S275JR", "general fabricated pipe adapter or non-pressure flange material", "EN 10025", "fabricated"),
+        ],
+        "enclosure_box_reference": [
+            item("ABS", "common injection-molded electronics enclosure material with impact resistance", "ISO 2580 material designation practice", "enclosure"),
+            item("PC/ABS", "higher impact and heat resistance than ABS for electronics housings", "ISO polymer designation practice", "rugged enclosure"),
+            item("PETG or PA-CF", "practical 3D printed enclosure choices depending on heat/stiffness needs", "ISO 19063 / ISO 16396", "printed prototype"),
+        ],
+        "cooling_fan_mount_reference": [
+            item("ABS or PC/ABS", "heat-tolerant plastic for fan shrouds and duct mounts", "ISO 2580 / ISO polymer designation practice", "duct"),
+            item("PETG", "printable fan duct material with better heat resistance than PLA", "ISO 19063 material designation practice", "printed prototype"),
+            item("6061-T6 aluminum", "stiff machined fan mount plate material", "ASTM B209/B221", "machined plate"),
+        ],
+        "fastener_nut_trap_reference": [
+            item("PA-CF nylon", "best functional printed insert-boss/nut-trap body material for heat and creep resistance", "ISO 16396 material designation practice", "printed functional"),
+            item("PETG", "good light-duty printed boss material for fit and assembly tests", "ISO 19063 material designation practice", "prototype"),
+            item("Brass heat-set inserts", "standard insert material for thermoplastic screw bosses", "DIN/ISO metric screw compatibility", "insert"),
+        ],
+    }
+
+    suggestions = family_materials.get(family_id or "")
+    if suggestions:
+        if printed:
+            printed_first = [s for s in suggestions if "print" in s.get("duty", "") or "PA-CF" in s.get("material", "") or "PETG" in s.get("material", "")]
+            suggestions = printed_first + [s for s in suggestions if s not in printed_first]
+        elif family_id == "common_trusses_reference" and light:
+            lightweight_first = [s for s in suggestions if "lightweight" in s.get("duty", "") or "aluminum" in s.get("material", "").lower()]
+            suggestions = lightweight_first + [s for s in suggestions if s not in lightweight_first]
+        elif heavy:
+            heavy_first = [s for s in suggestions if any(word in s.get("duty", "") for word in ("heavy", "structural", "high", "pressure")) or "steel" in s.get("material", "").lower()]
+            suggestions = heavy_first + [s for s in suggestions if s not in heavy_first]
+        elif light:
+            light_first = [s for s in suggestions if any(word in s.get("material", "").lower() for word in ("6061", "7075", "aluminum", "pom"))]
+            suggestions = light_first + [s for s in suggestions if s not in light_first]
+        elif timber and family_id == "structural_profiles_reference":
+            timber_first = [s for s in suggestions if "timber" in s.get("duty", "")]
+            suggestions = timber_first + [s for s in suggestions if s not in timber_first]
+        return suggestions[:3]
+
     if any(word in lowered for word in ("industrial", "heavy", "conveyor", "production", "shock", "steel frame")):
-        cast_reason = "rigid housing body with good damping for mounted bearing supports" if bearing_housing else "rigid body material with good damping for heavy mechanical parts"
         return [
-            item("Cast iron", cast_reason),
-            item("Cast steel or low-carbon steel", "better toughness for shock-loaded or welded assemblies"),
+            item("ASTM A36 / S275 structural steel", "robust weldable material for load-bearing mechanical parts", "ASTM A36 / EN 10025", "heavy duty"),
+            item("AISI 1045 steel", "stronger machined material for shafts, hubs, and loaded mechanical parts", "AISI 1045 / EN C45", "heavy duty"),
         ]
     if any(word in lowered for word in ("cnc", "robot", "lightweight", "aluminum", "fixture")):
-        aluminum_reason = "light, machinable housing body for light CNC, robotics, or fixture duty" if bearing_housing else "light, machinable body material for CNC, robotics, or fixture duty"
         return [
-            item("6061-T6 aluminum", aluminum_reason),
-            item("7075-T6 aluminum", "higher strength body material if weight matters and cost is acceptable"),
+            item("6061-T6 aluminum", "light, machinable body material for CNC, robotics, or fixture duty", "ASTM B221 / EN AW-6061 T6", "light duty"),
+            item("7075-T6 aluminum", "higher strength aluminum where weight matters and cost is acceptable", "ASTM B221 / EN AW-7075 T6", "high-strength lightweight"),
         ]
     if any(word in lowered for word in ("print", "printed", "3d", "prototype", "pla", "petg", "nylon")):
         return [
-            item("PA-CF / nylon carbon fiber", "best functional printed body choice for heat and creep resistance"),
-            item("PETG", "acceptable body material for light prototypes and fit checks"),
+            item("PA-CF / nylon carbon fiber", "best functional printed body choice for heat and creep resistance", "ISO 16396 material designation practice", "printed functional"),
+            item("PETG", "acceptable body material for light prototypes and fit checks", "ISO 19063 material designation practice", "prototype"),
         ]
     return [
-        item("6061-T6 aluminum", "default body material for light machined mechanical parts"),
-        item("Cast iron" if bearing_housing else "Low-carbon steel", "default robust body material for load-bearing mechanical parts"),
-        item("PA-CF", "default body material for functional printed prototypes"),
+        item("6061-T6 aluminum", "default body material for light machined mechanical parts", "ASTM B221 / EN AW-6061 T6", "general"),
+        item("Low-carbon steel", "default robust body material for load-bearing mechanical parts", "ASTM A36 / EN S275", "general"),
+        item("PA-CF", "default body material for functional printed prototypes", "ISO 16396 material designation practice", "prototype"),
     ]
 
 
@@ -1278,7 +1270,7 @@ def build_messages(
     family_lines = [
         f"DETECTED MECHANICAL FAMILY: {family_schema['label']} ({family_schema['id']}).",
         "Use the retrieved family references and part records that best match the user's requested mechanical part.",
-        "Ask for missing main parameters only when they are essential; assume secondary dimensions from mechanical practice.",
+        "Ask for missing main parameters only when they are essential; assume secondary dimensions from mechanical practice only when the user did not state them. Preserve every stated secondary parameter exactly unless it is physically impossible.",
     ]
     main_features = family_schema.get("main_features", [])[:12]
     if main_features:
@@ -1290,6 +1282,12 @@ def build_messages(
             "Reject the ring-on-plate failure mode and tall arch/bridge-frame shapes. "
             "Use a compact UCP-style body with low feet, solid pedestal/saddle, rounded integrated boss, subtle cap split, and paired foot slots or holes."
         )
+    if family_id == "shaft_reference":
+        family_lines.append(
+            "For transmission shaft, countershaft, gearbox shaft, or gear shaft requests with gears, use the shaft_transmission record and the project gears.scad library. "
+            "Call spur_gear(..., helix_angle=...) for gear sections; never hand-build gear teeth from cubes or rectangular blocks, and never reference undeclared gear_teeth variables. "
+            "Use the fixed numeric positions from the RAG example; do not create shaft_pos with concat() or reassign arrays inside for-loops because OpenSCAD variables are immutable."
+        )
     if family_id == "gear_reference":
         family_lines.append(
             "For gear requests, the gears-master reference is authoritative. "
@@ -1299,7 +1297,30 @@ def build_messages(
             "Never output a placeholder parameter-request module or echo('Please specify ...'). "
             "For a plain spur gear use spur_gear(..., helix_angle=0, optimized=true). "
             "Use nonzero helix_angle only when the user asks for helical, spiral, or herringbone gears. "
-            "Do not hand-build gears from rectangular/cube teeth or lumped cylinders when a gears.scad module exists."
+            "Do not hand-build gears from rectangular/cube teeth or lumped cylinders when a gears.scad module exists. "
+            "\n"
+            "BEVEL / SPIRAL BEVEL GEAR PAIR — mandatory rules: "
+            "1. gear_teeth is ALWAYS the larger wheel (more teeth); pinion_teeth is ALWAYS the smaller pinion (fewer teeth). "
+            "   If the user states a ratio like 16:32, set pinion_teeth=16 and gear_teeth=32. "
+            "2. For a spiral bevel pair use bevel_gear_pair(..., helix_angle=30) — NOT a wrapper module with difference(). "
+            "   The library internally applies -helix_angle to the pinion for correct hand matching. "
+            "3. gear_bore and pinion_bore are subtracted INSIDE the library. "
+            "   Pass the real bore diameter values directly. "
+            "   NEVER pass gear_bore=0 / pinion_bore=0 and then subtract cylinders manually. "
+            "4. OpenSCAD modules do not return values. "
+            "   NEVER write: body = bevel_gear_pair(...) — that is invalid OpenSCAD and silently does nothing. "
+            "   Call the module directly at the top level or inside another module. "
+            "\n"
+            "PLANETARY GEAR — mandatory rules: "
+            "Call planetary_gear(modul, sun_teeth, planet_teeth, number_planets, width, rim_width, bore, "
+            "together_built=true, optimized=true) ONCE. "
+            "This single call renders ALL THREE components: sun gear (centre), planet gears (orbiting), "
+            "and ring/annulus gear (outer). "
+            "NEVER simulate a planetary gear with a for-loop of spur_gear() or herringbone_gear() "
+            "calls positioned around a circle — that outputs only loose planet shapes with no sun "
+            "and no ring gear, which is always wrong. "
+            "ring_teeth is computed inside the module as sun_teeth + 2*planet_teeth — do not pass it. "
+            "The module always uses herringbone teeth internally."
         )
     if family_id == "sprocket_chain_reference":
         family_lines.append(
@@ -1329,7 +1350,141 @@ def build_messages(
             "captive nuts, grub screws, retainerInfo, idlerInfo, or baseInfo customization. "
             "Use pulley() only when the user explicitly requests custom nut/screw/retainer configuration. "
             "Do not invent triangular teeth, do not approximate HTD/GT2 grooves with polygons, and do not create smooth cylinders as timing pulleys. "
-            "For FDM 3D printing use toothWidthTweak around 0.2 and autoFlip=true."
+            "For FDM 3D printing use toothWidthTweak around 0.2. "
+            "autoFlip=true is already hardcoded inside pulley3DP — do NOT pass it as a parameter to pulley3DP. "
+            "Pass autoFlip=true explicitly only when using the full pulley() module. "
+            "SHAFT BORE for FDM: shaftDiameter = shaft_nominal + 0.2 mm for clearance (e.g. NEMA17 5mm shaft → shaftDiameter = 5.2). "
+            "BELT WIDTH — use only standard widths per profile: "
+            "MXL: 3.175, 6.35, 9.525 mm — do NOT use 6 mm for MXL (nearest standard is 6.35 mm). "
+            "GT2 2mm: 6, 9, 15 mm. HTD 5mm: 9, 15, 25 mm. T5: 6, 10, 16, 25 mm."
+        )
+    if family_id == "common_trusses_reference":
+        family_lines.append(
+            "For ALL truss requests, the retrieved king_post_roof_truss / queen_post_roof_truss / "
+            "pratt_howe_bridge_truss / warren_fink_k_truss_patterns records are authoritative. "
+            "Follow every design_rule and validation_criterion from those records exactly. "
+            "\n"
+            "KING-POST TRUSS — mandatory rules (cannot be overridden by training-data patterns): "
+            "1. Define SIX nodes: A=[-span/2,0,0], B=[span/2,0,0], C=[0,0,rise], D=[0,0,0], "
+            "   E=[-span/4,0,rise/2], F=[span/4,0,rise/2]. "
+            "   E and F are strut attachment nodes at the midpoints of the two rafters. "
+            "2. Split each rafter at its strut node — left rafter: member(A,E)+member(E,C); "
+            "   right rafter: member(C,F)+member(F,B). "
+            "   NEVER use a single member(A,C) or member(C,B) — that is a listed failure mode. "
+            "3. Add diagonal struts member(D,E,web_d) and member(D,F,web_d). "
+            "4. Total member calls = 9: A-D, D-B, A-E, E-C, C-F, F-B, C-D, D-E, D-F. "
+            "\n"
+            "MEMBER MODULE — mandatory for ALL truss types: "
+            "module member(p1,p2,d=4) must contain ONLY: rod(p1,p2,d); node(p1); node(p2); "
+            "Do NOT wrap rod() or member() in minkowski() under any circumstances. "
+            "Do NOT define or use a fillet_r variable in truss code. "
+            "minkowski on a cylinder produces capsule geometry, not a rod, and makes render 100x slower."
+        )
+    if family_id == "shaft_coupler_reference":
+        family_lines.append(
+            "For shaft coupler requests, the helical_beam_shaft_coupling record is authoritative. "
+            "\n"
+            "HELICAL BEAM COUPLER — mandatory rules: "
+            "1. Helical cuts use linear_extrude(height=length+2, twist=-(360*turns), slices=300, center=true) "
+            "   with the 2D slot profile translate([slot_r,0]) square([wall_depth+2, slot_w], center=true). "
+            "   NEVER use rotate_extrude for helical cuts — it creates a torus at fixed radius, not a helix. "
+            "2. The outer body CYLINDER is the POSITIVE volume. Bore and slots are subtracted FROM it. "
+            "   NEVER add the bore cylinder in union() and then subtract the same bore — they cancel out, "
+            "   producing an empty difference with no body. "
+            "3. For 2-start helical coupler: for(i=[0:1]) rotate([0,0,i*180]) linear_extrude(twist=...). "
+            "4. Do NOT generate: helix_point() function, manufacturing='fdm' string variable, "
+            "   circular_grooves() (horizontal rings), or rotate_extrude for helical geometry."
+        )
+    if family_id == "hinge_joint_snapfit_reference":
+        family_lines.append(
+            "For print-in-place hinge requests, the print_in_place_hinge_5knuckle record is authoritative. "
+            "\n"
+            "5-KNUCKLE HINGE — mandatory rules: "
+            "1. knuckle_l = leaf_length / knuckle_count (= 8 mm for 40mm/5). "
+            "   NEVER use leaf_length/(2*knuckle_count-1) — that formula gives 9 knuckle slots, not 5. "
+            "2. Leaf A loop: for(i=[0:(knuckle_count+1)/2-1]) → 3 knuckles. "
+            "   Leaf B loop: for(i=[0:(knuckle_count-1)/2-1]) → 2 knuckles. "
+            "   NEVER use [0:knuckle_count-1] for A (=5) and [0:knuckle_count-2] for B (=4) — that gives 9 total. "
+            "3. Pin axis is along X. ALL knuckle cylinders use rotate([0,90,0]). "
+            "   NEVER use rotate([90,0,0]) — that points cylinders along Y, every knuckle on a different axis. "
+            "4. ALL knuckle centres share the SAME position: y=0, z = leaf_thick + knuckle_OD/2. "
+            "   Leaf A x-centres: (2*i)*knuckle_l + knuckle_l/2. "
+            "   Leaf B x-centres: (2*i+1)*knuckle_l + knuckle_l/2. "
+            "5. BOTH leaf A and leaf B knuckles use difference(). "
+            "   Leaf A bore = pin_d + clearance; leaf B bore = pin_d + 2*clearance. "
+            "   NEVER add leaf A cylinders without difference() — pin will fuse to barrel. "
+            "6. Leaf A plate: translate([0, clearance, 0]) cube([leaf_length, leaf_width, leaf_thick]). "
+            "   Leaf B plate: translate([0, -(leaf_width+clearance), 0]) cube([...]). "
+            "   NEVER put leaf B at z=leaf_thick+clearance — that offsets the barrel off the pin axis."
+        )
+    if family_id == "linear_rail_carriage_reference":
+        family_lines.append(
+            "For LM8UU rod carriage and linear rail carriage requests, the dual_rod_carriage_lm8uu record is authoritative. "
+            "\n"
+            "BOTTOM RELIEF — mandatory formula: "
+            "translate([0,0,-car_h/2 + bottom_wall + relief_depth/2]) cube([...,relief_depth], center=true). "
+            "The relief bottom is at -car_h/2+bottom_wall so the floor stays solid. "
+            "NEVER use -car_h/2 + wall_thickness/2 — that centers the cube on the bottom face and removes the entire bottom wall. "
+            "\n"
+            "MOUNTING HOLES — mandatory: center the cylinder at z=0 for full through-holes: "
+            "translate([x,y,0]) cylinder(h=car_h+2, d=d, center=true). "
+            "NEVER translate to carriage_height/2+0.1 with center=true — that creates half-depth holes only. "
+            "\n"
+            "HEX NUT TRAP — mandatory: nut pocket and bolt hole must match the SAME bolt family. "
+            "M3: hex_nut_af=5.5mm → nut_d=hex_nut_af/cos(30)+0.2=6.55mm, bolt_d=3.4mm. "
+            "M4: hex_nut_af=7.0mm, bolt_d=4.5mm. "
+            "M6: hex_nut_af=10mm, bolt_d=6.5mm. "
+            "NEVER pair bolt_d=3.4mm (M3) with hex_nut_d=10mm (M6) — bolt will rattle loose in nut."
+        )
+    if family_id == "lead_screw_actuator_reference":
+        family_lines.append(
+            "For T8 nut carriage and lead screw actuator requests, the t8_nut_carriage record is authoritative. "
+            "\n"
+            "T8 NUT CARRIAGE STRUCTURE — mandatory: "
+            "1. LM8UU guide rod bores: HORIZONTAL along X — rotate([0,90,0]) at y=±rod_spacing/2, z=0. "
+            "2. T8 screw clearance bore: VERTICAL (Z) — plain unrotated cylinder, full height, centered. "
+            "3. T8 nut pocket: VERTICAL from top — "
+            "   translate([0,0,carriage_height/2-t8_nut_h/2]) cylinder(h=t8_nut_h+0.2, d=nut_pocket_d). "
+            "   nut_pocket_d must be LARGER than screw_clear (22.6 mm vs 9.5 mm). "
+            "4. Nut capture bolt holes: VERTICAL (Z) on bolt circle — "
+            "   for(a=[0,90,180,270]) rotate([0,0,a]) translate([nut_bolt_circle/2, 0, nut_z]) cylinder(d=3.4). "
+            "5. Nut bolt d = nut_bolt_d = 3.4 mm (M3 FDM clearance). "
+            "   NEVER compute as thread_clear + 1.0 = 1.4 mm — that is too small for any bolt. "
+            "6. Optional bottom relief: "
+            "   translate([0,0,-carriage_height/2+5]) cube([carriage_length-8, carriage_width-8, 8], center=true). "
+            "Do NOT use minkowski() anywhere — no sphere convolution, no fillet_r expansion."
+        )
+    if family_id == "gearbox_housing_reference":
+        family_lines.append(
+            "For gearbox housing requests, the gearbox_housing_reference record is authoritative. "
+            "\n"
+            "GEOMETRY VARIABLE ASSIGNMENT — strictly forbidden: "
+            "OpenSCAD modules do not return values. NEVER write: "
+            "outer = minkowski(){...};  cavity = hull(){...};  shafts = union(){...};  "
+            "body = some_module(...); — these are all invalid and silently produce nothing. "
+            "NEVER then reference those names inside difference() { outer; cavity; shafts; } — "
+            "those identifiers hold no geometry. "
+            "Write every CSG operation (union, difference, hull, minkowski, intersection) "
+            "DIRECTLY nested inline inside the module body. "
+            "\n"
+            "GEARBOX HOUSING STRUCTURE — mandatory: "
+            "module lower_half() { difference() { "
+            "  /* outer solid inline */ minkowski(){...} or cube(...); "
+            "  /* gear cavity inline */ hull(){translate(c1)cylinder(...); translate(c2)cylinder(...);} "
+            "  /* shaft bores inline */ translate(c1)cylinder(d=shaft_bore,...); translate(c2)cylinder(...); "
+            "  /* bearing seats inline */ translate(c1)cylinder(d=bearing_od,...); ... "
+            "  /* bolt holes inline */ for(dx=...){for(dy=...){translate([dx,dy,0])cylinder(...);}} "
+            "} } "
+            "All subtractions go inside ONE difference() call — no pre-computed geometry variables."
+        )
+    if family_id == "robotics_servo_reference":
+        family_lines.append(
+            "For MG996R U-bracket requests, the mg996r_servo_bracket record is authoritative. "
+            "Wing plates must be centered at x = +/-tab_span/2 (not y-direction walls). "
+            "Tab holes must drill along X using rotate([0,90,0]) cylinder at z = bracket_t + tab_hole_z. "
+            "Do NOT place tab holes as vertical Z cylinders through the base plate. "
+            "Do NOT use minkowski() or fillet_r on bracket walls. "
+            "No servo body pocket cutout is needed — servo slides into the open top of the U."
         )
     family_lines.append("Do not include material recommendations or standard explanations in OpenSCAD comments; those are chat-after-code notes only.")
     messages.append({"role": "system", "content": "\n".join(family_lines)})
@@ -1397,7 +1552,9 @@ def extract_scad(raw: str) -> str:
 
     cleaned = re.sub(r"^\s*(openscad|scad|scss)\s*\n+", "", cleaned, flags=re.IGNORECASE)
     cleaned = re.sub(r"^Here is the final OpenSCAD code for.*?:\s*", "", cleaned, flags=re.IGNORECASE)
-    return normalize_library_includes(sanitize_scad_metadata(cleaned.strip()))
+    cleaned = sanitize_scad_metadata(cleaned.strip())
+    cleaned = fix_openscad_list_slices(cleaned)   # repair l[1:] / l[0:n] slice syntax
+    return normalize_library_includes(cleaned)
 
 
 CHAT_METADATA_ASSIGNMENT_RE = re.compile(
@@ -1434,6 +1591,63 @@ def sanitize_scad_metadata(code: str) -> str:
         if blank_count <= 1:
             compacted.append(line)
     return "\n".join(compacted).strip()
+
+
+# ── List-slice auto-repair ──────────────────────────────────────────────────
+# OpenSCAD has no slice operator.  LLMs sometimes generate l[1:] or arr[0:n]
+# which crash the parser.  This function patches the two most common patterns
+# produced by code-generation models before the code reaches the validator.
+
+_SLICE_PRESENT_RE = re.compile(r"\w\s*\[\s*\d*\s*:\s*[\w\d]*\s*\]")
+
+# Pattern: function list_sum(l) = (len(l) == 0) ? 0 : l[0] + list_sum(l[1:]);
+_RECURSIVE_SLICE_FUNC_RE = re.compile(
+    r"function\s+(\w+)\s*\(\s*(\w+)\s*\)\s*=[^;]*\b\2\s*\[\s*1\s*:\s*\]\s*\)\s*;",
+    re.DOTALL,
+)
+
+# Pattern: any_func(array[0:var]) — slice passed as argument
+_SLICE_ARG_RE = re.compile(
+    r"\b(list_sum|sum_list|cumsum|cum_sum|prefix_sum)\s*\(\s*(\w+)\s*\[\s*0\s*:\s*(\w+|\d+)\s*\]\s*\)"
+)
+
+# Pattern: same func called with full array and no second arg — list_sum(arr)
+_BARE_CALL_RE = re.compile(
+    r"\b(list_sum|sum_list|cumsum|cum_sum|prefix_sum)\s*\(\s*(\w+)\s*\)(?!\s*,\s*[\d\w])"
+)
+
+
+def fix_openscad_list_slices(code: str) -> str:
+    """
+    Detect and repair Python-style list-slice syntax that OpenSCAD does not support.
+
+    Handles the two patterns LLMs most commonly generate:
+      1. function list_sum(l) = ... l[0] + list_sum(l[1:])
+         → function list_sum(l, n) = (n <= 0) ? 0 : l[n-1] + list_sum(l, n-1);
+      2. list_sum(step_lengths[0:i])
+         → list_sum(step_lengths, i)
+      3. list_sum(step_lengths)   (bare call after the function signature changed)
+         → list_sum(step_lengths, len(step_lengths))
+    """
+    if not _SLICE_PRESENT_RE.search(code):
+        return code  # fast path — no slice found
+
+    # 1. Replace recursive-slice function definition
+    def _replace_func(m: re.Match) -> str:
+        fname = m.group(1)
+        return (
+            f"function {fname}(l, n) = (n <= 0) ? 0 : l[n-1] + {fname}(l, n-1);"
+        )
+    code = _RECURSIVE_SLICE_FUNC_RE.sub(_replace_func, code)
+
+    # 2. Fix slice-as-argument calls: func(arr[0:i]) → func(arr, i)
+    code = _SLICE_ARG_RE.sub(r"\1(\2, \3)", code)
+
+    # 3. Fix bare full-array calls: func(arr) → func(arr, len(arr))
+    #    Only when the function was just rewritten to take two arguments.
+    code = _BARE_CALL_RE.sub(r"\1(\2, len(\2))", code)
+
+    return code
 
 
 GEARS_SCAD_PATH = str((BASE_DIR.parent / "gears.scad").resolve()).replace("\\", "/")
@@ -1753,6 +1967,79 @@ def _looks_truncated(code: str) -> bool:
 def validate_scad(code: str, prompt: str = "") -> list[dict]:
     family_id = detect_primary_family(f"{prompt}\n{code}")
     return validate_scad_full(code, prompt, family_id)
+
+
+def evaluate_generation(code: str, prompt: str, checks: list[dict], family_schema: dict) -> dict:
+    validity_labels = {
+        "No markdown fences",
+        "No stray language label",
+        "Balanced braces { }",
+        "Balanced parentheses ( )",
+        "3D primitives used",
+        "Named module present",
+        "Module called at end",
+        "No unfinished assignment at end",
+        "External library use allowed",
+    }
+    parametric_labels = {
+        "Parametric variables present",
+        "$fn resolution set",
+        "Boolean subtraction for cut features",
+        "difference() wraps union() correctly",
+    }
+
+    buckets = {
+        "validity": [],
+        "parametricity": [],
+        "usability": [],
+    }
+    for check in checks:
+        label = check.get("label", "")
+        category = check.get("category", "")
+        if label in validity_labels:
+            buckets["validity"].append(check)
+        elif label in parametric_labels or category == "derived" or label.lower().startswith("derived:"):
+            buckets["parametricity"].append(check)
+        else:
+            buckets["usability"].append(check)
+
+    def score(items: list[dict]) -> dict:
+        total = len(items)
+        passed = sum(1 for item in items if item.get("passed"))
+        blocking = sum(
+            1
+            for item in items
+            if not item.get("passed") and item.get("severity") in {"hard", "error"}
+        )
+        return {
+            "passed": passed,
+            "total": total,
+            "score": round((passed / total) * 100) if total else 100,
+            "blocking": blocking,
+        }
+
+    parameters = _extract_scad_parameters(code, limit=60)
+    modules = _extract_scad_modules(code)
+    features = _extract_design_features(prompt, code)
+    material_count = len(family_schema.get("material_suggestions") or [])
+
+    return {
+        "validity": score(buckets["validity"]),
+        "parametricity": score(buckets["parametricity"]),
+        "usability": score(buckets["usability"]),
+        "metrics": {
+            "parameters": len(parameters),
+            "modules": len(modules),
+            "detected_features": len(features),
+            "rag_family": family_schema.get("label") or family_schema.get("family_label"),
+            "material_options": material_count,
+        },
+        "notes": [
+            "Validity checks focus on parseable OpenSCAD structure and model completeness.",
+            "Parametricity checks focus on editable dimensions, derived formulas, and reusable feature logic.",
+            "Usability checks focus on family-specific mechanical intent and fabrication review signals.",
+        ],
+    }
 
 
 def _validate_scad_original(code: str, prompt: str = "") -> list[dict]:
@@ -2089,118 +2376,104 @@ roller_chain_sprocket();"""
 
 
 def deterministic_pillow_block_scad(prompt: str) -> str:
-    lowered = prompt.lower()
-    bearing_key = next((key for key in BEARING_SERIES_DEFAULTS if re.search(rf"\b{re.escape(key)}\b", lowered)), "6204")
-    shaft_diameter, bearing_od, bearing_width = BEARING_SERIES_DEFAULTS[bearing_key]
+    return """// No-flicker compact pillow block
+$fn = 96;
+eps = 0.05;
 
-    explicit_shaft = _number_for_pattern(prompt, r"(\d+(?:\.\d+)?)\s*mm\s+shaft")
-    if explicit_shaft:
-        shaft_diameter = explicit_shaft
+// Size
+base_len = 80;
+base_width = 22;
+base_thick = 7;
 
-    wall_thickness = _number_for_pattern(prompt, r"wall(?:_|\s*)thickness\s*(?:=|of)?\s*(\d+(?:\.\d+)?)") or 8
-    mount_hole_diameter = 6.6 if re.search(r"\bm6\b", lowered) else 5.5
-    if re.search(r"\bm4\b", lowered):
-        mount_hole_diameter = 4.5
-    if re.search(r"\bm8\b", lowered):
-        mount_hole_diameter = 8.8
+center_height = 24;
+housing_od = 42;
+housing_width = 20;
 
-    base_thickness = max(7, wall_thickness * 0.9)
-    boss_diameter = bearing_od + 2 * wall_thickness
-    boss_width = bearing_width + 2 * wall_thickness
-    base_length = max(boss_width + 54, bearing_od + 42)
-    base_width = boss_diameter + 18
-    mount_hole_spacing = base_length - max(22, 4 * mount_hole_diameter)
-    foot_pad_length = max(26, mount_hole_diameter * 5)
-    foot_pad_width = max(28, mount_hole_diameter * 5)
-    foot_pad_thickness = 4
-    slot_length = max(16, mount_hole_diameter * 3)
-    boss_center_z = base_thickness + boss_diameter / 2 - 4
-    pedestal_width = boss_width + 14
-    pedestal_depth = base_width - 18
-    pedestal_height = boss_center_z - base_thickness + 4
+// Bearing
+bearing_od = 32;
+bearing_id = 15;
+bearing_width = 12;
+clearance = 0.35;
 
-    return f"""$fn = 128;
-// Deterministic fallback: compact UCP-style pillow-block bearing housing.
-// Generated because the model returned incomplete OpenSCAD.
-bearing_series = "{bearing_key}";
-shaft_diameter = {shaft_diameter:g};
-bearing_od = {bearing_od:g};
-bearing_width = {bearing_width:g};
-wall_thickness = {wall_thickness:g};
-base_thickness = {base_thickness:g};
-base_length = {base_length:g};
-base_width = {base_width:g};
-foot_pad_length = {foot_pad_length:g};
-foot_pad_width = {foot_pad_width:g};
-foot_pad_thickness = {foot_pad_thickness:g};
-mount_hole_diameter = {mount_hole_diameter:g};
-mount_hole_spacing = {mount_hole_spacing:g};
-slot_length = {slot_length:g};
-shaft_clearance = 0.4;
-bearing_fit_clearance = 0.15;
-boss_diameter = {boss_diameter:g};
-boss_width = {boss_width:g};
-boss_center_z = {boss_center_z:g};
-pedestal_width = {pedestal_width:g};
-pedestal_depth = {pedestal_depth:g};
-pedestal_height = {pedestal_height:g};
-cap_groove_height = 1.2;
-cap_groove_z = boss_center_z + boss_diameter * 0.20;
+// Bolts
+bolt_dia = 7;
+bolt_spacing = 64;
+counterbore_dia = 13;
+counterbore_depth = 3;
 
-module rounded_slot(length, diameter, height) {{
-  hull() {{
-    translate([-length / 2, 0, 0])
-      cylinder(h = height, d = diameter, center = true);
-    translate([ length / 2, 0, 0])
-      cylinder(h = height, d = diameter, center = true);
-  }}
-}}
+module body() {
+    union() {
+        // Base
+        hull() {
+            translate([-base_len/2 + 8, 0, base_thick/2])
+                cylinder(d=16, h=base_thick, center=true);
 
-module pillow_block_bearing_housing() {{
-  difference() {{
-    union() {{
-      // Low footed base with raised pads.
-      translate([0, 0, base_thickness / 2])
-        cube([base_length, base_width, base_thickness], center = true);
-      for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
-        translate([x, 0, base_thickness + foot_pad_thickness / 2])
-          cube([foot_pad_length, foot_pad_width, foot_pad_thickness], center = true);
+            translate([ base_len/2 - 8, 0, base_thick/2])
+                cylinder(d=16, h=base_thick, center=true);
 
-      // Solid central pedestal and rounded body, like a compact cast UCP housing.
-      translate([0, 0, base_thickness + pedestal_height / 2])
-        cube([pedestal_width, pedestal_depth, pedestal_height], center = true);
-      hull() {{
-        translate([0, 0, base_thickness + 8])
-          cube([pedestal_width + 8, pedestal_depth, 10], center = true);
-        translate([0, 0, boss_center_z])
-          rotate([90, 0, 0])
-            cylinder(h = boss_width, d = boss_diameter, center = true);
-      }}
+            translate([0, 0, base_thick/2])
+                cube([base_len-16, base_width, base_thick], center=true);
+        }
 
-      // Integrated horizontal bearing boss blended into the pedestal.
-      translate([0, 0, boss_center_z])
+        // Main upright
+        hull() {
+            translate([0, 0, center_height])
+                rotate([90, 0, 0])
+                    cylinder(d=housing_od, h=housing_width, center=true);
+
+            translate([0, 0, base_thick + 4])
+                cube([housing_od * 0.85, housing_width, 8], center=true);
+        }
+
+        // Front raised rim
+        translate([0, -housing_width/2 - 1.25, center_height])
+            rotate([90, 0, 0])
+                cylinder(d=38, h=2.5, center=true);
+
+        // Small label pad, lifted off base front face
+        translate([30, -base_width/2 - 1.1, 3.8])
+            cube([18, 1.8, 6], center=true);
+    }
+}
+
+module pillow_block_bearing_housing() {
+    difference() {
+        body();
+
+        // Bearing pocket
+        translate([0, 0, center_height])
+            rotate([90, 0, 0])
+                cylinder(
+                    d=bearing_od + clearance,
+                    h=bearing_width + 0.8,
+                    center=true
+                );
+
+        // Shaft hole
+        translate([0, 0, center_height])
+            rotate([90, 0, 0])
+                cylinder(
+                    d=bearing_id + 1,
+                    h=housing_width + 8,
+                    center=true
+                );
+
+        // Mounting holes
+        for (x = [-bolt_spacing/2, bolt_spacing/2]) {
+            translate([x, 0, -eps])
+                cylinder(d=bolt_dia, h=base_thick + 2*eps);
+
+            translate([x, 0, base_thick - counterbore_depth])
+                cylinder(d=counterbore_dia, h=counterbore_depth + eps);
+        }
+    }
+
+    // Text placed slightly in front, not coplanar
+    translate([30, -base_width/2 - 2.05, 3.8])
         rotate([90, 0, 0])
-          cylinder(h = boss_width, d = boss_diameter, center = true);
-    }}
-
-    // Bearing pocket and shaft bore through the same horizontal axis.
-    translate([0, 0, boss_center_z])
-      rotate([90, 0, 0])
-        cylinder(h = boss_width + 4, d = bearing_od + bearing_fit_clearance, center = true);
-    translate([0, 0, boss_center_z])
-      rotate([90, 0, 0])
-        cylinder(h = base_width + 8, d = shaft_diameter + shaft_clearance, center = true);
-
-    // Thin subtractive cap split-line groove only; do not add a solid top slab.
-    translate([0, 0, cap_groove_z])
-      cube([pedestal_width + 10, boss_width + 4, cap_groove_height], center = true);
-
-    // Two foot mounting holes.
-    for (x = [-mount_hole_spacing / 2, mount_hole_spacing / 2])
-      translate([x, 0, base_thickness / 2])
-        rounded_slot(slot_length, mount_hole_diameter, base_thickness + foot_pad_thickness + 8);
-  }}
-}}
+            linear_extrude(0.6)
+                text("P002", size=4.2, halign="center", valign="center");
+}
 
 pillow_block_bearing_housing();"""
 
@@ -2315,10 +2588,15 @@ def _is_openrouter_free_route_error(exc: Exception) -> bool:
         token in message
         for token in (
             "429",
+            "503",
+            "502",
             "rate-limited",
             "rate limited",
             "no endpoints found",
+            "no healthy upstream",
+            "provider returned error",
             "temporarily",
+            "unavailable",
         )
     )
 
@@ -2422,10 +2700,20 @@ def generate_with_fallback(request: ChatRequest, messages: list[dict]) -> tuple[
     return raw, fallback_provider, fallback_model, True
 
 
-def _provider_error_response(exc: Exception) -> HTTPException | None:
+def _provider_error_response(exc: Exception, provider: str = "") -> HTTPException | None:
     message = str(exc)
     lowered = message.lower()
-    if "429" in message or "rate-limited" in lowered or "rate limited" in lowered:
+    is_rate_limit = "429" in message or "rate-limited" in lowered or "rate limited" in lowered
+    if is_rate_limit:
+        if provider == "openai" or "openai.com" in lowered:
+            return HTTPException(
+                status_code=429,
+                detail=(
+                    "OpenAI returned a rate-limit error (429). "
+                    "Your quota may be exhausted or the API key may be invalid. "
+                    "Check your usage at platform.openai.com/usage."
+                ),
+            )
         return HTTPException(
             status_code=429,
             detail=(
@@ -2434,13 +2722,18 @@ def _provider_error_response(exc: Exception) -> HTTPException | None:
                 "or use Ollama/OpenAI."
             ),
         )
-    if "no endpoints found" in lowered:
+    if "no endpoints found" in lowered or "no healthy upstream" in lowered:
         return HTTPException(
             status_code=503,
             detail=(
-                "OpenRouter has no active endpoint for this model right now. "
-                "Pick another OpenRouter model, such as qwen/qwen3-coder:free, or use Ollama/OpenAI."
+                "No active endpoint available for this model right now. "
+                "Pick another model, or use OpenAI/Ollama."
             ),
+        )
+    if "401" in message or "invalid api key" in lowered or "incorrect api key" in lowered:
+        return HTTPException(
+            status_code=401,
+            detail=f"Invalid or missing API key for provider '{provider}'. Check your .env file.",
         )
     return None
 
@@ -2487,6 +2780,7 @@ model_gateway = ModelGateway()
 
 @app.on_event("startup")
 def startup_event() -> None:
+    init_db()
     knowledge_base.warmup()
     log.info(
         "RAG ready: %d records, backend=%s",
@@ -2597,43 +2891,46 @@ def chat(request: ChatRequest) -> dict:
         retrieval_k = min(max(request.top_k, 4), 6) if provider == "ollama" else request.top_k
         memory_text = conversation_user_memory(request.history, text)
         detected_family = detect_family(memory_text)
-        clarification = build_clarification_request(memory_text, detected_family) if request.enable_clarification else None
         engineering_profile = build_engineering_profile(memory_text, detected_family)
-        if clarification:
-            clarification_provider = provider
-            clarification_model = model
-            clarification_used_fallback = False
-            try:
-                clarification, clarification_provider, clarification_model, clarification_used_fallback = generate_llm_clarification(
-                    request, text, memory_text, clarification, engineering_profile
-                )
-            except Exception as exc:
-                log.warning("LLM clarification failed; using deterministic fallback (%s).", exc)
-                clarification["generated_by"] = "rules-fallback"
-            return {
-                "result": "",
-                "provider": clarification_provider,
-                "model": clarification_model,
-                "requested_provider": provider,
-                "requested_model": model,
-                "used_fallback": clarification_used_fallback,
-                "auto_repaired": False,
-                "retrieved": [],
-                "history_hits": [],
-                "engineering": engineering_profile,
-                "part_family": knowledge_base.family_schema(detected_family),
-                "initial_validation": [],
-                "validation": [],
-                "needs_clarification": True,
-                "clarification": clarification,
-            }
+
+        # ── Enhancement modules: pre-generation analysis ──────────────────
+        mfg = request.manufacturing
+        intent_result    = analyze_intent(text)
+        constraint_result = solve_constraints(intent_result.extracted_params | intent_result.defaults_applied, detected_family)
+        physics_result   = analyze_physics(intent_result.extracted_params | intent_result.defaults_applied)
+        mfg_context      = format_mfg_context(mfg, detected_family)
+
+        # Build intent + constraint context to inject into prompt
+        intent_ctx = format_intent_summary(intent_result)
+        constraint_ctx = format_constraint_summary(constraint_result)
+        physics_ctx = format_physics_summary(physics_result)
+        tol_block = generate_tolerance_block(
+            intent_result.extracted_params | intent_result.defaults_applied, mfg
+        )
+
+        # Augment the prompt text with engineering context
+        extra_ctx_parts = []
+        if intent_ctx:    extra_ctx_parts.append(intent_ctx)
+        if constraint_ctx and not constraint_result.passed:
+            extra_ctx_parts.append(constraint_ctx)
+        if physics_ctx:   extra_ctx_parts.append(physics_ctx)
+        if mfg_context:   extra_ctx_parts.append(mfg_context)
+        if tol_block:
+            extra_ctx_parts.append(f"[TOLERANCE BLOCK — include at top of code]\n{tol_block}")
+        extra_ctx_str = "\n\n".join(extra_ctx_parts)
+        augmented_text = f"{text}\n\n{extra_ctx_str}" if extra_ctx_str else text
+        # ── End pre-generation ────────────────────────────────────────────
 
         retrieval_query = memory_text
-        retrieved = knowledge_base.retrieve(retrieval_query, top_k=retrieval_k, selected_doc_ids=request.selected_doc_ids)
-        history_hits = accepted_history.retrieve(retrieval_query, top_k=1, family_id=detected_family) if detected_family else []
+        if request.disable_rag:
+            retrieved = []
+            history_hits = []
+        else:
+            retrieved = knowledge_base.retrieve(retrieval_query, top_k=retrieval_k, selected_doc_ids=request.selected_doc_ids)
+            history_hits = accepted_history.retrieve(retrieval_query, top_k=1, family_id=detected_family) if detected_family else []
         combined_context = retrieved + history_hits
 
-        messages = build_messages(text, request.history, combined_context, provider=provider, family_id=detected_family)
+        messages = build_messages(augmented_text, request.history, combined_context, provider=provider, family_id=detected_family)
         raw, actual_provider, actual_model, used_fallback = generate_with_fallback(request, messages)
         result = extract_scad(raw)
         result = enforce_mechanical_library_output(text, result, detected_family)
@@ -2661,12 +2958,14 @@ def chat(request: ChatRequest) -> dict:
             validity = validate_scad(result, memory_text)
             family_schema = knowledge_base.family_schema(detected_family)
             design_notes = build_design_notes(memory_text, engineering_profile, family_schema)
+            evaluation = evaluate_generation(result, memory_text, validity, family_schema)
             return {
                 "result": result,
                 "provider": "deterministic",
                 "model": "l-bracket-fallback",
                 "requested_provider": provider,
                 "requested_model": model,
+                "rag_disabled": request.disable_rag,
                 "used_fallback": True,
                 "auto_repaired": False,
                 "repair_provider": "deterministic",
@@ -2676,6 +2975,7 @@ def chat(request: ChatRequest) -> dict:
                 "engineering": engineering_profile,
                 "part_family": family_schema,
                 "design_notes": design_notes,
+                "evaluation": evaluation,
                 "initial_validation": validity,
                 "validation": validity,
             }
@@ -2722,11 +3022,18 @@ def chat(request: ChatRequest) -> dict:
 
     family_schema = knowledge_base.family_schema(detected_family)
     design_notes = build_design_notes(memory_text, engineering_profile, family_schema)
+    evaluation = evaluate_generation(result, memory_text, validity, family_schema)
+
+    # ── Enhancement modules: post-generation analysis ─────────────────────
+    failure_report  = detect_failures(result, intent_result.extracted_params, detected_family)
+    dfm_warnings    = check_dfm(result, mfg)
+    tol_table       = get_tolerance_table_html(mfg)
 
     log_generation_event({
         "request_id": str(uuid.uuid4()),
         "prompt": text[:200],
         "family_id": detected_family,
+        "rag_disabled": request.disable_rag,
         "provider": actual_provider,
         "model": actual_model,
         "code_chars": len(result),
@@ -2744,6 +3051,7 @@ def chat(request: ChatRequest) -> dict:
         "model": actual_model,
         "requested_provider": provider,
         "requested_model": model,
+        "rag_disabled": request.disable_rag,
         "used_fallback": used_fallback or repair_used_fallback,
         "auto_repaired": score_validation(validity) > score_validation(initial_validation),
         "repair_provider": repair_provider,
@@ -2753,8 +3061,46 @@ def chat(request: ChatRequest) -> dict:
         "engineering": engineering_profile,
         "part_family": family_schema,
         "design_notes": design_notes,
+        "evaluation": evaluation,
         "initial_validation": initial_validation,
         "validation": validity,
+        # ── Enhancement module outputs ──────────────────────────────────
+        "intent": {
+            "part_family":     intent_result.part_family,
+            "intent_class":    intent_result.intent_class,
+            "extracted_params": intent_result.extracted_params,
+            "missing_params":  intent_result.missing_params,
+            "defaults_applied": intent_result.defaults_applied,
+            "is_assembly":     intent_result.is_assembly,
+            "confidence":      intent_result.confidence,
+            "warnings":        intent_result.warnings,
+        },
+        "constraints": {
+            "passed":  constraint_result.passed,
+            "issues":  [
+                {"severity": i.severity, "rule_id": i.rule_id, "message": i.message, "fix": i.fix}
+                for i in constraint_result.issues
+            ],
+        },
+        "physics": {
+            "calculations":    physics_result.calculations,
+            "warnings":        physics_result.warnings,
+            "recommendations": physics_result.recommendations,
+        },
+        "mechanical_quality": {
+            "score":          failure_report.score,
+            "grade":          failure_report.grade,
+            "issues":         [
+                {"severity": i.severity, "rule_id": i.rule_id, "message": i.message, "suggestion": i.suggestion}
+                for i in failure_report.issues
+            ],
+            "passed_checks":  failure_report.passed_checks,
+        },
+        "manufacturing": {
+            "process":    mfg,
+            "dfm_warnings": dfm_warnings,
+            "tolerance_table": tol_table,
+        },
     }
 
 
@@ -2858,6 +3204,58 @@ def generation_log(limit: int = 20) -> dict:
             except json.JSONDecodeError:
                 continue
     return {"events": events, "count": len(events)}
+
+
+# ── Auth routes ───────────────────────────────────────────────────────────────
+
+class RegisterRequest(BaseModel):
+    email: str
+    name: str
+    password: str
+    role: str = "student"
+    company: str = ""
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UpdateProfileRequest(BaseModel):
+    name: str
+    role: str
+    company: str
+
+
+def _safe_user(user: dict) -> dict:
+    return {k: user[k] for k in ("id", "email", "name", "role", "company", "created_at") if k in user}
+
+
+@app.post("/api/auth/register")
+def register(req: RegisterRequest) -> dict:
+    if len(req.password) < 6:
+        raise HTTPException(status_code=422, detail="Password must be at least 6 characters")
+    user = create_user(req.email, req.name, req.password, req.role, req.company)
+    token = make_token(user["id"])
+    return {"token": token, "user": _safe_user(user)}
+
+
+@app.post("/api/auth/login")
+def login(req: LoginRequest) -> dict:
+    user = authenticate_user(req.email, req.password)
+    token = make_token(user["id"])
+    return {"token": token, "user": _safe_user(user)}
+
+
+@app.get("/api/auth/me")
+def me(current_user: dict = Depends(get_current_user)) -> dict:
+    return _safe_user(current_user)
+
+
+@app.put("/api/auth/profile")
+def update_profile(req: UpdateProfileRequest, current_user: dict = Depends(get_current_user)) -> dict:
+    updated = update_user(current_user["id"], req.name, req.role, req.company)
+    return _safe_user(updated)
 
 
 app.mount("/", StaticFiles(directory=str(FRONTEND_DIR), html=True), name="frontend")

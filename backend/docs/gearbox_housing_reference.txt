@@ -118,6 +118,43 @@ Mechanical meaning to code:
 - Ribs represent stiffness; add thin cubes between walls and bosses.
 - Do not fill the gear cavity; subtract a large internal volume while leaving wall_thickness.
 
+CRITICAL OPENSCAD RULE FOR GEARBOX HOUSINGS
+OpenSCAD modules do NOT return values. NEVER assign geometry to a variable.
+ALL of the following are INVALID (they silently produce nothing):
+  outer    = minkowski() { cube(...); cylinder(...); };
+  cavity   = hull()       { ... };
+  shafts   = union()      { ... };
+  bearings = union()      { ... };
+  bolts    = union()      { ... };
+  fillets  = union()      { ... };
+  difference() { outer; cavity; shafts; bearings; bolts; }  // ← referencing those "variables" also invalid
+
+CORRECT pattern — write ALL CSG directly inside the module:
+  module lower_half() {
+    difference() {
+      // 1. outer solid (write the minkowski or cube INLINE here)
+      minkowski() {
+        cube([housing_length, housing_width, base_thickness], center=true);
+        cylinder(r=chamfer_depth, h=0.01, $fn=24);
+      }
+      // 2. gear cavity (write hull INLINE here)
+      hull() {
+        translate(gear1_center) cylinder(d=gear_pitch_dia_1+2*wall_thickness, h=base_thickness+2, center=true);
+        translate(gear2_center) cylinder(d=gear_pitch_dia_2+2*wall_thickness, h=base_thickness+2, center=true);
+      }
+      // 3. shaft bores INLINE
+      translate(gear1_center) cylinder(d=shaft_bore, h=base_thickness+2, center=true);
+      translate(gear2_center) cylinder(d=shaft_bore, h=base_thickness+2, center=true);
+      // 4. bearing seats INLINE
+      translate(gear1_center) cylinder(d=bearing_od, h=bearing_width, center=true);
+      translate(gear2_center) cylinder(d=bearing_od, h=bearing_width, center=true);
+      // 5. bolt holes INLINE
+      for (dx=[-bolt_spacing_x/2, bolt_spacing_x/2])
+        for (dy=[-bolt_spacing_y/2, bolt_spacing_y/2])
+          translate([dx,dy,0]) cylinder(d=bolt_hole_dia, h=base_thickness+2, center=true);
+    }
+  }
+
 OPENSCAD CODE RULE IMPLEMENTATIONS
 Use these patterns to turn gearbox-housing rules into OpenSCAD.
 

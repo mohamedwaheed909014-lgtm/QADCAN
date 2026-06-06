@@ -40,8 +40,16 @@ const knowledgeFilesEl = document.querySelector('#knowledge-files');
 const knowledgeSelectedEl = document.querySelector('#knowledge-selected');
 const selectAllKnowledgeBtn = document.querySelector('#select-all-knowledge');
 const clearKnowledgeBtn = document.querySelector('#clear-knowledge');
+const disableRagInput = document.querySelector('#disable-rag');
 const quickPrompts   = document.querySelector('#quick-prompts');
 const clearBtn       = document.querySelector('#clear-button');
+const promptTabs     = document.querySelector('#prompt-tabs');
+const recentPromptsEl = document.querySelector('#recent-prompts');
+const promptScoreEl  = document.querySelector('#prompt-score');
+const promptChecksEl = document.querySelector('#prompt-checks');
+const promptTools    = document.querySelector('#prompt-tools');
+const resultSummary  = document.querySelector('#result-summary');
+const codeStat       = document.querySelector('#code-stat');
 
 // ── State ────────────────────────────────────────────────────────────
 let history      = [];   // [{role, content}] full conversation
@@ -61,6 +69,29 @@ let previewRenderToken = 0;
 let lastPreviewGeometry = null;
 const PROVIDER_STORAGE_KEY = 'cadies-provider-v3';
 const MODEL_STORAGE_KEY = 'cadies-model-v3';
+const RECENT_PROMPTS_KEY = 'cadies-recent-prompts-v1';
+const DISABLE_RAG_STORAGE_KEY = 'cadies-disable-rag-v1';
+
+const PROMPT_GROUPS = {
+  truss: [
+    'standard Fink roof truss span 4200 mm rise 900 mm',
+    'Pratt bridge truss span 6000 mm height 900 mm 8 bays',
+    'Warren truss span 3000 mm height 500 mm 8 bays',
+    'Queen-post roof truss span 4800 mm rise 1200 mm',
+  ],
+  motion: [
+    'GT2 20-tooth timing pulley with 5 mm bore and set screw',
+    'clamp-style shaft coupler for two 8 mm shafts',
+    'stepped motor shaft with bearing seats, keyway, and threaded end',
+    'print-in-place hinge with 5 knuckles and clearance gaps',
+  ],
+  fixture: [
+    'MG996R U-bracket with M3 holes and cable relief',
+    'NEMA23 L-bracket with slotted base holes',
+    'drill jig with two bushings and workpiece stop',
+    '60 mm fan duct mount with rounded airflow opening and screw bosses',
+  ],
+};
 
 // ── Helpers ──────────────────────────────────────────────────────────
 function escHtml(s) {
@@ -77,6 +108,105 @@ function setStatus(msg, tone = 'neutral') {
 function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+}
+
+function getRecentPrompts() {
+  try {
+    return JSON.parse(localStorage.getItem(RECENT_PROMPTS_KEY) || '[]').filter(Boolean).slice(0, 6);
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentPrompt(text) {
+  const clean = text.trim();
+  if (!clean) return;
+  const next = [clean, ...getRecentPrompts().filter(item => item !== clean)].slice(0, 6);
+  localStorage.setItem(RECENT_PROMPTS_KEY, JSON.stringify(next));
+  renderRecentPrompts();
+}
+
+function renderRecentPrompts() {
+  const recent = getRecentPrompts();
+  if (!recent.length) {
+    recentPromptsEl.className = 'recent-prompts empty-knowledge';
+    recentPromptsEl.textContent = 'No recent prompts yet.';
+    return;
+  }
+  recentPromptsEl.className = 'recent-prompts';
+  recentPromptsEl.innerHTML = recent.map(item => `
+    <button type="button" class="recent-prompt" title="${escHtml(item)}">${escHtml(item)}</button>
+  `).join('');
+}
+
+function renderPromptGroup(group = 'truss') {
+  const prompts = PROMPT_GROUPS[group] || PROMPT_GROUPS.truss;
+  quickPrompts.innerHTML = prompts.map(text => (
+    `<button type="button" class="chip">${escHtml(text)}</button>`
+  )).join('');
+  promptTabs?.querySelectorAll('.prompt-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.group === group);
+  });
+}
+
+function usePrompt(text, decorate = true) {
+  promptInput.value = decorate
+    ? `Design a ${text.trim()} in parametric OpenSCAD with clearly named editable parameters, material suggestions, assumptions, and review limits.`
+    : text.trim();
+  autoResize(promptInput);
+  updatePromptCoach();
+  promptInput.focus();
+}
+
+function analyzePrompt(text) {
+  const lower = text.toLowerCase();
+  return [
+    { label: 'part family', ok: /(truss|shaft|coupler|pulley|sprocket|gear|bracket|mount|enclosure|flange|jig|fixture|hinge|knob|insert|carriage|adapter|clamp|fan)/.test(lower) },
+    { label: 'main dimensions', ok: /\b\d+(\.\d+)?\s*(mm|cm|m|inch|inches|in|ft|feet|tooth|teeth|bays|panels)\b/.test(lower) },
+    { label: 'usage or duty', ok: /(roof|bridge|walkway|display|prototype|motor|servo|cnc|pipe|fan|bearing|load|light|heavy|timber|steel|aluminum)/.test(lower) },
+    { label: 'features', ok: /(hole|bore|slot|keyway|gusset|web|flange|hub|boss|thread|knurl|standoff|lid|post|bearing|set screw|chamfer|groove)/.test(lower) },
+    { label: 'documentation', ok: /(material|bom|assumption|derivation|standard|iso|ansi|review|limit|notes?)/.test(lower) },
+  ];
+}
+
+function updatePromptCoach() {
+  const checks = analyzePrompt(promptInput.value.trim());
+  const score = checks.filter(item => item.ok).length;
+  promptScoreEl.textContent = `${score}/${checks.length}`;
+  promptScoreEl.dataset.tone = score >= 4 ? 'success' : score >= 2 ? 'working' : 'neutral';
+  promptChecksEl.innerHTML = checks.map(item => `
+    <span class="coach-pill ${item.ok ? 'ok' : ''}">${item.ok ? '✓' : '+'} ${item.label}</span>
+  `).join('');
+}
+
+function codeMetrics(code) {
+  const lines = code ? code.split(/\r?\n/).length : 0;
+  const modules = [...code.matchAll(/\bmodule\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(/g)].map(m => m[1]);
+  const params = [...code.matchAll(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*[^=]/gm)].map(m => m[1]);
+  return { lines, modules: [...new Set(modules)], params: [...new Set(params)] };
+}
+
+function renderResultSummary(code, data = {}) {
+  if (!code) {
+    resultSummary.hidden = true;
+    resultSummary.innerHTML = '';
+    codeStat.textContent = '0 lines';
+    return;
+  }
+  const metrics = codeMetrics(code);
+  const validation = data.validation || [];
+  const passed = validation.filter(item => item.passed).length;
+  const total = validation.length;
+  const family = data.engineering?.active_database_family || data.part_family?.label || data.part_family?.family_label || 'mechanical part';
+  codeStat.textContent = `${metrics.lines} lines`;
+  resultSummary.hidden = false;
+  resultSummary.innerHTML = `
+    <div class="result-item"><strong>${escHtml(String(metrics.lines))}</strong><span>code lines</span></div>
+    <div class="result-item"><strong>${escHtml(String(metrics.modules.length))}</strong><span>modules</span></div>
+    <div class="result-item"><strong>${escHtml(String(metrics.params.length))}</strong><span>parameters</span></div>
+    <div class="result-item"><strong>${total ? `${passed}/${total}` : '-'}</strong><span>checks</span></div>
+    <div class="result-family">${escHtml(family)}</div>
+  `;
 }
 
 function stripFences(code) {
@@ -336,6 +466,7 @@ function setCode(raw) {
   lastCode = stripFences(raw || '');
   codeOutput.textContent   = lastCode || '// No code generated.';
   codeFilename.textContent = lastCode ? 'generated_part.scad' : 'no file yet';
+  renderResultSummary(lastCode);
   acceptBtn.disabled       = !lastCode;
   copyBtn.disabled         = !lastCode;
   downloadBtn.disabled     = !lastCode;
@@ -377,7 +508,23 @@ const SEV_META = {
 };
 const CAT_LABELS = { universal: 'Universal', family: 'Family-specific', derived: 'Derived formula' };
 
-function renderValidation(items) {
+function renderEvaluationSummary(evaluation) {
+  if (!evaluation) return '';
+  const cards = ['validity', 'parametricity', 'usability'].map(key => {
+    const item = evaluation[key] || {};
+    const label = key === 'parametricity' ? 'Parametricity' : key[0].toUpperCase() + key.slice(1);
+    const score = Number.isFinite(item.score) ? item.score : 0;
+    const detail = `${item.passed ?? 0}/${item.total ?? 0} checks${item.blocking ? `, ${item.blocking} blocking` : ''}`;
+    return `<article class="evaluation-card">
+      <span>${label}</span>
+      <strong>${score}%</strong>
+      <small>${detail}</small>
+    </article>`;
+  }).join('');
+  return `<div class="evaluation-grid">${cards}</div>`;
+}
+
+function renderValidation(items, evaluation = null) {
   if (!items?.length) {
     validationEl.className   = 'empty-state';
     validationEl.textContent = 'Validation checks will appear after generation.';
@@ -426,7 +573,7 @@ function renderValidation(items) {
   }).join('');
 
   validationEl.className = 'val-panel';
-  validationEl.innerHTML = summary + groupsHtml;
+  validationEl.innerHTML = renderEvaluationSummary(evaluation) + summary + groupsHtml;
 }
 
 function renderMaterials(notes) {
@@ -446,15 +593,137 @@ function renderMaterials(notes) {
         const material = item.material || `Material ${index + 1}`;
         const reason = item.reason || item.notes || 'Chosen from usage and duty level.';
         const appliesTo = item.applies_to ? `<span>${escHtml(item.applies_to)}</span>` : '';
+        const standard = item.standard_basis ? `<small>${escHtml(item.standard_basis)}</small>` : '';
         return `<article class="material-card">
           <div class="material-card-top">
             <strong>${escHtml(material)}</strong>
             ${appliesTo}
           </div>
           <p>${escHtml(reason)}</p>
+          ${standard}
         </article>`;
       }).join('')}
     </div>`;
+}
+
+// ── Enhancement panel renderers ──────────────────────────────────────────────
+const intentPanelEl    = document.querySelector('#intent-panel');
+const constraintPanelEl= document.querySelector('#constraint-panel');
+const physicsPanelEl   = document.querySelector('#physics-panel');
+const mfgPanelEl       = document.querySelector('#mfg-panel');
+const qualityPanelEl   = document.querySelector('#quality-panel');
+const mfgSelect        = document.querySelector('#mfg-select');
+
+function renderIntentPanel(intent) {
+  if (!intent || !intentPanelEl) return;
+  const family = (intent.part_family || 'unknown').replace(/_reference$/, '').replace(/_/g, ' ');
+  const params = Object.entries(intent.extracted_params || {});
+  const defaults = Object.entries(intent.defaults_applied || {});
+  const missing = intent.missing_params || [];
+
+  intentPanelEl.className = 'intent-panel';
+  intentPanelEl.innerHTML = `
+    <div class="intent-row">
+      <span class="intent-badge">${escHtml(family)}</span>
+      <span class="intent-class">${escHtml(intent.intent_class || 'functional')}</span>
+      ${intent.is_assembly ? '<span class="intent-badge assembly">assembly</span>' : ''}
+      <span class="intent-conf">confidence ${Math.round((intent.confidence || 0) * 100)}%</span>
+    </div>
+    ${params.length ? `<div class="intent-params">
+      <strong>Extracted:</strong>
+      ${params.map(([k,v]) => `<span class="intent-param">${escHtml(k)} = ${escHtml(String(v))}</span>`).join('')}
+    </div>` : ''}
+    ${defaults.length ? `<div class="intent-params defaults">
+      <strong>Defaults applied:</strong>
+      ${defaults.map(([k,v]) => `<span class="intent-param default">${escHtml(k)} = ${escHtml(String(v))}</span>`).join('')}
+    </div>` : ''}
+    ${missing.length ? `<div class="intent-missing">⚠️ Missing: ${missing.map(escHtml).join(', ')}</div>` : ''}
+    ${(intent.warnings||[]).map(w => `<div class="intent-warning">${escHtml(w)}</div>`).join('')}
+  `;
+}
+
+function renderConstraintPanel(constraints) {
+  if (!constraints || !constraintPanelEl) return;
+  const issues = constraints.issues || [];
+  if (!issues.length) {
+    constraintPanelEl.className = 'constraint-panel pass';
+    constraintPanelEl.innerHTML = '<div class="constraint-pass">✅ All mechanical constraints passed.</div>';
+    return;
+  }
+  constraintPanelEl.className = 'constraint-panel';
+  constraintPanelEl.innerHTML = issues.map(issue => {
+    const icon = issue.severity === 'error' ? '❌' : issue.severity === 'warning' ? '⚠️' : 'ℹ️';
+    return `<div class="constraint-issue sev-${issue.severity}">
+      <div class="constraint-header">${icon} <span class="rule-id">[${escHtml(issue.rule_id)}]</span> ${escHtml(issue.message)}</div>
+      ${issue.fix ? `<div class="constraint-fix">→ Fix: ${escHtml(issue.fix)}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function renderPhysicsPanel(physics) {
+  if (!physics || !physicsPanelEl) return;
+  const calcs = Object.entries(physics.calculations || {});
+  if (!calcs.length && !(physics.warnings||[]).length) {
+    physicsPanelEl.className = 'empty-state';
+    physicsPanelEl.textContent = 'No physics calculations for this part.';
+    return;
+  }
+  physicsPanelEl.className = 'physics-panel';
+  physicsPanelEl.innerHTML = `
+    ${calcs.length ? `<div class="physics-calcs">
+      ${calcs.map(([k,v]) => `<div class="physics-row">
+        <span class="physics-key">${escHtml(k.replace(/_/g,' '))}</span>
+        <span class="physics-val">${escHtml(String(v))}</span>
+      </div>`).join('')}
+    </div>` : ''}
+    ${(physics.warnings||[]).map(w => `<div class="physics-warning">⚠️ ${escHtml(w)}</div>`).join('')}
+    ${(physics.recommendations||[]).map(r => `<div class="physics-rec">→ ${escHtml(r)}</div>`).join('')}
+  `;
+}
+
+function renderMfgPanel(manufacturing) {
+  if (!manufacturing || !mfgPanelEl) return;
+  const warnings = manufacturing.dfm_warnings || [];
+  const tol = manufacturing.tolerance_table || [];
+  mfgPanelEl.className = 'mfg-panel';
+  mfgPanelEl.innerHTML = `
+    <div class="mfg-process">Process: <strong>${escHtml(manufacturing.process || 'fdm').toUpperCase()}</strong></div>
+    ${warnings.length ? `<div class="mfg-warnings">
+      ${warnings.map(w => `<div class="mfg-warning">⚠️ ${escHtml(w)}</div>`).join('')}
+    </div>` : '<div class="mfg-ok">✅ No DFM issues detected.</div>'}
+    ${tol.length ? `<table class="tol-table">
+      <tr><th>Fit type</th><th>Offset (mm)</th><th>Description</th></tr>
+      ${tol.map(t => `<tr>
+        <td>${escHtml(t.fit_type)}</td>
+        <td class="tol-val">${t.offset_mm >= 0 ? '+' : ''}${t.offset_mm}</td>
+        <td>${escHtml(t.description)}</td>
+      </tr>`).join('')}
+    </table>` : ''}
+  `;
+}
+
+function renderQualityPanel(quality) {
+  if (!quality || !qualityPanelEl) return;
+  const score = quality.score ?? 0;
+  const grade = quality.grade || 'F';
+  const gradeColor = grade === 'A' ? 'success' : grade === 'B' ? 'working' : grade === 'C' ? 'warning' : 'error';
+  const issues = quality.issues || [];
+  qualityPanelEl.className = 'quality-panel';
+  qualityPanelEl.innerHTML = `
+    <div class="quality-header">
+      <div class="quality-score-circle" data-tone="${gradeColor}">${grade}</div>
+      <div class="quality-score-num">${score}/100</div>
+      <div class="quality-score-label">Mechanical Quality</div>
+    </div>
+    ${issues.map(i => {
+      const icon = i.severity === 'error' ? '❌' : i.severity === 'warning' ? '⚠️' : 'ℹ️';
+      return `<div class="quality-issue sev-${i.severity}">
+        ${icon} <span class="rule-id">[${escHtml(i.rule_id)}]</span> ${escHtml(i.message)}
+        ${i.suggestion ? `<div class="quality-fix">→ ${escHtml(i.suggestion)}</div>` : ''}
+      </div>`;
+    }).join('')}
+    ${(quality.passed_checks||[]).length ? `<div class="quality-passed">✅ ${(quality.passed_checks||[]).join(' · ')}</div>` : ''}
+  `;
 }
 
 async function loadGenerationLog(limit = 10) {
@@ -490,10 +759,13 @@ async function loadGenerationLog(limit = 10) {
 
 // ── Provider / model selects ─────────────────────────────────────────
 function renderKnowledgeFiles() {
+  const ragDisabled = !!disableRagInput?.checked;
+  selectAllKnowledgeBtn.disabled = ragDisabled;
+  clearKnowledgeBtn.disabled = ragDisabled;
   if (!knowledgeFiles.length) {
     knowledgeFilesEl.className = 'knowledge-files empty-knowledge';
     knowledgeFilesEl.textContent = 'No knowledge records found.';
-    knowledgeSelectedEl.textContent = '0 selected';
+    knowledgeSelectedEl.textContent = ragDisabled ? 'RAG off' : '0 selected';
     return;
   }
 
@@ -505,8 +777,8 @@ function renderKnowledgeFiles() {
     const kchars = Math.round((doc.chars || 0) / 100) / 10;
     const tooltip = doc.excerpt ? escHtml(doc.excerpt.slice(0, 120)) : '';
     return `
-    <label class="knowledge-file" title="${tooltip}">
-      <input type="checkbox" value="${escHtml(doc.id)}" ${selectedKnowledge.has(doc.id) ? 'checked' : ''} />
+    <label class="knowledge-file ${ragDisabled ? 'is-disabled' : ''}" title="${tooltip}">
+      <input type="checkbox" value="${escHtml(doc.id)}" ${selectedKnowledge.has(doc.id) ? 'checked' : ''} ${ragDisabled ? 'disabled' : ''} />
       <span>
         <span class="knowledge-file-title">
           ${badge}<strong>${escHtml(doc.title)}</strong>
@@ -515,7 +787,7 @@ function renderKnowledgeFiles() {
       </span>
     </label>`;
   }).join('');
-  knowledgeSelectedEl.textContent = `${selectedKnowledge.size} selected`;
+  knowledgeSelectedEl.textContent = ragDisabled ? 'RAG off' : `${selectedKnowledge.size} selected`;
 }
 
 function updateModels(providerId, preferred = '') {
@@ -545,19 +817,18 @@ async function loadConfig() {
   const knowledge = await kr.json();
   defaultModels = config.defaults;
 
-  // Update pills
   const families = status.families ?? 0;
-const support  = status.support_docs ?? 0;
-const parts    = status.partdb_records ?? 0;
+  const support = status.support_docs ?? 0;
+  const parts = status.partdb_records ?? 0;
+  const embed = status.embedding_model || status.embedding_backend;
 
-docCountEl.textContent =
-  `${families} families • ${support} rulebooks • ${parts}+ parts`;
-
-ragModeEl.textContent =
-  `Family-aware RAG • ${status.embedding_model}`;
+  docCountEl.textContent = `${families} families / ${support} rulebooks / ${parts}+ parts`;
+  ragModeEl.textContent = `Family-aware RAG / ${embed}`;
   knowledgeFiles = knowledge.documents || [];
   selectedKnowledge = new Set();
+  disableRagInput.checked = localStorage.getItem(DISABLE_RAG_STORAGE_KEY) === 'true';
   renderKnowledgeFiles();
+  if (disableRagInput.checked) ragModeEl.textContent = 'RAG disabled / ablation mode';
 
   providerMap = new Map(config.providers.map(p => [p.id, p]));
   const available = config.providers.filter(p => p.available);
@@ -579,23 +850,21 @@ ragModeEl.textContent =
   updateModels(providerSelect.value, defModel);
 
   submitBtn.disabled = false;
+  setStatus(`Ready / ${families} families / hybrid retrieval / ${embed}`, 'success');
+}
 
-  const embed = status.embedding_model || status.embedding_backend;
-  const retrieval = status.retrieval_backend || status.embedding_backend;
- setStatus(
-  `Ready • ${families} families • hybrid retrieval • ${embed}`,
-  'success'
-);}
-
-// ── Core send ────────────────────────────────────────────────────────
+// Core send
 async function send(userText) {
+  const ragDisabled = !!disableRagInput?.checked;
   const payload = {
     prompt:        userText,
     provider:      providerSelect.value,
     model:         modelSelect.value,
     temperature:   Number(temperatureInput.value),
     allow_fallback: allowFallback.checked,
-    selected_doc_ids: Array.from(selectedKnowledge),
+    disable_rag:   ragDisabled,
+    selected_doc_ids: ragDisabled ? [] : Array.from(selectedKnowledge),
+    manufacturing: mfgSelect?.value || 'fdm',
     history,
   };
 
@@ -621,33 +890,6 @@ async function send(userText) {
 
     typing.remove();
 
-    if (data.needs_clarification) {
-      const clarification = data.clarification || {};
-      const lines = [
-        clarification.message || 'I need a few main parameters before generating this mechanical part.',
-        '',
-        ...(clarification.questions || []).map((item, index) => `${index + 1}. ${item.question}`),
-        '',
-        'After that I will assume secondary dimensions from mechanical standards and suggest suitable materials.'
-      ];
-      const messageText = lines.join('\n');
-      addMessage('assistant', messageText, data.engineering?.active_database_family || 'Mechanical RAG');
-      const examples = data.part_family?.external_examples || [];
-      renderReferences(examples.map((item, index) => ({
-        title: item.title || `External example ${index + 1}`,
-        source: 'GrabCAD external preview',
-        score: 'ref',
-        excerpt: item.url || ''
-      })));
-      renderValidation([]);
-      renderMaterials(null);
-      setCode('');
-      history.push({ role: 'user', content: userText });
-      history.push({ role: 'assistant', content: messageText });
-      setStatus('Waiting for main mechanical parameters.', 'working');
-      return;
-    }
-
     const code = stripFences(data.result || '');
 
     const meta = data.used_fallback
@@ -662,11 +904,20 @@ async function send(userText) {
     lastGeneration = {
       provider: data.provider || payload.provider,
       model: data.model || payload.model,
+      disable_rag: payload.disable_rag,
       selected_doc_ids: payload.selected_doc_ids,
     };
-    renderReferences(data.retrieved  || []);
-    renderValidation(data.validation || []);
+    renderReferences(payload.disable_rag ? [] : (data.retrieved || []));
+    renderValidation(data.validation || [], data.evaluation || null);
     renderMaterials(data.design_notes);
+    renderResultSummary(code, data);
+    // Enhancement module panels
+    renderIntentPanel(data.intent);
+    renderConstraintPanel(data.constraints);
+    renderPhysicsPanel(data.physics);
+    renderMfgPanel(data.manufacturing);
+    renderQualityPanel(data.mechanical_quality);
+    saveRecentPrompt(userText);
 
     history.push({ role: 'user',      content: userText });
     history.push({ role: 'assistant', content: code });
@@ -738,6 +989,7 @@ modelSelect.addEventListener('change', () => {
 });
 
 knowledgeFilesEl.addEventListener('change', e => {
+  if (disableRagInput?.checked) return;
   const box = e.target.closest('input[type="checkbox"]');
   if (!box) return;
   if (box.checked) {
@@ -749,24 +1001,59 @@ knowledgeFilesEl.addEventListener('change', e => {
 });
 
 selectAllKnowledgeBtn.addEventListener('click', () => {
+  if (disableRagInput?.checked) return;
   selectedKnowledge = new Set(knowledgeFiles.map(doc => doc.id));
   renderKnowledgeFiles();
 });
 
 clearKnowledgeBtn.addEventListener('click', () => {
+  if (disableRagInput?.checked) return;
   selectedKnowledge = new Set();
   renderKnowledgeFiles();
+});
+
+disableRagInput?.addEventListener('change', () => {
+  localStorage.setItem(DISABLE_RAG_STORAGE_KEY, String(disableRagInput.checked));
+  renderKnowledgeFiles();
+  renderReferences([]);
+  ragModeEl.textContent = disableRagInput.checked
+    ? 'RAG disabled / ablation mode'
+    : 'Family-aware RAG';
+  setStatus(disableRagInput.checked ? 'Ablation mode: RAG disabled.' : 'RAG enabled.', disableRagInput.checked ? 'working' : 'success');
 });
 
 quickPrompts.addEventListener('click', e => {
   const chip = e.target.closest('.chip');
   if (!chip) return;
-  promptInput.value = `Design a ${chip.textContent.trim()} in parametric OpenSCAD with clearly named parameters and mechanically realistic proportions.`;
-  autoResize(promptInput);
-  promptInput.focus();
+  usePrompt(chip.textContent);
 });
 
 promptInput.addEventListener('input', () => autoResize(promptInput));
+promptInput.addEventListener('input', updatePromptCoach);
+
+promptTabs?.addEventListener('click', e => {
+  const tab = e.target.closest('.prompt-tab');
+  if (!tab) return;
+  renderPromptGroup(tab.dataset.group);
+});
+
+recentPromptsEl?.addEventListener('click', e => {
+  const btn = e.target.closest('.recent-prompt');
+  if (!btn) return;
+  usePrompt(btn.textContent, false);
+});
+
+promptTools?.addEventListener('click', e => {
+  const chip = e.target.closest('.tool-chip');
+  if (!chip) return;
+  const add = chip.dataset.add || '';
+  if (!promptInput.value.includes(add.trim())) {
+    promptInput.value = `${promptInput.value.trim()}${add}`.trim();
+    autoResize(promptInput);
+    updatePromptCoach();
+  }
+  promptInput.focus();
+});
 
 promptInput.addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey) {
@@ -793,7 +1080,7 @@ copyBtn.addEventListener('click', async () => {
   if (!lastCode) return;
   await navigator.clipboard.writeText(lastCode);
   const orig = copyBtn.textContent;
-  copyBtn.textContent = '✓ Copied';
+  copyBtn.textContent = 'Copied';
   setTimeout(() => { copyBtn.textContent = orig; }, 2000);
   setStatus('Copied to clipboard.', 'success');
 });
@@ -871,6 +1158,7 @@ clearBtn.addEventListener('click', () => {
     </div>`;
   codeOutput.textContent   = '// Parametric OpenSCAD code will appear here.\n// Describe a part to get started, then keep chatting to refine it.';
   codeFilename.textContent = 'no file yet';
+  renderResultSummary('');
   acceptBtn.disabled = copyBtn.disabled = downloadBtn.disabled = exportStlBtn.disabled = true;
   resetPreviewState('waiting for generated geometry');
   referencesEl.className = validationEl.className = 'empty-state';
@@ -883,6 +1171,9 @@ clearBtn.addEventListener('click', () => {
 
 // ── Boot ─────────────────────────────────────────────────────────────
 submitBtn.disabled = true;
+renderPromptGroup('truss');
+renderRecentPrompts();
+updatePromptCoach();
 document.querySelector('#refresh-log-btn')?.addEventListener('click', () => loadGenerationLog(20));
 loadConfig().catch(err => {
   setStatus(err.message, 'error');

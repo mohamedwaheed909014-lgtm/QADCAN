@@ -374,3 +374,62 @@ module king_post_truss() {
 
 king_post_truss();
 ```
+
+K-TRUSS REFERENCE UPDATE
+------------------------
+Use the node-and-cylinder K-truss model for K-truss prompts:
+span 160 mm, height 55 mm, 4 bays, chord diameter 6 mm, web diameter 4 mm, joint sphere diameter 8 mm.
+Geometry: top and bottom chords are segmented by bay, every bay has a mid-height joint, and four web members form the K pattern into that joint. End verticals and internal center verticals are included.
+
+FINK ROOF TRUSS REFERENCE UPDATE
+--------------------------------
+Use the node-and-cylinder Fink roof truss model for Fink prompts. It has span 200 mm, rise 70 mm, chord diameter 6 mm, web diameter 4 mm, and joint spheres 8 mm. Geometry nodes are A/B bearings, C ridge, D/E roof midpoints, and F bottom center. Members are bottom chord A-B, rafters A-C and C-B, central web C-F, Fink web D-F/E-F/D-A/E-B, and short ridge braces D-C/C-E.
+
+WARREN TRUSS REFERENCE UPDATE
+-----------------------------
+Use the node-and-cylinder Warren truss model for Warren prompts. It has span 260 mm, height 70 mm, 8 bays, chord diameter 5 mm, web diameter 4 mm, and joint spheres 8 mm. Geometry includes segmented top and bottom chords, alternating triangular web diagonals using i % 2, and end verticals at both supports.
+
+HOWE TRUSS REFERENCE UPDATE
+---------------------------
+Use the node-and-cylinder Howe bridge/roof truss model for Howe prompts. It has span 280 mm, height 70 mm, 8 bays, chord diameter 5 mm, web diameter 4 mm, and joint spheres 8 mm. Geometry includes segmented top and bottom chords, vertical posts at every panel point, and Howe diagonals split at floor(bays/2): top-left to bottom-right on the left half, bottom-left to top-right on the right half.
+
+PRATT TRUSS REFERENCE UPDATE
+----------------------------
+Use the node-and-cylinder Pratt bridge/roof truss model for Pratt prompts. It has span 280 mm, height 70 mm, 8 bays, chord diameter 5 mm, web diameter 4 mm, and joint spheres 8 mm. Geometry includes segmented top and bottom chords, vertical posts at every panel point, and Pratt diagonals split at floor(bays/2): bottom-left to top-right on the left half, top-left to bottom-right on the right half.
+
+KING AND QUEEN POST TRUSS REFERENCE UPDATE
+------------------------------------------
+King-post roof truss primary geometry:
+- span = 240 mm, rise = 80 mm, chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- A = left bearing [-span/2,0,0], B = right bearing [span/2,0,0]
+- C = ridge [0,0,rise], D = bottom center [0,0,0]
+- bottom tie beam: A-D and D-B
+- rafters: A-C and C-B
+- king post: C-D
+- joints are spheres; members are cylinders between 3D points
+
+Queen-post roof truss primary geometry:
+- span = 260 mm, rise = 80 mm, chord_d = 5 mm, web_d = 4 mm, joint_d = 8 mm
+- A/B are bearings, C is roof peak
+- D/E are bottom queen-post points at +/-span/4
+- F/G are upper queen-post points at +/-span/4 and rise/2
+- bottom tie beam: A-D, D-E, E-B
+- rafters: A-C and C-B
+- queen posts: D-F and E-G
+- straining beam: F-G
+- diagonal struts: F-C and G-C
+- joints are spheres; members are cylinders between 3D points
+
+REALISTIC I-BEAM REFERENCE UPDATE
+---------------------------------
+Primary I-beam geometry now uses a 2D rounded steel I-section profile extruded along beam_length:
+- beam_length = 220 mm
+- height = 55 mm
+- flange_width = 42 mm
+- flange_thickness = 6 mm
+- web_thickness = 7 mm
+- inside_fillet = 4 mm at web-to-flange intersections
+- edge_radius = 0.8 mm using offset(r) and offset(delta)
+- profile contains top flange square, bottom flange square, central web square, and four inside fillet circles
+- final beam uses rotate([90,0,0]) and linear_extrude(height = beam_length)
+Use this instead of the old three-cube I-beam when the user asks for a realistic long steel I-beam.

@@ -485,10 +485,16 @@ FAMILY_VALIDATION_RULES: dict[str, list[tuple[str, Any, str, str]]] = {
              or (
                  bool(re.search(r"\bflange(_thickness|_width)?\s*=", c, re.IGNORECASE))
                  and bool(re.search(r"\bweb(_thickness)?\s*=", c, re.IGNORECASE))
-                 and c.lower().count("cube(") >= 3
+                 and (
+                     c.lower().count("cube(") >= 3
+                     or (
+                         bool(re.search(r"\blinear_extrude\s*\(", c, re.IGNORECASE))
+                         and c.lower().count("square(") >= 3
+                     )
+                 )
              )
          ),
-         "I-beam MUST be three cubes: top flange, bottom flange, and web. A single rectangular bar is wrong.", "error"),
+         "I-beam must include top flange, bottom flange, and web, either as 3D solids or an extruded 2D I-section profile.", "error"),
         ("I-beam not a single solid bar",
          lambda c: (
              not bool(re.search(r"\b(i[- ]?beam|ipe|hea)\b", c, re.IGNORECASE))

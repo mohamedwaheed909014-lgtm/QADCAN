@@ -7,32 +7,58 @@
       "id": "shaft_stepped_general",
       "family": "shaft_reference",
       "category": "shaft",
-      "name": "Stepped shaft with multiple bearing seats",
-      "standards": ["ISO shaft fits (h7/g6)"],
+      "name": "Parametric stepped shaft with optional keyway",
+      "standards": [
+        "ISO shaft fits (h7/g6)"
+      ],
       "standard_dimensions_mm": {
-        "length": 120,
-        "main_diameter": 20,
-        "step1_diameter": 15,
-        "step2_diameter": 10,
-        "step_lengths": [40, 40, 40]
+        "step_diameters": [
+          20,
+          25,
+          30,
+          25,
+          20
+        ],
+        "step_lengths": [
+          18,
+          35,
+          45,
+          35,
+          18
+        ],
+        "total_length": 151,
+        "chamfer": 1.2,
+        "keyway_width": 6,
+        "keyway_depth": 3,
+        "keyway_start": 25,
+        "keyway_length": 60
       },
       "fit_guidance_mm": {
         "bearing_seat_fit": "-0.01 to -0.02",
         "clearance_fit": "+0.02 to +0.05"
       },
       "required_features": [
-        "Multiple coaxial diameters",
-        "Step transitions"
+        "Multiple coaxial stepped diameters",
+        "Parametric steps array",
+        "Symmetric diameter layout",
+        "Optional subtractive keyway slot"
       ],
-      "openscad_module": "$fn=128; module shaft(){cylinder(h=40,d=20);translate([0,0,40])cylinder(h=40,d=15);translate([0,0,80])cylinder(h=40,d=10);} shaft();"
+      "openscad_module": "// Parametric stepped shaft\n// Units: mm\n\n$fn = 128;\n\nshaft_d = 25;       // main (largest) shaft diameter\n\n// [diameter, length]\nsteps = [\n    [20, 18],\n    [25, 35],\n    [30, 45],\n    [25, 35],\n    [20, 18]\n];\n\n// Chamfer size\nchamfer = 1.2;\n\n// Optional keyway\nshow_keyway = true;\nkeyway_width = 6;\nkeyway_depth = 3;\nkeyway_start = 25;\nkeyway_length = 60;\n\nmodule shaft_step(d, l) {\n    cylinder(d=d, h=l);\n}\n\nfunction sum_lengths(n) =\n    n == 0 ? 0 :\n    steps[n-1][1] + sum_lengths(n-1);\n\nmodule stepped_shaft() {\n    difference() {\n        union() {\n            for (i = [0 : len(steps)-1]) {\n                translate([0,0,sum_lengths(i)])\n                    shaft_step(steps[i][0], steps[i][1]);\n            }\n        }\n\n        // Keyway cut along top\n        if (show_keyway)\n            translate([-keyway_width/2, -steps[2][0]/2, keyway_start])\n                cube([keyway_width, keyway_depth, keyway_length]);\n    }\n}\n\nstepped_shaft();",
+      "aliases": [
+        "parametric stepped shaft",
+        "multi-step shaft",
+        "stepped shaft with keyway",
+        "symmetric stepped shaft"
+      ]
     },
-
     {
       "id": "shaft_keyed",
       "family": "shaft_reference",
       "category": "shaft",
       "name": "Keyed shaft (DIN 6885)",
-      "standards": ["DIN 6885A"],
+      "standards": [
+        "DIN 6885A"
+      ],
       "standard_dimensions_mm": {
         "shaft_d": 20,
         "length": 100,
@@ -43,15 +69,16 @@
         "Rectangular keyway",
         "Subtractive slot"
       ],
-      "openscad_module": "$fn=128; module shaft(){difference(){cylinder(h=100,d=20);translate([0,9,50])cube([6,3,110],center=true);}} shaft();"
+      "openscad_module": "// DIN 6885A keyed shaft — d=20 mm, L=100 mm\n$fn = 128;\n\nshaft_d   = 20;   // shaft diameter (mm)\nshaft_len = 100;  // shaft length (mm)\nkeyway_w  = 6;    // keyway width (mm)\nkeyway_d  = 3;    // keyway depth (mm)\n\nmodule keyed_shaft() {\n    difference() {\n        cylinder(h=shaft_len, d=shaft_d);\n        translate([-keyway_w/2, shaft_d/2 - keyway_d, -1])\n            cube([keyway_w, keyway_d + 1, shaft_len + 2]);\n    }\n}\n\nkeyed_shaft();"
     },
-
     {
       "id": "shaft_threaded",
       "family": "shaft_reference",
       "category": "shaft",
       "name": "Threaded shaft (lead screw)",
-      "standards": ["ISO metric thread"],
+      "standards": [
+        "ISO metric thread"
+      ],
       "standard_dimensions_mm": {
         "diameter": 8,
         "length": 150,
@@ -60,155 +87,323 @@
       "required_features": [
         "Helical thread"
       ],
-      "openscad_module": "$fn=128; module shaft(){linear_extrude(height=150,twist=360*150/2)circle(d=8);} shaft();"
+      "openscad_module": "// Threaded shaft (lead screw) — M8x2, L=150 mm\n$fn = 128;\n\nshaft_d   = 8;     // nominal thread diameter (mm)\nshaft_len = 150;   // shaft length (mm)\npitch     = 2.0;   // thread pitch (mm)\n\nmodule threaded_shaft() {\n    linear_extrude(height=shaft_len, twist=360*shaft_len/pitch)\n        circle(d=shaft_d);\n}\n\nthreaded_shaft();"
     },
-
     {
       "id": "shaft_splined",
       "family": "shaft_reference",
       "category": "shaft",
-      "name": "Splined shaft",
-      "standards": ["DIN 5480 approximation"],
+      "name": "Splined shaft (DIN 5480 external involute spline)",
+      "aliases": [
+        "splined shaft",
+        "spline shaft",
+        "external spline",
+        "involute spline",
+        "DIN 5480 shaft",
+        "splined hub shaft",
+        "multi-tooth shaft"
+      ],
+      "standards": [
+        "DIN 5480"
+      ],
       "standard_dimensions_mm": {
-        "outer_d": 20,
-        "length": 80,
-        "teeth": 12
+        "shaft_length": 160,
+        "root_diameter": 28,
+        "outer_diameter": 34,
+        "teeth": 28,
+        "tooth_fill_ratio": 0.5,
+        "end_chamfer": 1.2
+      },
+      "fit_guidance_mm": {
+        "tip_clearance": "0.1 to 0.2 mm on diameter for sliding or fixed fits",
+        "side_fit": "H7/js6 or H7/k6 for close fits per DIN 5480"
       },
       "required_features": [
-        "External spline teeth",
-        "Radial symmetry"
+        "polygon() 2D profile using list comprehension with for/let/each",
+        "Alternating root and outer radius points per tooth",
+        "linear_extrude along shaft axis",
+        "Parametric tooth_fill ratio (0.45-0.60)",
+        "Optional end chamfer using difference() with tapered cylinders"
       ],
-      "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=80,d=18);for(i=[0:11])rotate([0,0,360*i/12])translate([10,0,0])cube([2,2,80],center=true);}} shaft();"
+      "design_rules": [
+        "Use polygon() with for/let/each list comprehension — do NOT use difference() to cut tooth spaces from a solid disc.",
+        "Each tooth contributes 4 polygon points: valley-entry, tip-start, tip-end, valley-exit.",
+        "root_d is the valley (minor) diameter; outer_d is the tooth tip (major) diameter.",
+        "tooth_fill controls tooth arc width: 0.50 = equal tooth and gap.",
+        "Rotate 90 degrees before linear_extrude so the shaft axis lies along X (or keep along Z without the rotate).",
+        "Set  = 160 or higher for smooth circular interpolation."
+      ],
+      "validation_criteria": [
+        "splined_shaft module present",
+        "difference() applied to a 2D circle(r=r_tip) with tooth-space polygons",
+        "z evenly spaced tooth spaces present",
+        "polygon corners use r_root and r_tip with pressure-angle-derived angles",
+        "linear_extrude present for shaft length"
+      ],
+      "failure_modes": [
+        "cube teeth added to a root cylinder — produces rectangular protrusions, not spline teeth",
+        "translate([r,0,0]) cube(...) pattern — off-axis boxes are not spline teeth",
+        "no tooth-space difference, only a plain cylinder"
+      ],
+      "openscad_module": "// Clean external splined shaft\n// Units: mm\n\n$fn = 160;\n\n// ---------- Parameters ----------\nshaft_len = 160;\nroot_d = 28;          // valley diameter\nouter_d = 34;         // tooth tip diameter\nshaft_d = outer_d;    // alias: main shaft reference diameter\nteeth = 28;\n\ntooth_fill = 0.50;    // 0.45 to 0.60\nend_chamfer = 1.2;\n\n// ---------- 2D spline profile ----------\nmodule spline_profile(root_d, outer_d, teeth, tooth_fill) {\n    angle_step = 360 / teeth;\n    r_root = root_d / 2;\n    r_outer = outer_d / 2;\n\n    polygon(points = [\n        for (i = [0 : teeth - 1])\n            let(\n                a0 = i * angle_step - angle_step / 2,\n                a1 = i * angle_step - angle_step * tooth_fill / 2,\n                a2 = i * angle_step + angle_step * tooth_fill / 2,\n                a3 = i * angle_step + angle_step / 2\n            )\n            each [\n                [r_root  * cos(a0), r_root  * sin(a0)],\n                [r_outer * cos(a1), r_outer * sin(a1)],\n                [r_outer * cos(a2), r_outer * sin(a2)],\n                [r_root  * cos(a3), r_root  * sin(a3)]\n            ]\n    ]);\n}\n\n// ---------- Shaft body ----------\nmodule splined_shaft() {\n    rotate([0, 90, 0])\n        linear_extrude(height = shaft_len, center = true, convexity = 10)\n            spline_profile(root_d, outer_d, teeth, tooth_fill);\n}\n\n// ---------- Optional simple end bevels ----------\nmodule beveled_splined_shaft() {\n    difference() {\n        splined_shaft();\n\n        // left bevel cut\n        translate([-shaft_len/2 - 0.01, 0, 0])\n            rotate([0, 90, 0])\n                cylinder(\n                    h = end_chamfer,\n                    d1 = outer_d + 4,\n                    d2 = root_d,\n                    center = false\n                );\n\n        // right bevel cut\n        translate([shaft_len/2 - end_chamfer + 0.01, 0, 0])\n            rotate([0, 90, 0])\n                cylinder(\n                    h = end_chamfer,\n                    d1 = root_d,\n                    d2 = outer_d + 4,\n                    center = false\n                );\n    }\n}\n\nbeveled_splined_shaft();"
     },
-{
-  "id": "shaft_transmission",
-  "family": "shaft_reference",
-  "category": "shaft",
-  "name": "Transmission shaft",
-  "aliases": ["gear shaft", "power transmission shaft"],
-  "standards": ["General machine design", "ISO fits"],
-
-  "standard_dimensions_mm": {
-    "length": 160,
-    "main_diameter": 25,
-    "bearing_diameter": 20,
-    "end_diameter": 15
-  },
-
-  "required_features": [
-    "Stepped shaft geometry",
-    "Bearing seats",
-    "Gear mounting section",
-    "Optional keyway"
-  ],
-
-  "design_rules": [
-    "Bearing seats must match bearing inner diameter",
-    "Gear seat must include torque transmission feature (keyway or spline)"
-  ],
-
-  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=40,d=15);translate([0,0,40])cylinder(h=30,d=20);translate([0,0,70])cylinder(h=60,d=25);translate([0,0,130])cylinder(h=30,d=20);translate([0,0,160])cylinder(h=40,d=15);}} shaft();"
-},{
-  "id": "shaft_input",
-  "family": "shaft_reference",
-  "category": "shaft",
-  "name": "Input shaft",
-  "aliases": ["drive shaft", "motor shaft"],
-
-  "standard_dimensions_mm": {
-    "diameter": 20,
-    "length": 120,
-    "gear_section_d": 30
-  },
-
-  "required_features": [
-    "Gear mounted on shaft",
-    "Bearing support sections",
-    "Torque input interface"
-  ],
-
-  "design_rules": [
-    "Must align with motor or power source",
-    "Include gear or spline interface"
-  ],
-
-  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=40,d=20);translate([0,0,40])cylinder(h=40,d=30);translate([0,0,80])cylinder(h=40,d=20);}} shaft();"
-},{
-  "id": "shaft_line",
-  "family": "shaft_reference",
-  "category": "shaft",
-  "name": "Line shaft",
-  "aliases": ["long transmission shaft"],
-
-  "standard_dimensions_mm": {
-    "diameter": 25,
-    "length": 300
-  },
-
-  "required_features": [
-    "Long uniform shaft",
-    "Multiple mounting positions"
-  ],
-
-  "design_rules": [
-    "Maintain straightness",
-    "Avoid excessive deflection"
-  ],
-
-  "openscad_module": "$fn=128; module shaft(){cylinder(h=300,d=25);} shaft();"
-},{
-  "id": "shaft_machine",
-  "family": "shaft_reference",
-  "category": "shaft",
-  "name": "Machine shaft",
-
-  "standard_dimensions_mm": {
-    "diameter": 30,
-    "length": 150
-  },
-
-  "required_features": [
-    "Supports rotating components",
-    "Multiple mounting sections"
-  ],
-
-  "design_rules": [
-    "Designed for general-purpose rotation",
-    "Can include gears, pulleys, or bearings"
-  ],
-
-  "openscad_module": "$fn=128; module shaft(){cylinder(h=150,d=30);} shaft();"
-},{
-  "id": "shaft_spindle",
-  "family": "shaft_reference",
-  "category": "shaft",
-  "name": "Spindle shaft",
-  "aliases": ["machine spindle"],
-
-  "standard_dimensions_mm": {
-    "diameter": 20,
-    "length": 120,
-    "head_diameter": 40
-  },
-
-  "required_features": [
-    "High precision shaft",
-    "Tool mounting head"
-  ],
-
-  "design_rules": [
-    "High concentricity required",
-    "Smooth surface finish"
-  ],
-
-  "openscad_module": "$fn=128; module shaft(){union(){cylinder(h=100,d=20);translate([0,0,100])cylinder(h=20,d=40);}} shaft();"
-},
+    {
+      "id": "shaft_transmission",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Transmission shaft with gears.scad helical gears",
+      "aliases": [
+        "transmission shaft",
+        "counter shaft",
+        "countershaft",
+        "gear shaft",
+        "gearbox shaft",
+        "power transmission shaft",
+        "multi gear shaft",
+        "helical gear shaft"
+      ],
+      "standards": [
+        "General machine design",
+        "ISO fits"
+      ],
+      "standard_dimensions_mm": {
+        "overall_length": 347,
+        "shaft_diameters": [
+          18,
+          34,
+          28,
+          26,
+          24,
+          22,
+          18
+        ],
+        "gear_teeth": [
+          42,
+          30,
+          28,
+          24
+        ],
+        "gear_modules": [
+          1.9,
+          1.8,
+          1.8,
+          1.8
+        ],
+        "gear_widths": [
+          30,
+          24,
+          24,
+          24
+        ],
+        "helix_angles": [
+          22,
+          -22,
+          22,
+          -22
+        ],
+        "center_spline_outer_diameter": 40,
+        "end_spline_outer_diameter": 25,
+        "cross_hole_diameter": 5
+      },
+      "required_features": [
+        "Long stepped shaft core",
+        "Multiple coaxial helical gears generated with gears.scad spur_gear()",
+        "Alternating helix directions on gear sections",
+        "Center dog spline section",
+        "End spline section",
+        "Shoulders between gear sections",
+        "Thread ring details at the output end",
+        "Radial cross hole through the end journal"
+      ],
+      "design_rules": [
+        "For transmission shaft, countershaft, gearbox shaft, or gear shaft requests, use this exact gears.scad-based pattern unless the user explicitly asks for a different construction.",
+        "Use the project gear library: use <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad> and call spur_gear(..., helix_angle=...) through library_helical_gear().",
+        "Never hand-build transmission-shaft gear teeth from cubes, rectangular blocks, or simple radial boxes.",
+        "Do not define a custom block-tooth module gear(...) for this family.",
+        "Keep all shaft steps, library gears, splines, shoulders, thread rings, and the radial cross-hole on one coaxial shaft axis.",
+        "Do not reference undeclared gear variables such as gear_teeth3.",
+        "Do not assign geometry to variables. OpenSCAD geometry statements cannot be stored in variables.",
+        "Do not declare string metadata variables such as manufacturing = \"fdm\" in OpenSCAD code.",
+        "Use explicit fixed positions from the RAG example for shaft sections and gears; do not compute shaft_pos by appending to an array.",
+        "OpenSCAD variables are immutable. NEVER write shaft_pos = [0]; for (...) shaft_pos = concat(...). Use fixed numeric positions or a pure recursive function instead.",
+        "Do not wrap spur_gear() in a gear_assembly() module that subtracts shaft bores and adds hubs unless the user explicitly asks for loose gears; the RAG pattern uses bore=0 so gears fuse to the shaft assembly."
+      ],
+      "openscad_module": "// Transmission shaft with gears.scad helical gears\n// Units: mm\n\nuse <D:/downloads/openscad_copilot (1)/openscad_copilot/gears.scad>\n\n$fn = 96;\n\nshaft_len = 347;\nshaft_d = 18;\npressure_angle = 20;\n\nmodule shaft_section(x, len, dia) {\n    translate([x, 0, 0])\n        rotate([0, 90, 0])\n            cylinder(h = len, d = dia, center = false);\n}\n\nmodule library_helical_gear(x, width, teeth, module_size, helix_angle) {\n    translate([x, 0, 0])\n        rotate([0, 90, 0])\n            spur_gear(\n                modul = module_size,\n                tooth_number = teeth,\n                width = width,\n                bore = 0,\n                pressure_angle = pressure_angle,\n                helix_angle = helix_angle,\n                optimized = true\n            );\n}\n\nmodule spline_section(x, width, root_d, outer_d, teeth = 24) {\n    pitch = 360 / teeth;\n\n    translate([x, 0, 0])\n        rotate([0, 90, 0])\n            linear_extrude(height = width, slices = 2)\n                union() {\n                    circle(d = root_d);\n                    for (i = [0 : teeth - 1])\n                        rotate(i * pitch)\n                            polygon(points = [\n                                [root_d / 2, -0.75],\n                                [outer_d / 2, -0.45],\n                                [outer_d / 2,  0.45],\n                                [root_d / 2,  0.75]\n                            ]);\n                }\n}\n\nmodule transmission_shaft() {\n    difference() {\n        union() {\n            // Stepped shaft core.\n            shaft_section(0,   28, 18);\n            shaft_section(28,  42, 34);\n            shaft_section(70,  45, 28);\n            shaft_section(115, 55, 26);\n            shaft_section(170, 58, 24);\n            shaft_section(228, 55, 22);\n            shaft_section(283, 64, 18);\n\n            // Library-generated helical gears.\n            library_helical_gear(25,  30, 42, 1.9,  22);\n            library_helical_gear(88,  24, 30, 1.8, -22);\n            library_helical_gear(118, 24, 28, 1.8,  22);\n            library_helical_gear(238, 24, 24, 1.8, -22);\n\n            // Center dog spline.\n            spline_section(174, 30, 30, 40, 24);\n\n            // Shoulders.\n            shaft_section(74,  8, 38);\n            shaft_section(150, 8, 34);\n            shaft_section(213, 8, 30);\n            shaft_section(270, 7, 26);\n\n            // End spline.\n            spline_section(300, 25, 18, 25, 24);\n\n            // Thread-ring representation.\n            for (i = [0 : 8])\n                shaft_section(330 + i * 2.1, 0.8, 22);\n        }\n\n        // Radial cross hole.\n        translate([292, 0, 0])\n            rotate([90, 0, 0])\n                cylinder(h = 50, d = 5, center = true);\n    }\n}\n\ntransmission_shaft();",
+      "failure_modes": [
+        "gear teeth hand-built from rectangular cubes instead of gears.scad spur_gear()",
+        "custom module gear(...) with block teeth used for transmission shaft gears",
+        "undefined gear_teeth3 or other missing gear parameter referenced",
+        "plain hollow tube or smooth cylinder returned for a transmission shaft request",
+        "transmission shaft housing returned instead of the rotating gear shaft",
+        "loose gears placed beside the shaft instead of coaxially mounted on it",
+        "missing spline sections or output thread/end details",
+        "geometry assigned to variables instead of emitted directly in modules",
+        "shaft_pos = [0]; for (...) shaft_pos = concat(...) used; OpenSCAD cannot reassign variables this way",
+        "gear_assembly() adds hubs and subtracts shaft bores instead of using the RAG library_helical_gear() pattern with bore=0",
+        "array-driven generated positions drift from the fixed-position shaft_transmission RAG example"
+      ],
+      "validation_criteria": [
+        "gears.scad is included with use or include",
+        "library_helical_gear module present",
+        "spur_gear() is called for each transmission gear section",
+        "helix_angle parameter is used on gear calls",
+        "no custom rectangular-tooth module gear() is present",
+        "no cube teeth in the gear module",
+        "gear_teeth3 is not referenced",
+        "spline sections present",
+        "thread rings present",
+        "cross hole subtraction present",
+        "fixed numeric shaft_section positions are used",
+        "no shaft_pos = concat(...) reassignment pattern",
+        "no gear_assembly() bore-subtracting wrapper replaces library_helical_gear()"
+      ]
+    },
+    {
+      "id": "shaft_input",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Input shaft",
+      "aliases": [
+        "drive shaft",
+        "motor shaft"
+      ],
+      "standard_dimensions_mm": {
+        "diameter": 20,
+        "length": 120,
+        "gear_section_d": 30
+      },
+      "required_features": [
+        "Gear mounted on shaft",
+        "Bearing support sections",
+        "Torque input interface"
+      ],
+      "design_rules": [
+        "Must align with motor or power source",
+        "Include gear or spline interface"
+      ],
+      "openscad_module": "// Input shaft — three sections, L=120 mm\n$fn = 128;\n\nshaft_d   = 30;   // main (gear seat) diameter (mm)\nbearing_d = 20;   // bearing / end section diameter (mm)\n\nmodule input_shaft() {\n    union() {\n        cylinder(h=40, d=bearing_d);\n        translate([0,0,40]) cylinder(h=40, d=shaft_d);\n        translate([0,0,80]) cylinder(h=40, d=bearing_d);\n    }\n}\n\ninput_shaft();"
+    },
+    {
+      "id": "shaft_line",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Parametric line shaft with pulleys",
+      "aliases": [
+        "line shaft",
+        "long transmission shaft",
+        "pulley line shaft",
+        "factory line shaft",
+        "belt drive line shaft",
+        "shaft with pulleys"
+      ],
+      "standard_dimensions_mm": {
+        "shaft_length": 500,
+        "shaft_diameter": 40,
+        "bearing_seat_diameter": 45,
+        "bearing_seat_length": 40,
+        "keyed_section_length": 80,
+        "keyway_width": 8,
+        "keyway_depth": 3,
+        "pulley_diameters": [
+          120,
+          180
+        ],
+        "pulley_widths": [
+          40,
+          50
+        ],
+        "thread_ring_diameter": 44
+      },
+      "required_features": [
+        "Long continuous shaft section",
+        "Bearing seats near both ends",
+        "Two keyed shaft sections with subtractive keyways",
+        "Two coaxial pulleys mounted on the shaft",
+        "Simplified threaded end represented by narrow rings"
+      ],
+      "design_rules": [
+        "A line shaft should be a long rotating shaft carrying pulleys or belt-drive elements, not just a short plain cylinder with one keyway.",
+        "Use the full line-shaft assembly pattern: main shaft, bearing seats, keyed sections, coaxial pulleys, and simplified threaded end rings.",
+        "Keep all shaft sections, bearing seats, pulleys, and thread rings coaxial on the same shaft axis.",
+        "Use subtractive keyways on keyed sections with a direct difference() block; do not store the shaft or slot geometry in variables.",
+        "Pulleys are positive coaxial geometry with a bore through their center.",
+        "Threaded ends can be represented by repeated narrow rings when detailed thread geometry is not required.",
+        "OpenSCAD geometry cannot be assigned to variables. NEVER write shaft = cylinder(...), slot = translate(...) cube(...), body = union(){...}, or result = difference(){...}.",
+        "If helper modules are needed, define module shaft_section(...), module keyed_section(...), and module pulley(...), then call those modules directly inside union() or difference().",
+        "Do not declare string metadata variables such as manufacturing = \"fdm\" in OpenSCAD code."
+      ],
+      "openscad_module": "// Parametric Line Shaft\n// Units: mm\n\n$fn = 120;\n\n// -------------------------\n// Shaft section\n// -------------------------\nmodule shaft_section(x, len, dia) {\n    translate([x, 0, 0])\n    rotate([0, 90, 0])\n        cylinder(h = len, d = dia);\n}\n\n// -------------------------\n// Bearing seat\n// -------------------------\nmodule bearing_seat(x, len, dia) {\n    shaft_section(x, len, dia);\n}\n\n// -------------------------\n// Keyway sleeve\n// -------------------------\nmodule keyed_section(x, len, dia, key_w = 8, key_d = 3) {\n    difference() {\n        shaft_section(x, len, dia);\n\n        translate([x + len / 2, dia / 2 - key_d / 2, 0])\n            cube([len + 2, key_d, key_w], center = true);\n    }\n}\n\n// -------------------------\n// Pulley\n// -------------------------\nmodule pulley(x, width, od, bore) {\n    translate([x, 0, 0])\n    rotate([0, 90, 0])\n    difference() {\n        union() {\n            cylinder(h = width, d = od);\n\n            translate([0, 0, width * 0.2])\n                cylinder(h = width * 0.6, d = od * 0.75);\n        }\n\n        translate([0, 0, -1])\n            cylinder(h = width + 2, d = bore);\n    }\n}\n\n// -------------------------\n// Complete Line Shaft\n// -------------------------\nmodule line_shaft() {\n    union() {\n        // Main shaft\n        shaft_section(0, 500, 40);\n\n        // Bearing seats\n        bearing_seat(40, 40, 45);\n        bearing_seat(420, 40, 45);\n\n        // Keyed sections\n        keyed_section(120, 80, 40);\n        keyed_section(260, 80, 40);\n\n        // Pulleys\n        pulley(120, 40, 120, 40);\n        pulley(260, 50, 180, 40);\n\n        // Threaded end representation\n        for (i = [0 : 12])\n            shaft_section(470 + i * 2, 1, 44);\n    }\n}\n\nline_shaft();",
+      "failure_modes": [
+        "plain smooth cylinder returned for a line shaft request",
+        "short keyed shaft returned instead of the full line shaft assembly",
+        "shaft = cylinder(...) or slot = translate(...) cube(...) used; OpenSCAD geometry assignment is invalid",
+        "pulleys omitted from the line shaft",
+        "pulleys placed beside the shaft instead of coaxially mounted",
+        "keyed sections missing their subtractive keyway cuts",
+        "bearing seats missing or not coaxial with the main shaft",
+        "line shaft confused with transmission countershaft with gears",
+        "geometry assigned to variables instead of emitted directly in modules"
+      ],
+      "validation_criteria": [
+        "module line_shaft() present",
+        "shaft_section module present",
+        "keyed_section module uses difference() directly",
+        "pulley module present and called at least twice",
+        "bearing_seat called near both shaft ends",
+        "threaded end represented by repeated narrow shaft_section rings",
+        "no geometry assignment such as shaft = cylinder or slot = translate"
+      ]
+    },
+    {
+      "id": "shaft_machine",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Machine shaft",
+      "standard_dimensions_mm": {
+        "diameter": 30,
+        "length": 150
+      },
+      "required_features": [
+        "Supports rotating components",
+        "Multiple mounting sections"
+      ],
+      "design_rules": [
+        "Designed for general-purpose rotation",
+        "Can include gears, pulleys, or bearings"
+      ],
+      "openscad_module": "// Machine shaft — general purpose, L=150 mm\n$fn = 128;\n\nshaft_d   = 30;   // shaft diameter (mm)\nshaft_len = 150;  // shaft length (mm)\n\nmodule machine_shaft() {\n    cylinder(h=shaft_len, d=shaft_d);\n}\n\nmachine_shaft();"
+    },
+    {
+      "id": "shaft_spindle",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Spindle shaft",
+      "aliases": [
+        "machine spindle"
+      ],
+      "standard_dimensions_mm": {
+        "diameter": 20,
+        "length": 120,
+        "head_diameter": 40
+      },
+      "required_features": [
+        "High precision shaft",
+        "Tool mounting head"
+      ],
+      "design_rules": [
+        "High concentricity required",
+        "Smooth surface finish"
+      ],
+      "openscad_module": "// Spindle shaft — two-section\n$fn = 128;\n\nshaft_d    = 20;   // spindle shaft diameter (mm)\nflange_d   = 40;   // flange / toolholder diameter (mm)\nshaft_len  = 100;  // shaft length (mm)\nflange_len = 20;   // flange length (mm)\n\nmodule spindle_shaft() {\n    union() {\n        cylinder(h=shaft_len, d=shaft_d);\n        translate([0, 0, shaft_len])\n            cylinder(h=flange_len, d=flange_d);\n    }\n}\n\nspindle_shaft();"
+    },
     {
       "id": "shaft_d_flat",
       "family": "shaft_reference",
       "category": "shaft",
       "name": "D-shaft (motor shaft)",
-      "standards": ["General motor shaft practice"],
+      "standards": [
+        "General motor shaft practice"
+      ],
       "standard_dimensions_mm": {
         "diameter": 6,
         "length": 50,
@@ -217,8 +412,52 @@
       "required_features": [
         "Flat cut surface"
       ],
-      "openscad_module": "$fn=128; module shaft(){difference(){cylinder(h=50,d=6);translate([0,2.5,25])cube([6,1,60],center=true);}} shaft();"
+      "openscad_module": "// D-flat shaft — flat ground on round section\n$fn = 128;\n\nshaft_d   = 6;    // shaft diameter (mm)\nshaft_len = 50;   // shaft length (mm)\nflat_depth = 1.0; // depth of flat cut from OD (mm)\n\nmodule d_flat_shaft() {\n    difference() {\n        cylinder(h=shaft_len, d=shaft_d);\n        translate([-shaft_d/2, shaft_d/2 - flat_depth, -1])\n            cube([shaft_d, flat_depth + 1, shaft_len + 2]);\n    }\n}\n\nd_flat_shaft();"
+    },
+    {
+      "id": "shaft_crankshaft_v6_six_throw",
+      "family": "shaft_reference",
+      "category": "shaft",
+      "name": "Crankshaft V6 six-throw style",
+      "aliases": [
+        "crankshaft",
+        "v6 crankshaft",
+        "six throw crankshaft",
+        "engine crankshaft",
+        "6 throw crank"
+      ],
+      "standards": [
+        "General crankshaft layout practice",
+        "ISO shaft fit practice for journals"
+      ],
+      "standard_dimensions_mm": {
+        "main_diameter": 18,
+        "rod_journal_diameter": 14,
+        "throw_radius": 20,
+        "main_spacing": 34,
+        "rod_journal_length": 22,
+        "web_thickness": 9,
+        "main_web_diameter": 44,
+        "rod_web_diameter": 32,
+        "overall_length_approx": 324
+      },
+      "required_features": [
+        "Continuous main shaft",
+        "Seven main journals",
+        "Six offset rod pins",
+        "120-degree V6 throw phasing",
+        "Crank webs connecting main and rod journals",
+        "Counterweights opposite rod throws",
+        "Front stepped nose",
+        "Rear flywheel flange"
+      ],
+      "design_rules": [
+        "Rod pins are offset from main axis by throw radius",
+        "Each throw uses paired webs and counterweights",
+        "Main journals remain coaxial along the X axis",
+        "Keep crankshaft as one connected solid body"
+      ],
+      "openscad_module": "// V6 crankshaft, 6-throw style\n// One connected OpenSCAD body\n// Units: mm\n\n$fn = 180;\n\n// Main dimensions\nshaft_d = 18;  // main journal diameter (alias: shaft_d)\nmain_d = shaft_d;\nrod_d  = 14;\nthrow  = 20;\n\n// Layout\nmain_spacing = 34;\nrod_len = 22;\nweb_t = 9;\n\n// Web sizes\nweb_main_d = 44;\nweb_rod_d  = 32;\n\n// Helper\nmodule cyl_x(d,l){\n    rotate([0,90,0])\n        cylinder(d=d,h=l,center=true);\n}\n\nmodule web(x,ang){\n    y = throw*cos(ang);\n    z = throw*sin(ang);\n\n    hull(){\n        translate([x,0,0])\n            cyl_x(web_main_d, web_t);\n\n        translate([x,y,z])\n            cyl_x(web_rod_d, web_t);\n    }\n}\n\nmodule counterweight(x,ang){\n    y = -throw*cos(ang);\n    z = -throw*sin(ang);\n\n    hull(){\n        translate([x,y,z])\n            scale([1,1.25,0.45])\n                cyl_x(42, web_t);\n\n        translate([x,y*0.45,z*0.45])\n            scale([0.8,1,0.3])\n                cyl_x(24, web_t);\n    }\n}\n\nmodule rod_pin(x,ang){\n    y = throw*cos(ang);\n    z = throw*sin(ang);\n\n    translate([x,y,z])\n        cyl_x(rod_d, rod_len);\n}\n\nmodule crank_throw(x,ang){\n    web(x-7,ang);\n    web(x+7,ang);\n\n    counterweight(x-7,ang);\n    counterweight(x+7,ang);\n\n    rod_pin(x,ang);\n\n    // rod journal side collars\n    y = throw*cos(ang);\n    z = throw*sin(ang);\n\n    translate([x-rod_len/2-2,y,z])\n        cyl_x(20,4);\n\n    translate([x+rod_len/2+2,y,z])\n        cyl_x(20,4);\n}\n\nmodule v6_crankshaft() {\n    union(){\n\n        // Continuous center shaft\n        cyl_x(main_d,260);\n\n        // Main journals\n        for(x=[-102,-68,-34,0,34,68,102])\n            translate([x,0,0])\n                cyl_x(22,16);\n\n        // V6 crank throws, 120-degree phasing\n        crank_throw(-85,   0);\n        crank_throw(-51, 120);\n        crank_throw(-17, 240);\n        crank_throw( 17,   0);\n        crank_throw( 51, 120);\n        crank_throw( 85, 240);\n\n        // Main bearing collars\n        for(x=[-119,-68,0,68,119])\n            translate([x,0,0])\n                cyl_x(30,6);\n\n        // Front stepped nose\n        translate([-130,0,0])\n            cyl_x(16,24);\n\n        translate([-148,0,0])\n            cyl_x(12,18);\n\n        // Rear flywheel flange\n        translate([130,0,0])\n            cyl_x(34,12);\n\n        translate([145,0,0])\n            cyl_x(24,18);\n\n        translate([162,0,0])\n            cyl_x(50,10);\n    }\n}\n\nv6_crankshaft();"
     }
-
   ]
 }
