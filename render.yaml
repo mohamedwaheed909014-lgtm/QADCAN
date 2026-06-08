@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: openscad-copilot
+    env: docker
+    plan: free
+    autoDeploy: true
+    healthCheckPath: /api/status
+    envVars:
+      - key: EMBEDDING_BACKEND
+        value: tfidf
+      - key: OPENSCAD_BIN
+        value: openscad
+      - key: OPENROUTER_ALLOW_PAID
+        value: "false"
+      - key: ENABLE_CLARIFICATION
+        value: "false"
