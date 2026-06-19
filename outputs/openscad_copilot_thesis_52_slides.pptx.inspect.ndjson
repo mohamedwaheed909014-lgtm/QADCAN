@@ -1,0 +1,1139 @@
+{"kind":"deck","id":"pr/8alj7q","name":"Deck"}
+{"kind":"layout","layoutId":"0fc2a70f-3706-449e-8b84-e67450549991","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"2e75c74d-df82-4aae-bcee-da5f62490fa3","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/jy3w3v","slide":1,"title":"THESIS PRESENTATION","textShapes":10}
+{"kind":"shape","id":"sh/8bat47y1","slide":1,"bbox":[0,0,18,720]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":1,"text":"THESIS PRESENTATION","textPreview":"THESIS PRESENTATION","textChars":19,"textLines":1,"bbox":[72,78,420,30]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":1,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[72,176,850,145]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":1,"text":"AI-assisted parametric CAD generation using RAG, validation, and multi-model generation","textPreview":"AI-assisted parametric CAD generation using RAG, validation, and multi-model generation","textChars":87,"textLines":1,"bbox":[75,338,780,70]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":1,"bbox":[78,463,13,13]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":1,"text":"Thesis backend, frontend, and knowledge-base architecture","textPreview":"Thesis backend, frontend, and knowledge-base architecture","textChars":57,"textLines":1,"bbox":[106,455,760,44]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":1,"bbox":[78,521,13,13]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":1,"text":"Natural language to validated OpenSCAD and STL export","textPreview":"Natural language to validated OpenSCAD and STL export","textChars":53,"textLines":1,"bbox":[106,513,760,44]}
+{"kind":"shape","id":"sh/crmhk3q5","slide":1,"bbox":[930,160,250,310]}
+{"kind":"shape","id":"sh/2t83itgf","slide":1,"bbox":[965,195,180,28]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":1,"text":"Prompt","textPreview":"Prompt","textChars":6,"textLines":1,"bbox":[980,201,150,18]}
+{"kind":"shape","id":"sh/kzupwb2h","slide":1,"bbox":[965,243,180,28]}
+{"kind":"textbox","id":"sh/9knih4by","slide":1,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[980,249,150,18]}
+{"kind":"shape","id":"sh/25kb6xkf","slide":1,"bbox":[965,291,180,28]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":1,"text":"OpenSCAD","textPreview":"OpenSCAD","textChars":8,"textLines":1,"bbox":[980,297,150,18]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":1,"bbox":[965,339,180,28]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":1,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[980,345,150,18]}
+{"kind":"shape","id":"sh/2hwfyxob","slide":1,"bbox":[965,387,180,28]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":1,"text":"STL","textPreview":"STL","textChars":3,"textLines":1,"bbox":[980,393,150,18]}
+{"kind":"notes","id":"nt/jy3w3v","slide":1,"text":"Introduce the project as a complete AI-CAD system, not a simple chatbot. The application takes mechanical design requests, generates editable OpenSCAD, validates the result, and supports STL export."}
+{"kind":"slide","id":"sl/3wwfbr","slide":2,"title":"INTRODUCTION","textShapes":11}
+{"kind":"shape","id":"sh/fu18jqh0","slide":2,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/4fu18jqh","slide":2,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":2,"text":"INTRODUCTION","textPreview":"INTRODUCTION","textChars":12,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":2,"text":"System Goal","textPreview":"System Goal","textChars":11,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/fil0rqd4","slide":2,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/83itgfml","slide":2,"text":"Introduction","textPreview":"Introduction","textChars":12,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/mtwra5gb","slide":2,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/fepkzupw","slide":2,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":2,"text":"Convert natural-language mechanical requests into validated OpenSCAD code","textPreview":"Convert natural-language mechanical requests into validated OpenSCAD code","textChars":73,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/epkzupwb","slide":2,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":2,"text":"Support iterative refinement through chat","textPreview":"Support iterative refinement through chat","textChars":41,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/wval87ed","slide":2,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"Return engineering feedback beside the generated code","textPreview":"Return engineering feedback beside the generated code","textChars":53,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":2,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":2,"text":"Enable export to fabrication-ready STL","textPreview":"Enable export to fabrication-ready STL","textChars":38,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":2,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/7u54zido","slide":2,"text":"Introduction","textPreview":"Introduction","textChars":12,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/3wwfbr","slide":2,"text":"The project reduces the effort required to create parametric CAD models. Users describe a desired part and refine dimensions or features through conversation."}
+{"kind":"slide","id":"sl/fbzgqh","slide":3,"title":"INTRODUCTION","textShapes":11}
+{"kind":"shape","id":"sh/8v6psfil","slide":3,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":3,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":3,"text":"INTRODUCTION","textPreview":"INTRODUCTION","textChars":12,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":3,"text":"Main Backend Modules","textPreview":"Main Backend Modules","textChars":20,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/8jqh0fep","slide":3,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":3,"text":"Introduction","textPreview":"Introduction","textChars":12,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/xs72x4na","slide":3,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/87ed8bat","slide":3,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":3,"text":"app.py: API, orchestration, model calls, repair, export","textPreview":"app.py: API, orchestration, model calls, repair, export","textChars":55,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/7y1kre1w","slide":3,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":3,"text":"rag.py: mechanical knowledge retrieval and family detection","textPreview":"rag.py: mechanical knowledge retrieval and family detection","textChars":59,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/p4r65wju","slide":3,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/i5sneloj","slide":3,"text":"validation_and_logging.py: quality checks, scoring, event logs","textPreview":"validation_and_logging.py: quality checks, scoring, event logs","textChars":62,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/7qpg3ex0","slide":3,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":3,"text":"backend/docs: domain knowledge used by RAG","textPreview":"backend/docs: domain knowledge used by RAG","textChars":42,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"textbox","id":"sh/pwb2hwfy","slide":3,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":3,"text":"Introduction","textPreview":"Introduction","textChars":12,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/fbzgqh","slide":3,"text":"Each file has a clear responsibility, making the system easier to understand, maintain, and extend."}
+{"kind":"slide","id":"sl/dxaleh","slide":4,"title":"ARCHITECTURE","textShapes":20}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":4,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":4,"text":"ARCHITECTURE","textPreview":"ARCHITECTURE","textChars":12,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":4,"text":"High-Level Data Flow","textPreview":"High-Level Data Flow","textChars":20,"textLines":1,"bbox":[58,96,820,50]}
+{"kind":"shape","id":"sh/j6tovaho","slide":4,"bbox":[70,210,145,70]}
+{"kind":"textbox","id":"sh/ulwval87","slide":4,"text":"User prompt","textPreview":"User prompt","textChars":11,"textLines":1,"bbox":[82,228,121,36]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[217,238,26,28]}
+{"kind":"shape","id":"sh/crmhk3q5","slide":4,"bbox":[237,210,145,70]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":4,"text":"FastAPI endpoint","textPreview":"FastAPI endpoint","textChars":16,"textLines":1,"bbox":[249,228,121,36]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[384,238,26,28]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":4,"bbox":[404,210,145,70]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":4,"text":"Engineering analysis","textPreview":"Engineering analysis","textChars":20,"textLines":1,"bbox":[416,228,121,36]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[551,238,26,28]}
+{"kind":"shape","id":"sh/zidonyd0","slide":4,"bbox":[571,210,145,70]}
+{"kind":"textbox","id":"sh/svu9knih","slide":4,"text":"RAG retrieval","textPreview":"RAG retrieval","textChars":13,"textLines":1,"bbox":[583,228,121,36]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":4,"text":"↓","textPreview":"↓","textChars":1,"textLines":1,"bbox":[631,316,26,28]}
+{"kind":"shape","id":"sh/ap4r65wj","slide":4,"bbox":[70,360,145,70]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":4,"text":"AI generation","textPreview":"AI generation","textChars":13,"textLines":1,"bbox":[82,378,121,36]}
+{"kind":"textbox","id":"sh/sji5snel","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[217,388,26,28]}
+{"kind":"shape","id":"sh/h4byhgn2","slide":4,"bbox":[237,360,145,70]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":4,"text":"Validation and repair","textPreview":"Validation and repair","textChars":21,"textLines":1,"bbox":[249,378,121,36]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":4,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[384,388,26,28]}
+{"kind":"shape","id":"sh/7mp0bi9s","slide":4,"bbox":[404,360,145,70]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":4,"text":"CAD code + reports","textPreview":"CAD code + reports","textChars":18,"textLines":1,"bbox":[416,378,121,36]}
+{"kind":"shape","id":"sh/pg3ex0nu","slide":4,"bbox":[760,214,400,215]}
+{"kind":"textbox","id":"sh/wval87ed","slide":4,"text":"Core idea","textPreview":"Core idea","textChars":9,"textLines":1,"bbox":[790,242,340,28]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":4,"text":"The system surrounds AI generation with engineering context before the model call and quality control after the model call.","textPreview":"The system surrounds AI generation with engineering context before the model call and quality control after the model call.","textChars":123,"textLines":1,"bbox":[790,288,330,100]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":4,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":4,"text":"Architecture","textPreview":"Architecture","textChars":12,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/dxaleh","slide":4,"text":"The backend enriches the request, retrieves domain knowledge, generates code, validates it, and returns structured feedback."}
+{"kind":"slide","id":"sl/v29s2c","slide":5,"title":"BACKEND","textShapes":5}
+{"kind":"shape","id":"sh/bq1oryts","slide":5,"bbox":[0,0,1280,13]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":5,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,116,380,32]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":5,"text":"Backend Layer","textPreview":"Backend Layer","textChars":13,"textLines":1,"bbox":[72,204,850,90]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":5,"text":"FastAPI orchestration, model access, validation, repair, and export","textPreview":"FastAPI orchestration, model access, validation, repair, and export","textChars":67,"textLines":1,"bbox":[75,324,820,80]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":5,"bbox":[910,170,230,230]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[950,220,150,80]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":5,"text":"SECTION","textPreview":"SECTION","textChars":7,"textLines":1,"bbox":[950,315,150,24]}
+{"kind":"notes","id":"nt/v29s2c","slide":5,"text":"Explain this slide in relation to the system architecture."}
+{"kind":"slide","id":"sl/2dukqb","slide":6,"title":"BACKEND","textShapes":11}
+{"kind":"shape","id":"sh/loj2t83i","slide":6,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":6,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":6,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":6,"text":"app.py: Main Orchestrator","textPreview":"app.py: Main Orchestrator","textChars":25,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/lwval87e","slide":6,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":6,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/sneloj2t","slide":6,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/l87ed8ba","slide":6,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":6,"text":"Creates the FastAPI application","textPreview":"Creates the FastAPI application","textChars":31,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/czed8v6p","slide":6,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":6,"text":"Loads configuration and environment variables","textPreview":"Loads configuration and environment variables","textChars":45,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/ytsvu9kn","slide":6,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":6,"text":"Connects model providers, RAG, validation, and frontend","textPreview":"Connects model providers, RAG, validation, and frontend","textChars":55,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/cbulwval","slide":6,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":6,"text":"Coordinates generation, repair, history, authentication, and STL export","textPreview":"Coordinates generation, repair, history, authentication, and STL export","textChars":71,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"textbox","id":"sh/u54zidon","slide":6,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":6,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/2dukqb","slide":6,"text":"app.py is the control center. Every main workflow passes through it, from loading models to returning final CAD code and engineering analysis."}
+{"kind":"slide","id":"sl/75vja7","slide":7,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/il0rqd4v","slide":7,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/tcj6tova","slide":7,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":7,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":7,"text":"API Endpoints","textPreview":"API Endpoints","textChars":13,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/idonyd0z","slide":7,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":7,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/bulwval8","slide":7,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/i9s36hcr","slide":7,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":7,"text":"GET /api/status, /api/models, /api/knowledge, /api/part-family","textPreview":"GET /api/status, /api/models, /api/knowledge, /api/part-family","textChars":62,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/p0bi9s36","slide":7,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":7,"text":"POST /api/chat for the main generation pipeline","textPreview":"POST /api/chat for the main generation pipeline","textChars":47,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/bulwval8","slide":7,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/032lszqt","slide":7,"text":"POST /api/accept to save successful designs","textPreview":"POST /api/accept to save successful designs","textChars":43,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/tovahoza","slide":7,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":7,"text":"POST /api/export-stl to render OpenSCAD into STL","textPreview":"POST /api/export-stl to render OpenSCAD into STL","textChars":48,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/bi9s36hc","slide":7,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":7,"text":"Auth endpoints: register, login, me, profile","textPreview":"Auth endpoints: register, login, me, profile","textChars":44,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":7,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":7,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/75vja7","slide":7,"text":"The API separates the frontend from backend computation. The most important endpoint is /api/chat because it runs the complete AI-CAD pipeline."}
+{"kind":"slide","id":"sl/rokp2z","slide":8,"title":"BACKEND","textShapes":13}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":8,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":8,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":8,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":8,"text":"Chat Request Model","textPreview":"Chat Request Model","textChars":18,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":8,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":8,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":8,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/mhk3q5o7","slide":8,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/0z61032l","slide":8,"text":"prompt: user design request","textPreview":"prompt: user design request","textChars":27,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":8,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":8,"text":"provider and model: selected AI backend","textPreview":"provider and model: selected AI backend","textChars":39,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":8,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":8,"text":"temperature: generation variability","textPreview":"temperature: generation variability","textChars":35,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":8,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":8,"text":"top_k and selected_doc_ids: RAG control","textPreview":"top_k and selected_doc_ids: RAG control","textChars":39,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/72x4nap4","slide":8,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":8,"text":"disable_rag and allow_fallback: evaluation and robustness options","textPreview":"disable_rag and allow_fallback: evaluation and robustness options","textChars":65,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/p4r65wju","slide":8,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":8,"text":"history and manufacturing: context for refinement and DFM","textPreview":"history and manufacturing: context for refinement and DFM","textChars":57,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/gvy90je9","slide":8,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":8,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/2p8nqxs7","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/rokp2z","slide":8,"text":"The structured request model prevents ambiguous API calls and supports experiments such as RAG ablation."}
+{"kind":"slide","id":"sl/tp0o9h","slide":9,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":9,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/loj2t83i","slide":9,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":9,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":9,"text":"Model Gateway","textPreview":"Model Gateway","textChars":13,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/e9cvixcz","slide":9,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/lwval87e","slide":9,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/32lszqtc","slide":9,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/ahoza1gv","slide":9,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":9,"text":"Supports Ollama, OpenAI, OpenRouter, and Hugging Face Router","textPreview":"Supports Ollama, OpenAI, OpenRouter, and Hugging Face Router","textChars":60,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/54zidony","slide":9,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/udg7adsj","slide":9,"text":"Exposes one generate() interface to the rest of the app","textPreview":"Exposes one generate() interface to the rest of the app","textChars":55,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/nyd0z610","slide":9,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/cvixczed","slide":9,"text":"Checks provider availability","textPreview":"Checks provider availability","textChars":28,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/5gbq1ory","slide":9,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":9,"text":"Applies provider-specific request formats internally","textPreview":"Applies provider-specific request formats internally","textChars":52,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/nap4r65w","slide":9,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":9,"text":"Enables fallback when a selected provider fails","textPreview":"Enables fallback when a selected provider fails","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":9,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":9,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/tp0o9h","slide":9,"text":"The ModelGateway hides provider differences so app.py can request generation without knowing each API in detail."}
+{"kind":"slide","id":"sl/gdox6l","slide":10,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/8jqh0fep","slide":10,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/fyxobm58","slide":10,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":10,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":10,"text":"Prompt Construction","textPreview":"Prompt Construction","textChars":19,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/8v6psfil","slide":10,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":10,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/1gvy90je","slide":10,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":10,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":10,"text":"Starts with a strict OpenSCAD system prompt","textPreview":"Starts with a strict OpenSCAD system prompt","textChars":43,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":10,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":10,"text":"Adds detected mechanical family rules","textPreview":"Adds detected mechanical family rules","textChars":37,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":10,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":10,"text":"Injects RAG references and accepted-history examples","textPreview":"Injects RAG references and accepted-history examples","textChars":52,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/z61032ls","slide":10,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":10,"text":"Adds constraints, physics, manufacturing, and tolerance context","textPreview":"Adds constraints, physics, manufacturing, and tolerance context","textChars":63,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":10,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":10,"text":"Preserves user-stated dimensions and design intent","textPreview":"Preserves user-stated dimensions and design intent","textChars":50,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":10,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/nih4byhg","slide":10,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/gdox6l","slide":10,"text":"The backend creates a domain-rich prompt that guides the model toward valid, functional, parametric OpenSCAD."}
+{"kind":"slide","id":"sl/aukmpf","slide":11,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/m58z25kb","slide":11,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/twra5gbq","slide":11,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":11,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":11,"text":"/api/chat Pipeline","textPreview":"/api/chat Pipeline","textChars":18,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/mhk3q5o7","slide":11,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":11,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/bat47y1k","slide":11,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":11,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":11,"text":"Validate prompt and select provider/model","textPreview":"Validate prompt and select provider/model","textChars":41,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/twra5gbq","slide":11,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":11,"text":"Detect part family and build engineering profile","textPreview":"Detect part family and build engineering profile","textChars":48,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/bq1oryts","slide":11,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":11,"text":"Analyze intent, constraints, physics, and manufacturing process","textPreview":"Analyze intent, constraints, physics, and manufacturing process","textChars":63,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/t83itgfm","slide":11,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":11,"text":"Retrieve relevant knowledge from RAG","textPreview":"Retrieve relevant knowledge from RAG","textChars":36,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":11,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":11,"text":"Generate, extract, validate, repair, and return results","textPreview":"Generate, extract, validate, repair, and return results","textChars":55,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":11,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":11,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/aukmpf","slide":11,"text":"This endpoint combines generative AI with deterministic engineering logic before and after generation."}
+{"kind":"slide","id":"sl/67151y","slide":12,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/nyd0z610","slide":12,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/cj6tovah","slide":12,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/54zidony","slide":12,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":12,"text":"Auto-Repair Strategy","textPreview":"Auto-Repair Strategy","textChars":20,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/nap4r65w","slide":12,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/cvixczed","slide":12,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":12,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/jm1cfa9w","slide":12,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":12,"text":"Collect failed validation checks","textPreview":"Collect failed validation checks","textChars":32,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":12,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":12,"text":"Build a repair prompt with failed code and feedback","textPreview":"Build a repair prompt with failed code and feedback","textChars":51,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":12,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":12,"text":"Regenerate corrected OpenSCAD","textPreview":"Regenerate corrected OpenSCAD","textChars":29,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/idonyd0z","slide":12,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":12,"text":"Revalidate and keep the better result","textPreview":"Revalidate and keep the better result","textChars":37,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/0je9cvix","slide":12,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/bulwval8","slide":12,"text":"Limit attempts to avoid endless repair loops","textPreview":"Limit attempts to avoid endless repair loops","textChars":44,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":12,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":12,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/67151y","slide":12,"text":"Validation feedback becomes an input to generation, creating a self-correction loop that improves usability."}
+{"kind":"slide","id":"sl/gqcrep","slide":13,"title":"BACKEND","textShapes":11}
+{"kind":"shape","id":"sh/qxs72x4n","slide":13,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/xobm58z2","slide":13,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/83itgfml","slide":13,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":13,"text":"Deterministic Fallbacks","textPreview":"Deterministic Fallbacks","textChars":23,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/m94fu18j","slide":13,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":13,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":13,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":13,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":13,"text":"Used when model output is empty or fails hard checks","textPreview":"Used when model output is empty or fails hard checks","textChars":52,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/5wjudg7a","slide":13,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":13,"text":"Provides rule-based OpenSCAD for selected critical families","textPreview":"Provides rule-based OpenSCAD for selected critical families","textChars":59,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":13,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":13,"text":"Examples include bearing housing and L-bracket logic","textPreview":"Examples include bearing housing and L-bracket logic","textChars":52,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/58z25kb6","slide":13,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":13,"text":"Combines AI flexibility with predictable safety paths","textPreview":"Combines AI flexibility with predictable safety paths","textChars":53,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"textbox","id":"sh/n29gr2p8","slide":13,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":13,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/gqcrep","slide":13,"text":"The system is not purely probabilistic; it includes deterministic fallbacks for common or high-value part families."}
+{"kind":"slide","id":"sl/0bbmyu","slide":14,"title":"BACKEND","textShapes":11}
+{"kind":"shape","id":"sh/9w3m94fu","slide":14,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/25kb6xkf","slide":14,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":14,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":14,"text":"Accepted History","textPreview":"Accepted History","textChars":16,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/9knih4by","slide":14,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":14,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/gvy90je9","slide":14,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/9gr2p8nq","slide":14,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/dg7adsji","slide":14,"text":"Stores successful user-accepted designs","textPreview":"Stores successful user-accepted designs","textChars":39,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/ovahoza1","slide":14,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/vahoza1g","slide":14,"text":"Builds summaries with family, modules, parameters, and features","textPreview":"Builds summaries with family, modules, parameters, and features","textChars":63,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/6tovahoz","slide":14,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/d8v6psfi","slide":14,"text":"Retrieves similar accepted examples for future prompts","textPreview":"Retrieves similar accepted examples for future prompts","textChars":54,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/onyd0z61","slide":14,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/z25kb6xk","slide":14,"text":"Improves consistency across repeated design tasks","textPreview":"Improves consistency across repeated design tasks","textChars":49,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"textbox","id":"sh/6hcrmhk3","slide":14,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/d4vmtwra","slide":14,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/0bbmyu","slide":14,"text":"Accepted history acts as local memory. Approved designs can become examples for future generation."}
+{"kind":"slide","id":"sl/q67ewj","slide":15,"title":"BACKEND","textShapes":12}
+{"kind":"shape","id":"sh/w3m94fu1","slide":15,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":15,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":15,"text":"BACKEND","textPreview":"BACKEND","textChars":7,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/lwval87e","slide":15,"text":"STL Export Endpoint","textPreview":"STL Export Endpoint","textChars":19,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":15,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":15,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/l87ed8ba","slide":15,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/sneloj2t","slide":15,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":15,"text":"Receives generated OpenSCAD code","textPreview":"Receives generated OpenSCAD code","textChars":32,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/fyxobm58","slide":15,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":15,"text":"Writes a temporary .scad file","textPreview":"Writes a temporary .scad file","textChars":29,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/x4nap4r6","slide":15,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":15,"text":"Calls the local OpenSCAD CLI","textPreview":"Calls the local OpenSCAD CLI","textChars":28,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":15,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":15,"text":"Produces an STL mesh","textPreview":"Produces an STL mesh","textChars":20,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/xczed8v6","slide":15,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":15,"text":"Returns the file to frontend for preview or download","textPreview":"Returns the file to frontend for preview or download","textChars":52,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":15,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":15,"text":"Backend","textPreview":"Backend","textChars":7,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/q67ewj","slide":15,"text":"This turns generated code into a practical manufacturing artifact."}
+{"kind":"slide","id":"sl/eb8nls","slide":16,"title":"RAG","textShapes":5}
+{"kind":"shape","id":"sh/2p8nqxs7","slide":16,"bbox":[0,0,1280,13]}
+{"kind":"textbox","id":"sh/9gr2p8nq","slide":16,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,116,380,32]}
+{"kind":"textbox","id":"sh/gvy90je9","slide":16,"text":"Retrieval-Augmented Generation","textPreview":"Retrieval-Augmented Generation","textChars":30,"textLines":1,"bbox":[72,204,850,90]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":16,"text":"Grounding AI output in mechanical references and structured part databases","textPreview":"Grounding AI output in mechanical references and structured part databases","textChars":74,"textLines":1,"bbox":[75,324,820,80]}
+{"kind":"shape","id":"sh/2hwfyxob","slide":16,"bbox":[910,170,230,230]}
+{"kind":"textbox","id":"sh/94fu18jq","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[950,220,150,80]}
+{"kind":"textbox","id":"sh/kjm1cfa9","slide":16,"text":"SECTION","textPreview":"SECTION","textChars":7,"textLines":1,"bbox":[950,315,150,24]}
+{"kind":"notes","id":"nt/eb8nls","slide":16,"text":"Explain this slide in relation to the system architecture."}
+{"kind":"slide","id":"sl/oqqhnk","slide":17,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/kzupwb2h","slide":17,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/re1w7mp0","slide":17,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":17,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/9w3m94fu","slide":17,"text":"Why RAG Is Needed","textPreview":"Why RAG Is Needed","textChars":17,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/kb6xkf6d","slide":17,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":17,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/94fu18jq","slide":17,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/kjm1cfa9","slide":17,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":17,"text":"LLMs can miss exact mechanical rules","textPreview":"LLMs can miss exact mechanical rules","textChars":36,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":17,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":17,"text":"LLMs may generate invalid OpenSCAD syntax","textPreview":"LLMs may generate invalid OpenSCAD syntax","textChars":41,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/xc3ylc7u","slide":17,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":17,"text":"Generic output often lacks functional features","textPreview":"Generic output often lacks functional features","textChars":46,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/fepkzupw","slide":17,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":17,"text":"Project-specific references improve reliability","textPreview":"Project-specific references improve reliability","textChars":47,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/xkf6dcbu","slide":17,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":17,"text":"RAG reduces hallucination by grounding prompts","textPreview":"RAG reduces hallucination by grounding prompts","textChars":46,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":17,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":17,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/oqqhnk","slide":17,"text":"Mechanical CAD requires domain-specific details. RAG gives the model local knowledge at generation time."}
+{"kind":"slide","id":"sl/8xjj6j","slide":18,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/6tovahoz","slide":18,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/dg7adsji","slide":18,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":18,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/z25kb6xk","slide":18,"text":"rag.py Role","textPreview":"rag.py Role","textChars":11,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/6hcrmhk3","slide":18,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/d8v6psfi","slide":18,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/vy90je9c","slide":18,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/6dcbulwv","slide":18,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":18,"text":"Loads local knowledge documents","textPreview":"Loads local knowledge documents","textChars":31,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/xkf6dcbu","slide":18,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":18,"text":"Detects mechanical part families","textPreview":"Detects mechanical part families","textChars":32,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/fepkzupw","slide":18,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":18,"text":"Builds embedding or TF-IDF indexes","textPreview":"Builds embedding or TF-IDF indexes","textChars":34,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/xc3ylc7u","slide":18,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":18,"text":"Ranks relevant documents for a prompt","textPreview":"Ranks relevant documents for a prompt","textChars":37,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":18,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":18,"text":"Returns context to app.py for prompt injection","textPreview":"Returns context to app.py for prompt injection","textChars":46,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":18,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":18,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/sji5snel","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/8xjj6j","slide":18,"text":"rag.py is the knowledge engine, separate from app.py so retrieval can evolve independently."}
+{"kind":"slide","id":"sl/uvdjh2","slide":19,"title":"RAG","textShapes":13}
+{"kind":"shape","id":"sh/neloj2t8","slide":19,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/czed8v6p","slide":19,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":19,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/u54zidon","slide":19,"text":"RAG Document Model","textPreview":"RAG Document Model","textChars":18,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/nqxs72x4","slide":19,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/cbulwval","slide":19,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/y90je9cv","slide":19,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":19,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":19,"text":"id and title identify each knowledge item","textPreview":"id and title identify each knowledge item","textChars":41,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/eloj2t83","slide":19,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":19,"text":"text contains searchable content","textPreview":"text contains searchable content","textChars":32,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/wra5gbq1","slide":19,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/7u54zido","slide":19,"text":"source and file_type describe provenance","textPreview":"source and file_type describe provenance","textChars":40,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/ed8bat47","slide":19,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":19,"text":"family links the document to a mechanical category","textPreview":"family links the document to a mechanical category","textChars":50,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/wfyxobm5","slide":19,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":19,"text":"record stores structured JSON part data","textPreview":"record stores structured JSON part data","textChars":39,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":19,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":19,"text":"thresholds and negative keywords improve ranking","textPreview":"thresholds and negative keywords improve ranking","textChars":48,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":19,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/83itgfml","slide":19,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/uvdjh2","slide":19,"text":"A consistent document model allows text files, JSON databases, and code references to become searchable records."}
+{"kind":"slide","id":"sl/3oxx9z","slide":20,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/1032lszq","slide":20,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/u9knih4b","slide":20,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/judg7ads","slide":20,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":20,"text":"Family Detection","textPreview":"Family Detection","textChars":16,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/1orytsvu","slide":20,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/u18jqh0f","slide":20,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/jm1cfa9w","slide":20,"text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/cvixczed","slide":20,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/5gbq1ory","slide":20,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":20,"text":"Uses keyword tables for mechanical families","textPreview":"Uses keyword tables for mechanical families","textChars":43,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":20,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":20,"text":"Maps prompts like pillow block to bearing housing","textPreview":"Maps prompts like pillow block to bearing housing","textChars":49,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":20,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":20,"text":"Maps GT2 pulley to pulley belt drive","textPreview":"Maps GT2 pulley to pulley belt drive","textChars":36,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/8bat47y1","slide":20,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":20,"text":"Maps NEMA bracket to motor mount family","textPreview":"Maps NEMA bracket to motor mount family","textChars":39,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/q5o7qpg3","slide":20,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":20,"text":"Controls both retrieval and validation behavior","textPreview":"Controls both retrieval and validation behavior","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":20,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":20,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":20,"text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/3oxx9z","slide":20,"text":"Family detection routes the prompt to better references and more relevant validation rules."}
+{"kind":"slide","id":"sl/e9h0py","slide":21,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/x4nap4r6","slide":21,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":21,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":21,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":21,"text":"Supported Mechanical Families","textPreview":"Supported Mechanical Families","textChars":29,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/xczed8v6","slide":21,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":21,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":21,"text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/8z25kb6x","slide":21,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/1gvy90je","slide":21,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":21,"text":"Bearing housings, gears, shafts, pulleys, sprockets","textPreview":"Bearing housings, gears, shafts, pulleys, sprockets","textChars":51,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/wval87ed","slide":21,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":21,"text":"Brackets, flanges, couplers, trusses, enclosures","textPreview":"Brackets, flanges, couplers, trusses, enclosures","textChars":48,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/epkzupwb","slide":21,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":21,"text":"Lead screw actuators, linear rail carriages, servo mounts","textPreview":"Lead screw actuators, linear rail carriages, servo mounts","textChars":57,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/w7mp0bi9","slide":21,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":21,"text":"Fasteners, nut traps, clamps, fixtures, hinges, linkages","textPreview":"Fasteners, nut traps, clamps, fixtures, hinges, linkages","textChars":56,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/e1w7mp0b","slide":21,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":21,"text":"Each family has specialized retrieval and validation expectations","textPreview":"Each family has specialized retrieval and validation expectations","textChars":65,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":21,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/svu9knih","slide":21,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":21,"text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/e9h0py","slide":21,"text":"The system is a multi-family mechanical CAD assistant rather than a single-part generator."}
+{"kind":"slide","id":"sl/gs3sd5","slide":22,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/bm58z25k","slide":22,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/47y1kre1","slide":22,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":22,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":22,"text":"Hybrid Retrieval Backends","textPreview":"Hybrid Retrieval Backends","textChars":25,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/bat47y1k","slide":22,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":22,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/tgfmlkjm","slide":22,"text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/mhk3q5o7","slide":22,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":22,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":22,"text":"Sentence-transformer embeddings for semantic similarity","textPreview":"Sentence-transformer embeddings for semantic similarity","textChars":55,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":22,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":22,"text":"Ollama embeddings for local embedding support","textPreview":"Ollama embeddings for local embedding support","textChars":45,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/4r65wjud","slide":22,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":22,"text":"TF-IDF fallback for keyword-based retrieval","textPreview":"TF-IDF fallback for keyword-based retrieval","textChars":43,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/mtwra5gb","slide":22,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/xkf6dcbu","slide":22,"text":"Cosine similarity for ranking","textPreview":"Cosine similarity for ranking","textChars":29,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/4zidonyd","slide":22,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":22,"text":"Runtime fallback keeps retrieval available","textPreview":"Runtime fallback keeps retrieval available","textChars":42,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":22,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/u9knih4b","slide":22,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/judg7ads","slide":22,"text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/gs3sd5","slide":22,"text":"Dense embeddings are useful, but TF-IDF ensures the app can still retrieve knowledge if embeddings fail."}
+{"kind":"slide","id":"sl/6fci8p","slide":23,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/il0rqd4v","slide":23,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/tcj6tova","slide":23,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":23,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":23,"text":"Family-Aware Scoring","textPreview":"Family-Aware Scoring","textChars":20,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/idonyd0z","slide":23,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":23,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":23,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/bulwval8","slide":23,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/i9s36hcr","slide":23,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":23,"text":"Primary family documents receive a relevance boost","textPreview":"Primary family documents receive a relevance boost","textChars":50,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/p0bi9s36","slide":23,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":23,"text":"Unrelated families receive a penalty","textPreview":"Unrelated families receive a penalty","textChars":36,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/bulwval8","slide":23,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/032lszqt","slide":23,"text":"Negative keywords prevent wrong-family matches","textPreview":"Negative keywords prevent wrong-family matches","textChars":46,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/tovahoza","slide":23,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":23,"text":"Support documents are gated by family relevance","textPreview":"Support documents are gated by family relevance","textChars":47,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/bi9s36hc","slide":23,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":23,"text":"Scores are clamped between 0 and 1","textPreview":"Scores are clamped between 0 and 1","textChars":34,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":23,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":23,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":23,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/6fci8p","slide":23,"text":"Family-aware scoring prevents misleading documents from entering the prompt."}
+{"kind":"slide","id":"sl/4s4lc9","slide":24,"title":"RAG","textShapes":12}
+{"kind":"shape","id":"sh/d8bat47y","slide":24,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/2lszqtcj","slide":24,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":24,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":24,"text":"RAG Output to app.py","textPreview":"RAG Output to app.py","textChars":20,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/d0z61032","slide":24,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":24,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":24,"text":"24","textPreview":"24","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":24,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/donyd0z6","slide":24,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":24,"text":"Document title and source","textPreview":"Document title and source","textChars":25,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/0fepkzup","slide":24,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/bulwval8","slide":24,"text":"Similarity score","textPreview":"Similarity score","textChars":16,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/i9s36hcr","slide":24,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/tovahoza","slide":24,"text":"Short excerpt for frontend display","textPreview":"Short excerpt for frontend display","textChars":34,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/032lszqt","slide":24,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":24,"text":"Full text for prompt context","textPreview":"Full text for prompt context","textChars":28,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/ixczed8v","slide":24,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":24,"text":"Retrieved references returned for explainability","textPreview":"Retrieved references returned for explainability","textChars":48,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":24,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":24,"text":"RAG","textPreview":"RAG","textChars":3,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":24,"text":"24","textPreview":"24","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/4s4lc9","slide":24,"text":"Retrieved results are visible to the frontend, making generation more explainable."}
+{"kind":"slide","id":"sl/nudd2u","slide":25,"title":"VALIDATION","textShapes":5}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":25,"bbox":[0,0,1280,13]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":25,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,116,380,32]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":25,"text":"Validation and Logging","textPreview":"Validation and Logging","textChars":22,"textLines":1,"bbox":[72,204,850,90]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":25,"text":"Turning generated code into checked, scored, traceable CAD output","textPreview":"Turning generated code into checked, scored, traceable CAD output","textChars":65,"textLines":1,"bbox":[75,324,820,80]}
+{"kind":"shape","id":"sh/mtwra5gb","slide":25,"bbox":[910,170,230,230]}
+{"kind":"textbox","id":"sh/xkf6dcbu","slide":25,"text":"25","textPreview":"25","textChars":2,"textLines":1,"bbox":[950,220,150,80]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":25,"text":"SECTION","textPreview":"SECTION","textChars":7,"textLines":1,"bbox":[950,315,150,24]}
+{"kind":"notes","id":"nt/nudd2u","slide":25,"text":"Explain this slide in relation to the system architecture."}
+{"kind":"slide","id":"sl/wht3nx","slide":26,"title":"VALIDATION","textShapes":12}
+{"kind":"shape","id":"sh/6xkf6dcb","slide":26,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/hk3q5o7q","slide":26,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":26,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":26,"text":"Why Validation Is Required","textPreview":"Why Validation Is Required","textChars":26,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/65wjudg7","slide":26,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":26,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/obm58z25","slide":26,"text":"26","textPreview":"26","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":26,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":26,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":26,"text":"AI output can contain markdown or language labels","textPreview":"AI output can contain markdown or language labels","textChars":49,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/1w7mp0bi","slide":26,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":26,"text":"Code may have broken braces or parentheses","textPreview":"Code may have broken braces or parentheses","textChars":42,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/jqh0fepk","slide":26,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":26,"text":"Geometry may miss modules, primitives, or parameters","textPreview":"Geometry may miss modules, primitives, or parameters","textChars":52,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":26,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":26,"text":"Mechanical parts may be decorative but nonfunctional","textPreview":"Mechanical parts may be decorative but nonfunctional","textChars":52,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/j2t83itg","slide":26,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":26,"text":"Validation protects the user from unusable CAD","textPreview":"Validation protects the user from unusable CAD","textChars":46,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/1cfa9w3m","slide":26,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":26,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":26,"text":"26","textPreview":"26","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/wht3nx","slide":26,"text":"Generated OpenSCAD can look correct but still fail. Validation is the quality gate."}
+{"kind":"slide","id":"sl/hdgdm2","slide":27,"title":"VALIDATION","textShapes":12}
+{"kind":"shape","id":"sh/e9cvixcz","slide":27,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/lwval87e","slide":27,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":27,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":27,"text":"validation_and_logging.py Role","textPreview":"validation_and_logging.py Role","textChars":30,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":27,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":27,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":27,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":27,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/at47y1kr","slide":27,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/knih4byh","slide":27,"text":"Runs universal OpenSCAD checks","textPreview":"Runs universal OpenSCAD checks","textChars":30,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/d8bat47y","slide":27,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":27,"text":"Runs derived-parameter formula checks","textPreview":"Runs derived-parameter formula checks","textChars":37,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/v6psfil0","slide":27,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":27,"text":"Runs family-specific mechanical checks","textPreview":"Runs family-specific mechanical checks","textChars":38,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/d0z61032","slide":27,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":27,"text":"Scores validation results","textPreview":"Scores validation results","textChars":25,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/vu9knih4","slide":27,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":27,"text":"Logs structured generation events","textPreview":"Logs structured generation events","textChars":33,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":27,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":27,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":27,"text":"27","textPreview":"27","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/hdgdm2","slide":27,"text":"This module checks syntax-like structure, parametric quality, and mechanical intent."}
+{"kind":"slide","id":"sl/bcifjt","slide":28,"title":"VALIDATION","textShapes":13}
+{"kind":"shape","id":"sh/8nqxs72x","slide":28,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/j2t83itg","slide":28,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":28,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":28,"text":"Universal Validation Checks","textPreview":"Universal Validation Checks","textChars":27,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/8bat47y1","slide":28,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":28,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":28,"text":"28","textPreview":"28","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/1kre1w7m","slide":28,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/c3ylc7u5","slide":28,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":28,"text":"No markdown fences or stray language labels","textPreview":"No markdown fences or stray language labels","textChars":43,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/zidonyd0","slide":28,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":28,"text":"Balanced braces and parentheses","textPreview":"Balanced braces and parentheses","textChars":31,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":28,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":28,"text":"Parametric variables are present","textPreview":"Parametric variables are present","textChars":32,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/za1gvy90","slide":28,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/svu9knih","slide":28,"text":"3D primitives or trusted library calls exist","textPreview":"3D primitives or trusted library calls exist","textChars":44,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/hgn29gr2","slide":28,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":28,"text":"Named module is present and called at the end","textPreview":"Named module is present and called at the end","textChars":45,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":28,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":28,"text":"Cut features use difference() where appropriate","textPreview":"Cut features use difference() where appropriate","textChars":47,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":28,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/d0z61032","slide":28,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":28,"text":"28","textPreview":"28","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/bcifjt","slide":28,"text":"Universal checks apply to every generated file and catch basic failures."}
+{"kind":"slide","id":"sl/zqbq6z","slide":29,"title":"VALIDATION","textShapes":12}
+{"kind":"shape","id":"sh/qh0fepkz","slide":29,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":29,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":29,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":29,"text":"Derived Parameter Checks","textPreview":"Derived Parameter Checks","textChars":24,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/q5o7qpg3","slide":29,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":29,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":29,"text":"29","textPreview":"29","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/ji5snelo","slide":29,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/uxc3ylc7","slide":29,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":29,"text":"Gear pitch diameter from module and tooth count","textPreview":"Gear pitch diameter from module and tooth count","textChars":47,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/58z25kb6","slide":29,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":29,"text":"Pulley pitch diameter from teeth, pitch, and PI","textPreview":"Pulley pitch diameter from teeth, pitch, and PI","textChars":47,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/n29gr2p8","slide":29,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":29,"text":"Sprocket pitch diameter from chain pitch formula","textPreview":"Sprocket pitch diameter from chain pitch formula","textChars":48,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/5wjudg7a","slide":29,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":29,"text":"Bearing boss diameter from bearing OD and wall thickness","textPreview":"Bearing boss diameter from bearing OD and wall thickness","textChars":56,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":29,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/cbulwval","slide":29,"text":"Encourages formulas instead of magic numbers","textPreview":"Encourages formulas instead of magic numbers","textChars":44,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":29,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":29,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":29,"text":"29","textPreview":"29","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/zqbq6z","slide":29,"text":"Derived checks enforce parametric relationships, which are central to OpenSCAD design."}
+{"kind":"slide","id":"sl/b5nnqh","slide":30,"title":"VALIDATION","textShapes":12}
+{"kind":"shape","id":"sh/29gr2p8n","slide":30,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/d0z61032","slide":30,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":30,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":30,"text":"Family-Specific Checks","textPreview":"Family-Specific Checks","textChars":22,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/2lszqtcj","slide":30,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/d8bat47y","slide":30,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/knih4byh","slide":30,"text":"30","textPreview":"30","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/val87ed8","slide":30,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/6psfil0r","slide":30,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":30,"text":"Bearing housing: bearing seat, shaft bore, base, mounting holes","textPreview":"Bearing housing: bearing seat, shaft bore, base, mounting holes","textChars":63,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/xc3ylc7u","slide":30,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":30,"text":"Gear: pitch logic, bore, teeth loop, hub","textPreview":"Gear: pitch logic, bore, teeth loop, hub","textChars":40,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":30,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":30,"text":"Shaft coupler: two coaxial bores and clamp features","textPreview":"Shaft coupler: two coaxial bores and clamp features","textChars":51,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/xkf6dcbu","slide":30,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":30,"text":"Brackets: perpendicular plates and correct hole direction","textPreview":"Brackets: perpendicular plates and correct hole direction","textChars":57,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/fepkzupw","slide":30,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/83itgfml","slide":30,"text":"Servo, truss, hinge, sprocket, fixture checks are also covered","textPreview":"Servo, truss, hinge, sprocket, fixture checks are also covered","textChars":62,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":30,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/lszqtcj6","slide":30,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":30,"text":"30","textPreview":"30","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/b5nnqh","slide":30,"text":"Mechanical correctness depends on the part type, so validation must be domain-specific."}
+{"kind":"slide","id":"sl/bhqyhv","slide":31,"title":"VALIDATION","textShapes":13}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":31,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/rytsvu9k","slide":31,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/yd0z6103","slide":31,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/9s36hcrm","slide":31,"text":"Hard Failure Labels","textPreview":"Hard Failure Labels","textChars":19,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/g7adsji5","slide":31,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/rmhk3q5o","slide":31,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/y1kre1w7","slide":31,"text":"31","textPreview":"31","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":31,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/g3ex0nux","slide":31,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/m94fu18j","slide":31,"text":"Balanced braces and parentheses","textPreview":"Balanced braces and parentheses","textChars":31,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/fu18jqh0","slide":31,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":31,"text":"No unfinished assignment at end","textPreview":"No unfinished assignment at end","textChars":31,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/x0nuxc3y","slide":31,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":31,"text":"3D primitives used","textPreview":"3D primitives used","textChars":18,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/fil0rqd4","slide":31,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/83itgfml","slide":31,"text":"Named module present","textPreview":"Named module present","textChars":20,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/xobm58z2","slide":31,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":31,"text":"Parametric variables present","textPreview":"Parametric variables present","textChars":28,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/fepkzupw","slide":31,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/72x4nap4","slide":31,"text":"Hard failures can block the final response","textPreview":"Hard failures can block the final response","textChars":42,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":31,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/p8nqxs72","slide":31,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":31,"text":"31","textPreview":"31","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/bhqyhv","slide":31,"text":"Hard failures indicate the result is likely unusable and should be repaired or rejected."}
+{"kind":"slide","id":"sl/qifnak","slide":32,"title":"VALIDATION","textShapes":12}
+{"kind":"shape","id":"sh/032lszqt","slide":32,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/bi9s36hc","slide":32,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":32,"text":"VALIDATION","textPreview":"VALIDATION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":32,"text":"Generation Event Logging","textPreview":"Generation Event Logging","textChars":24,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/0fepkzup","slide":32,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/bulwval8","slide":32,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":32,"text":"32","textPreview":"32","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/t47y1kre","slide":32,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/0je9cvix","slide":32,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":32,"text":"Writes JSONL events to logs","textPreview":"Writes JSONL events to logs","textChars":27,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/3m94fu18","slide":32,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":32,"text":"Stores timestamp, prompt, family, provider, model","textPreview":"Stores timestamp, prompt, family, provider, model","textChars":49,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":32,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":32,"text":"Tracks passed and failed checks","textPreview":"Tracks passed and failed checks","textChars":31,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":32,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/sji5snel","slide":32,"text":"Records hard failures and repair usage","textPreview":"Records hard failures and repair usage","textChars":38,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/h4byhgn2","slide":32,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":32,"text":"Supports later evaluation and debugging","textPreview":"Supports later evaluation and debugging","textChars":39,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":32,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/ra5gbq1o","slide":32,"text":"Validation","textPreview":"Validation","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/2p8nqxs7","slide":32,"text":"32","textPreview":"32","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/qifnak","slide":32,"text":"Logging creates measurable evidence for success rate, common failures, and repair effectiveness."}
+{"kind":"slide","id":"sl/sekz73","slide":33,"title":"FRONTEND","textShapes":5}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":33,"bbox":[0,0,1280,13]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":33,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,116,380,32]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":33,"text":"Frontend Workspace","textPreview":"Frontend Workspace","textChars":18,"textLines":1,"bbox":[72,204,850,90]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":33,"text":"A static CAD workspace for chat, code, preview, validation, and export","textPreview":"A static CAD workspace for chat, code, preview, validation, and export","textChars":70,"textLines":1,"bbox":[75,324,820,80]}
+{"kind":"shape","id":"sh/n29gr2p8","slide":33,"bbox":[910,170,230,230]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":33,"text":"33","textPreview":"33","textChars":2,"textLines":1,"bbox":[950,220,150,80]}
+{"kind":"textbox","id":"sh/58z25kb6","slide":33,"text":"SECTION","textPreview":"SECTION","textChars":7,"textLines":1,"bbox":[950,315,150,24]}
+{"kind":"notes","id":"nt/sekz73","slide":33,"text":"Explain this slide in relation to the system architecture."}
+{"kind":"slide","id":"sl/wmlteu","slide":34,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/4r65wjud","slide":34,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":34,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":34,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/xkf6dcbu","slide":34,"text":"Frontend File Structure","textPreview":"Frontend File Structure","textChars":23,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/4zidonyd","slide":34,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":34,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":34,"text":"34","textPreview":"34","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/xobm58z2","slide":34,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/83itgfml","slide":34,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":34,"text":"frontend/index.html defines the application layout","textPreview":"frontend/index.html defines the application layout","textChars":50,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":34,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":34,"text":"frontend/main.js controls behavior and API communication","textPreview":"frontend/main.js controls behavior and API communication","textChars":56,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/5wjudg7a","slide":34,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/yhgn29gr","slide":34,"text":"frontend/styles.css defines the visual system","textPreview":"frontend/styles.css defines the visual system","textChars":45,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/n29gr2p8","slide":34,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":34,"text":"The frontend is served as static files by FastAPI","textPreview":"The frontend is served as static files by FastAPI","textChars":49,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/58z25kb6","slide":34,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/ytsvu9kn","slide":34,"text":"No heavy frontend framework is required","textPreview":"No heavy frontend framework is required","textChars":39,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":34,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/fepkzupw","slide":34,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/mtwra5gb","slide":34,"text":"34","textPreview":"34","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/wmlteu","slide":34,"text":"The frontend is lightweight: the AI-CAD complexity lives in the backend, while the UI stays easy to serve and understand."}
+{"kind":"slide","id":"sl/nydbb6","slide":35,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/b2hwfyxo","slide":35,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/4nap4r65","slide":35,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":35,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":35,"text":"index.html: Page Layout","textPreview":"index.html: Page Layout","textChars":23,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/bq1oryts","slide":35,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/4byhgn29","slide":35,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":35,"text":"35","textPreview":"35","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/m1cfa9w3","slide":35,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/bm58z25k","slide":35,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/val87ed8","slide":35,"text":"Topbar with status, RAG mode, and navigation","textPreview":"Topbar with status, RAG mode, and navigation","textChars":44,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/6psfil0r","slide":35,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":35,"text":"Settings sidebar for models and RAG controls","textPreview":"Settings sidebar for models and RAG controls","textChars":44,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/kre1w7mp","slide":35,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/vixczed8","slide":35,"text":"Chat workspace for design prompts and refinement","textPreview":"Chat workspace for design prompts and refinement","textChars":48,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/2x4nap4r","slide":35,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":35,"text":"STL preview panel and OpenSCAD code panel","textPreview":"STL preview panel and OpenSCAD code panel","textChars":41,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":35,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":35,"text":"Bottom analysis cards for engineering feedback","textPreview":"Bottom analysis cards for engineering feedback","textChars":46,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/29gr2p8n","slide":35,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":35,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":35,"text":"35","textPreview":"35","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/nydbb6","slide":35,"text":"index.html provides the containers for every visible part of the workspace."}
+{"kind":"slide","id":"sl/pogd0r","slide":36,"title":"FRONTEND","textShapes":13}
+{"kind":"shape","id":"sh/ahoza1gv","slide":36,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/l87ed8ba","slide":36,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/sneloj2t","slide":36,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/3ex0nuxc","slide":36,"text":"Settings Sidebar","textPreview":"Settings Sidebar","textChars":16,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/at47y1kr","slide":36,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":36,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/szqtcj6t","slide":36,"text":"36","textPreview":"36","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":36,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":36,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":36,"text":"Provider and model selection","textPreview":"Provider and model selection","textChars":28,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/l0rqd4vm","slide":36,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":36,"text":"Temperature control","textPreview":"Temperature control","textChars":19,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/7u54zido","slide":36,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":36,"text":"RAG disable toggle for ablation mode","textPreview":"RAG disable toggle for ablation mode","textChars":36,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/lc7u54zi","slide":36,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/eloj2t83","slide":36,"text":"Knowledge record selection","textPreview":"Knowledge record selection","textChars":26,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/36hcrmhk","slide":36,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/wval87ed","slide":36,"text":"Fallback provider option","textPreview":"Fallback provider option","textChars":24,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/pg3ex0nu","slide":36,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/9knih4by","slide":36,"text":"Quick prompts and recent designs","textPreview":"Quick prompts and recent designs","textChars":32,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":36,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/re1w7mp0","slide":36,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":36,"text":"36","textPreview":"36","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/pogd0r","slide":36,"text":"The settings sidebar gives users experimental control over generation and retrieval."}
+{"kind":"slide","id":"sl/2grpvj","slide":37,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/loj2t83i","slide":37,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":37,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":37,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":37,"text":"Chat and Prompt Coach","textPreview":"Chat and Prompt Coach","textChars":21,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/lwval87e","slide":37,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":37,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":37,"text":"37","textPreview":"37","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/sneloj2t","slide":37,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/l87ed8ba","slide":37,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":37,"text":"User enters natural-language mechanical requests","textPreview":"User enters natural-language mechanical requests","textChars":48,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/czed8v6p","slide":37,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":37,"text":"Conversation history supports iterative refinement","textPreview":"Conversation history supports iterative refinement","textChars":50,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/ytsvu9kn","slide":37,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":37,"text":"Prompt readiness score encourages better design input","textPreview":"Prompt readiness score encourages better design input","textChars":53,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/cbulwval","slide":37,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":37,"text":"Tool chips add material, BOM, standards, or editable-parameter requests","textPreview":"Tool chips add material, BOM, standards, or editable-parameter requests","textChars":71,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/u54zidon","slide":37,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":37,"text":"Recent prompts are stored locally","textPreview":"Recent prompts are stored locally","textChars":33,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":37,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":37,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/54zidony","slide":37,"text":"37","textPreview":"37","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/2grpvj","slide":37,"text":"The chat interface supports iterative mechanical design, and the prompt coach improves input quality."}
+{"kind":"slide","id":"sl/fo6jbs","slide":38,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/ytsvu9kn","slide":38,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/5kb6xkf6","slide":38,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":38,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":38,"text":"main.js: Interaction Controller","textPreview":"main.js: Interaction Controller","textChars":31,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/u54zidon","slide":38,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":38,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/cbulwval","slide":38,"text":"38","textPreview":"38","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":38,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/y90je9cv","slide":38,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":38,"text":"Loads backend status, model list, and knowledge records","textPreview":"Loads backend status, model list, and knowledge records","textChars":55,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/hk3q5o7q","slide":38,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":38,"text":"Builds the /api/chat request payload","textPreview":"Builds the /api/chat request payload","textChars":36,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/zed8v6ps","slide":38,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/obm58z25","slide":38,"text":"Updates chat, code, references, materials, and validation panels","textPreview":"Updates chat, code, references, materials, and validation panels","textChars":64,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/hwfyxobm","slide":38,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":38,"text":"Manages accept, copy, download, export, and reset actions","textPreview":"Manages accept, copy, download, export, and reset actions","textChars":57,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":38,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":38,"text":"Keeps frontend state synchronized across panels","textPreview":"Keeps frontend state synchronized across panels","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":38,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/54zidony","slide":38,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":38,"text":"38","textPreview":"38","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/fo6jbs","slide":38,"text":"main.js connects user actions to backend endpoints and updates every panel with the backend response."}
+{"kind":"slide","id":"sl/sfvjsd","slide":39,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/cj6tovah","slide":39,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/nyd0z610","slide":39,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/udg7adsj","slide":39,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":39,"text":"STL Preview System","textPreview":"STL Preview System","textChars":18,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/cvixczed","slide":39,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/nap4r65w","slide":39,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":39,"text":"39","textPreview":"39","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/1orytsvu","slide":39,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/c7u54zid","slide":39,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/6xkf6dcb","slide":39,"text":"Uses Three.js for 3D rendering","textPreview":"Uses Three.js for 3D rendering","textChars":30,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/zed8v6ps","slide":39,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":39,"text":"Uses STLLoader to parse backend-generated STL","textPreview":"Uses STLLoader to parse backend-generated STL","textChars":45,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/hk3q5o7q","slide":39,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":39,"text":"Uses OrbitControls for interactive inspection","textPreview":"Uses OrbitControls for interactive inspection","textChars":45,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":39,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/obm58z25","slide":39,"text":"Calls /api/export-stl to convert OpenSCAD into mesh","textPreview":"Calls /api/export-stl to convert OpenSCAD into mesh","textChars":51,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/hwfyxobm","slide":39,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":39,"text":"Displays live preview status and error messages","textPreview":"Displays live preview status and error messages","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":39,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":39,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":39,"text":"39","textPreview":"39","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/sfvjsd","slide":39,"text":"The preview gives visual verification of generated geometry."}
+{"kind":"slide","id":"sl/kp2lpo","slide":40,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/qtcj6tov","slide":40,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/1gvy90je","slide":40,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":40,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/fmlkjm1c","slide":40,"text":"Code Output and Export","textPreview":"Code Output and Export","textChars":22,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/q1orytsv","slide":40,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":40,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/87ed8bat","slide":40,"text":"40","textPreview":"40","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/fyxobm58","slide":40,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":40,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/sfil0rqd","slide":40,"text":"Displays generated OpenSCAD in a dedicated code panel","textPreview":"Displays generated OpenSCAD in a dedicated code panel","textChars":53,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":40,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":40,"text":"Shows filename and line count","textPreview":"Shows filename and line count","textChars":29,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":40,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":40,"text":"Allows copy and .scad download","textPreview":"Allows copy and .scad download","textChars":30,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":40,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":40,"text":"Accepts successful designs into history","textPreview":"Accepts successful designs into history","textChars":39,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/z61032ls","slide":40,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":40,"text":"Exports STL for manufacturing workflows","textPreview":"Exports STL for manufacturing workflows","textChars":39,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":40,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":40,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":40,"text":"40","textPreview":"40","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/kp2lpo","slide":40,"text":"The code panel turns generated output into a reusable engineering artifact."}
+{"kind":"slide","id":"sl/pk9wtr","slide":41,"title":"FRONTEND","textShapes":13}
+{"kind":"shape","id":"sh/7mp0bi9s","slide":41,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/w7mp0bi9","slide":41,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":41,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":41,"text":"Engineering Feedback Panels","textPreview":"Engineering Feedback Panels","textChars":27,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/7adsji5s","slide":41,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/wval87ed","slide":41,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":41,"text":"41","textPreview":"41","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/eloj2t83","slide":41,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/36hcrmhk","slide":41,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":41,"text":"Mechanical intent analysis","textPreview":"Mechanical intent analysis","textChars":26,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/qxs72x4n","slide":41,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":41,"text":"Constraint check results","textPreview":"Constraint check results","textChars":24,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/83itgfml","slide":41,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":41,"text":"Physics and calculations","textPreview":"Physics and calculations","textChars":24,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/m94fu18j","slide":41,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":41,"text":"Manufacturing and tolerance guidance","textPreview":"Manufacturing and tolerance guidance","textChars":36,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/4fu18jqh","slide":41,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":41,"text":"Mechanical quality score","textPreview":"Mechanical quality score","textChars":24,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":41,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/upwb2hwf","slide":41,"text":"Validation, RAG references, materials, and generation log","textPreview":"Validation, RAG references, materials, and generation log","textChars":57,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/nap4r65w","slide":41,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/cvixczed","slide":41,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":41,"text":"41","textPreview":"41","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/pk9wtr","slide":41,"text":"These panels make the system explainable by showing why output is accepted or what risks remain."}
+{"kind":"slide","id":"sl/7ostar","slide":42,"title":"FRONTEND","textShapes":12}
+{"kind":"shape","id":"sh/8bat47y1","slide":42,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/jqh0fepk","slide":42,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":42,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":42,"text":"styles.css: Visual System","textPreview":"styles.css: Visual System","textChars":25,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":42,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":42,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":42,"text":"42","textPreview":"42","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":42,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/crmhk3q5","slide":42,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/2t83itgf","slide":42,"text":"Defines colors, typography, spacing, and layout","textPreview":"Defines colors, typography, spacing, and layout","textChars":47,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/re1w7mp0","slide":42,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":42,"text":"Creates sticky topbar, hero area, sidebar, cards, and panels","textPreview":"Creates sticky topbar, hero area, sidebar, cards, and panels","textChars":60,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/9knih4by","slide":42,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":42,"text":"Styles status indicators and validation results","textPreview":"Styles status indicators and validation results","textChars":47,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/rqd4vmtw","slide":42,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/kb6xkf6d","slide":42,"text":"Supports responsive behavior","textPreview":"Supports responsive behavior","textChars":28,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/9w3m94fu","slide":42,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/2hwfyxob","slide":42,"text":"Keeps the CAD workspace readable despite dense information","textPreview":"Keeps the CAD workspace readable despite dense information","textChars":58,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/r2p8nqxs","slide":42,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":42,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":42,"text":"42","textPreview":"42","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/7ostar","slide":42,"text":"The CSS provides visual hierarchy for a technically dense application."}
+{"kind":"slide","id":"sl/r7h2o5","slide":43,"title":"DOCS","textShapes":5}
+{"kind":"shape","id":"sh/x4nap4r6","slide":43,"bbox":[0,0,1280,13]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":43,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,116,380,32]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":43,"text":"Docs and Knowledge Base","textPreview":"Docs and Knowledge Base","textChars":23,"textLines":1,"bbox":[72,204,850,90]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":43,"text":"Structured mechanical memory for RAG and validation","textPreview":"Structured mechanical memory for RAG and validation","textChars":51,"textLines":1,"bbox":[75,324,820,80]}
+{"kind":"shape","id":"sh/xczed8v6","slide":43,"bbox":[910,170,230,230]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":43,"text":"43","textPreview":"43","textChars":2,"textLines":1,"bbox":[950,220,150,80]}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":43,"text":"SECTION","textPreview":"SECTION","textChars":7,"textLines":1,"bbox":[950,315,150,24]}
+{"kind":"notes","id":"nt/r7h2o5","slide":43,"text":"Explain this slide in relation to the system architecture."}
+{"kind":"slide","id":"sl/0gaz37","slide":44,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/mtwra5gb","slide":44,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/xkf6dcbu","slide":44,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/4zidonyd","slide":44,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":44,"text":"Docs Folder Structure","textPreview":"Docs Folder Structure","textChars":21,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/mlkjm1cf","slide":44,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":44,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":44,"text":"44","textPreview":"44","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/fu18jqh0","slide":44,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/m94fu18j","slide":44,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/sji5snel","slide":44,"text":"Active knowledge base is stored in backend/docs","textPreview":"Active knowledge base is stored in backend/docs","textChars":47,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/h4byhgn2","slide":44,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":44,"text":"Current content includes .txt, .json, and .scad files","textPreview":"Current content includes .txt, .json, and .scad files","textChars":53,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":44,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":44,"text":".txt files are rulebooks and examples","textPreview":".txt files are rulebooks and examples","textChars":37,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":44,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":44,"text":".json files are structured mechanical part databases","textPreview":".json files are structured mechanical part databases","textChars":52,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/3m94fu18","slide":44,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":44,"text":".scad files are reusable OpenSCAD libraries","textPreview":".scad files are reusable OpenSCAD libraries","textChars":43,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/hoza1gvy","slide":44,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":44,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/szqtcj6t","slide":44,"text":"44","textPreview":"44","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/0gaz37","slide":44,"text":"backend/docs acts as the engineering memory loaded by rag.py."}
+{"kind":"slide","id":"sl/kbuhcr","slide":45,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/hgn29gr2","slide":45,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/ap4r65wj","slide":45,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":45,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":45,"text":"JSON Knowledge Files","textPreview":"JSON Knowledge Files","textChars":20,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":45,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":45,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":45,"text":"45","textPreview":"45","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/s72x4nap","slide":45,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":45,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/h0fepkzu","slide":45,"text":"Contain metadata, family label, units, and scope","textPreview":"Contain metadata, family label, units, and scope","textChars":48,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/sfil0rqd","slide":45,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":45,"text":"Define material suggestions and output policy","textPreview":"Define material suggestions and output policy","textChars":45,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":45,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":45,"text":"Organize main, derived, and secondary parameters","textPreview":"Organize main, derived, and secondary parameters","textChars":48,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/orytsvu9","slide":45,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/z61032ls","slide":45,"text":"Store standard dimensions and mechanical constraints","textPreview":"Store standard dimensions and mechanical constraints","textChars":52,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/al87ed8b","slide":45,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":45,"text":"Provide validation criteria and example records","textPreview":"Provide validation criteria and example records","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/oza1gvy9","slide":45,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":45,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/d0z61032","slide":45,"text":"45","textPreview":"45","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/kbuhcr","slide":45,"text":"JSON files are machine-readable and allow structured extraction of parameters, constraints, and criteria."}
+{"kind":"slide","id":"sl/dzmp2r","slide":46,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/zed8v6ps","slide":46,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/oza1gvy9","slide":46,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":46,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":46,"text":"TXT Reference Files","textPreview":"TXT Reference Files","textChars":19,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/zqtcj6to","slide":46,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/obm58z25","slide":46,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":46,"text":"46","textPreview":"46","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":46,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":46,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":46,"text":"Describe mechanical family rules in human-readable form","textPreview":"Describe mechanical family rules in human-readable form","textChars":55,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/ed8v6psf","slide":46,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":46,"text":"Contain standard dimensions and key parameters","textPreview":"Contain standard dimensions and key parameters","textChars":46,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/wjudg7ad","slide":46,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/7qpg3ex0","slide":46,"text":"Include OpenSCAD modeling patterns","textPreview":"Include OpenSCAD modeling patterns","textChars":34,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/i5sneloj","slide":46,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/pwb2hwfy","slide":46,"text":"List common failure modes","textPreview":"List common failure modes","textChars":25,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/0bi9s36h","slide":46,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":46,"text":"Provide examples for prompt grounding","textPreview":"Provide examples for prompt grounding","textChars":37,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":46,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":46,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":46,"text":"46","textPreview":"46","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/dzmp2r","slide":46,"text":"Text files express rich engineering explanation and modeling advice."}
+{"kind":"slide","id":"sl/szohav","slide":47,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/h4byhgn2","slide":47,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/adsji5sn","slide":47,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/3ylc7u54","slide":47,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":47,"text":"SCAD Library Files","textPreview":"SCAD Library Files","textChars":18,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":47,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":47,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":47,"text":"47","textPreview":"47","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/s36hcrmh","slide":47,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":47,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/58z25kb6","slide":47,"text":"Example: backend/docs/sprocket.scad","textPreview":"Example: backend/docs/sprocket.scad","textChars":35,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/gn29gr2p","slide":47,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/n29gr2p8","slide":47,"text":"Reusable OpenSCAD modules can be called directly","textPreview":"Reusable OpenSCAD modules can be called directly","textChars":48,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/yhgn29gr","slide":47,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":47,"text":"Reduces the need to reinvent complex geometry","textPreview":"Reduces the need to reinvent complex geometry","textChars":45,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/gbq1oryt","slide":47,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/nuxc3ylc","slide":47,"text":"Improves accuracy for specialized mechanical parts","textPreview":"Improves accuracy for specialized mechanical parts","textChars":50,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/y90je9cv","slide":47,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":47,"text":"Works with RAG instructions and prompt policies","textPreview":"Works with RAG instructions and prompt policies","textChars":47,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/cbulwval","slide":47,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":47,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":47,"text":"47","textPreview":"47","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/szohav","slide":47,"text":"Trusted libraries can be more reliable than generating specialized geometry from scratch."}
+{"kind":"slide","id":"sl/7fjavw","slide":48,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/neloj2t8","slide":48,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/czed8v6p","slide":48,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":48,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/u54zidon","slide":48,"text":"Docs to Prompt Context","textPreview":"Docs to Prompt Context","textChars":22,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/nqxs72x4","slide":48,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/cbulwval","slide":48,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":48,"text":"48","textPreview":"48","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/y90je9cv","slide":48,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/nuxc3ylc","slide":48,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":48,"text":"rag.py loads documents from backend/docs","textPreview":"rag.py loads documents from backend/docs","textChars":40,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/eloj2t83","slide":48,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":48,"text":"Documents become searchable RAG records","textPreview":"Documents become searchable RAG records","textChars":39,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/wra5gbq1","slide":48,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/7u54zido","slide":48,"text":"Prompt is classified into a mechanical family","textPreview":"Prompt is classified into a mechanical family","textChars":45,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/ed8bat47","slide":48,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":48,"text":"Relevant records are retrieved and ranked","textPreview":"Relevant records are retrieved and ranked","textChars":41,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/wfyxobm5","slide":48,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":48,"text":"app.py injects selected context into the model prompt","textPreview":"app.py injects selected context into the model prompt","textChars":53,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":48,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":48,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":48,"text":"48","textPreview":"48","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/7fjavw","slide":48,"text":"Static documents become active model guidance through retrieval and prompt injection."}
+{"kind":"slide","id":"sl/igjf3r","slide":49,"title":"DOCS","textShapes":12}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":49,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/ulwval87","slide":49,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":49,"text":"DOCS","textPreview":"DOCS","textChars":4,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":49,"text":"Docs and Validation Relationship","textPreview":"Docs and Validation Relationship","textChars":32,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/1kre1w7m","slide":49,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":49,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":49,"text":"49","textPreview":"49","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/8bat47y1","slide":49,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/1w7mp0bi","slide":49,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/d0z61032","slide":49,"text":"Docs define required features and design rules","textPreview":"Docs define required features and design rules","textChars":46,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/kf6dcbul","slide":49,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":49,"text":"Validation checks reflect those expectations","textPreview":"Validation checks reflect those expectations","textChars":44,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/29gr2p8n","slide":49,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/d8bat47y","slide":49,"text":"Derived formulas become formula checks","textPreview":"Derived formulas become formula checks","textChars":38,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/knih4byh","slide":49,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":49,"text":"Failure modes become warning or error checks","textPreview":"Failure modes become warning or error checks","textChars":44,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/2lszqtcj","slide":49,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":49,"text":"Knowledge, generation, and validation form a closed loop","textPreview":"Knowledge, generation, and validation form a closed loop","textChars":56,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":49,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/kzupwb2h","slide":49,"text":"Docs","textPreview":"Docs","textChars":4,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/9knih4by","slide":49,"text":"49","textPreview":"49","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/igjf3r","slide":49,"text":"The same engineering knowledge used for prompting is reflected in validation rules."}
+{"kind":"slide","id":"sl/e7tpj5","slide":50,"title":"INTEGRATION","textShapes":20}
+{"kind":"shape","id":"sh/lszqtcj6","slide":50,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/a5gbq1or","slide":50,"text":"INTEGRATION","textPreview":"INTEGRATION","textChars":11,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":50,"text":"Complete System Integration","textPreview":"Complete System Integration","textChars":27,"textLines":1,"bbox":[58,96,820,50]}
+{"kind":"shape","id":"sh/sji5snel","slide":50,"bbox":[70,210,145,70]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":50,"text":"Frontend workspace","textPreview":"Frontend workspace","textChars":18,"textLines":1,"bbox":[82,228,121,36]}
+{"kind":"textbox","id":"sh/adsji5sn","slide":50,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[217,238,26,28]}
+{"kind":"shape","id":"sh/3ylc7u54","slide":50,"bbox":[237,210,145,70]}
+{"kind":"textbox","id":"sh/svu9knih","slide":50,"text":"app.py API orchestration","textPreview":"app.py API orchestration","textChars":24,"textLines":1,"bbox":[249,228,121,36]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":50,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[384,238,26,28]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":50,"bbox":[404,210,145,70]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":50,"text":"rag.py retrieval","textPreview":"rag.py retrieval","textChars":16,"textLines":1,"bbox":[416,228,121,36]}
+{"kind":"textbox","id":"sh/bat47y1k","slide":50,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[551,238,26,28]}
+{"kind":"shape","id":"sh/mp0bi9s3","slide":50,"bbox":[571,210,145,70]}
+{"kind":"textbox","id":"sh/tsvu9kni","slide":50,"text":"backend/docs knowledge","textPreview":"backend/docs knowledge","textChars":22,"textLines":1,"bbox":[583,228,121,36]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":50,"text":"↓","textPreview":"↓","textChars":1,"textLines":1,"bbox":[631,316,26,28]}
+{"kind":"shape","id":"sh/bm58z25k","slide":50,"bbox":[70,360,145,70]}
+{"kind":"textbox","id":"sh/m1cfa9w3","slide":50,"text":"AI model generation","textPreview":"AI model generation","textChars":19,"textLines":1,"bbox":[82,378,121,36]}
+{"kind":"textbox","id":"sh/twra5gbq","slide":50,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[217,388,26,28]}
+{"kind":"shape","id":"sh/4byhgn29","slide":50,"bbox":[237,360,145,70]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":50,"text":"validation/logging","textPreview":"validation/logging","textChars":18,"textLines":1,"bbox":[249,378,121,36]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":50,"text":"→","textPreview":"→","textChars":1,"textLines":1,"bbox":[384,388,26,28]}
+{"kind":"shape","id":"sh/idonyd0z","slide":50,"bbox":[404,360,145,70]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":50,"text":"STL preview/export","textPreview":"STL preview/export","textChars":18,"textLines":1,"bbox":[416,378,121,36]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":50,"bbox":[760,214,400,215]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":50,"text":"Core idea","textPreview":"Core idea","textChars":9,"textLines":1,"bbox":[790,242,340,28]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":50,"text":"The system surrounds AI generation with engineering context before the model call and quality control after the model call.","textPreview":"The system surrounds AI generation with engineering context before the model call and quality control after the model call.","textChars":123,"textLines":1,"bbox":[790,288,330,100]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":50,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/032lszqt","slide":50,"text":"Integration","textPreview":"Integration","textChars":11,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/tovahoza","slide":50,"text":"50","textPreview":"50","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/e7tpj5","slide":50,"text":"Each layer has a focused role and communicates through clear interfaces."}
+{"kind":"slide","id":"sl/4y2cun","slide":51,"title":"CONCLUSION","textShapes":13}
+{"kind":"shape","id":"sh/vu9knih4","slide":51,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/kf6dcbul","slide":51,"bbox":[58,48,190,30]}
+{"kind":"textbox","id":"sh/d0z61032","slide":51,"text":"CONCLUSION","textPreview":"CONCLUSION","textChars":10,"textLines":1,"bbox":[74,55,160,18]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":51,"text":"Main Thesis Contribution","textPreview":"Main Thesis Contribution","textChars":24,"textLines":1,"bbox":[58,96,900,52]}
+{"kind":"shape","id":"sh/v6psfil0","slide":51,"bbox":[880,60,250,72]}
+{"kind":"textbox","id":"sh/knih4byh","slide":51,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[905,76,200,20]}
+{"kind":"textbox","id":"sh/d8bat47y","slide":51,"text":"51","textPreview":"51","textChars":2,"textLines":1,"bbox":[905,98,200,24]}
+{"kind":"shape","id":"sh/6psfil0r","slide":51,"bbox":[58,178,1010,405]}
+{"kind":"shape","id":"sh/val87ed8","slide":51,"bbox":[98,226,13,13]}
+{"kind":"textbox","id":"sh/judg7ads","slide":51,"text":"Practical natural-language to OpenSCAD generation pipeline","textPreview":"Practical natural-language to OpenSCAD generation pipeline","textChars":58,"textLines":1,"bbox":[126,218,860,44]}
+{"kind":"shape","id":"sh/u9knih4b","slide":51,"bbox":[98,284,13,13]}
+{"kind":"textbox","id":"sh/1032lszq","slide":51,"text":"Multi-family mechanical RAG knowledge base","textPreview":"Multi-family mechanical RAG knowledge base","textChars":42,"textLines":1,"bbox":[126,276,860,44]}
+{"kind":"shape","id":"sh/cfa9w3m9","slide":51,"bbox":[98,342,13,13]}
+{"kind":"textbox","id":"sh/jm1cfa9w","slide":51,"text":"Domain-specific validation and scoring","textPreview":"Domain-specific validation and scoring","textChars":38,"textLines":1,"bbox":[126,334,860,44]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":51,"bbox":[98,400,13,13]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":51,"text":"Multi-provider model gateway with fallback","textPreview":"Multi-provider model gateway with fallback","textChars":42,"textLines":1,"bbox":[126,392,860,44]}
+{"kind":"shape","id":"sh/c7u54zid","slide":51,"bbox":[98,458,13,13]}
+{"kind":"textbox","id":"sh/nap4r65w","slide":51,"text":"Repair loop and deterministic safety paths","textPreview":"Repair loop and deterministic safety paths","textChars":42,"textLines":1,"bbox":[126,450,860,44]}
+{"kind":"shape","id":"sh/upwb2hwf","slide":51,"bbox":[98,516,13,13]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":51,"text":"Frontend workspace with preview and export","textPreview":"Frontend workspace with preview and export","textChars":42,"textLines":1,"bbox":[126,508,860,44]}
+{"kind":"textbox","id":"sh/val87ed8","slide":51,"text":"Mechanical OpenSCAD Copilot","textPreview":"Mechanical OpenSCAD Copilot","textChars":27,"textLines":1,"bbox":[58,682,330,22]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":51,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[480,682,320,22]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":51,"text":"51","textPreview":"51","textChars":2,"textLines":1,"bbox":[1160,682,70,22]}
+{"kind":"notes","id":"nt/4y2cun","slide":51,"text":"The project is an integrated architecture for AI-assisted parametric CAD, not only a prompt experiment."}
+{"kind":"slide","id":"sl/smhl3x","slide":52,"title":"Conclusion","textShapes":7}
+{"kind":"textbox","id":"sh/fa9w3m94","slide":52,"text":"Conclusion","textPreview":"Conclusion","textChars":10,"textLines":1,"bbox":[72,76,760,70]}
+{"kind":"shape","id":"sh/8v6psfil","slide":52,"bbox":[78,193,13,13]}
+{"kind":"textbox","id":"sh/xczed8v6","slide":52,"text":"app.py coordinates the system","textPreview":"app.py coordinates the system","textChars":29,"textLines":1,"bbox":[106,185,930,44]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":52,"bbox":[78,251,13,13]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":52,"text":"rag.py supplies mechanical knowledge","textPreview":"rag.py supplies mechanical knowledge","textChars":36,"textLines":1,"bbox":[106,243,930,44]}
+{"kind":"shape","id":"sh/8jqh0fep","slide":52,"bbox":[78,309,13,13]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":52,"text":"validation_and_logging.py controls quality and traceability","textPreview":"validation_and_logging.py controls quality and traceability","textChars":59,"textLines":1,"bbox":[106,301,930,44]}
+{"kind":"shape","id":"sh/q1orytsv","slide":52,"bbox":[78,367,13,13]}
+{"kind":"textbox","id":"sh/fmlkjm1c","slide":52,"text":"frontend/ gives users an interactive CAD workspace","textPreview":"frontend/ gives users an interactive CAD workspace","textChars":50,"textLines":1,"bbox":[106,359,930,44]}
+{"kind":"shape","id":"sh/jqh0fepk","slide":52,"bbox":[78,425,13,13]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":52,"text":"backend/docs provides the engineering memory","textPreview":"backend/docs provides the engineering memory","textChars":44,"textLines":1,"bbox":[106,417,930,44]}
+{"kind":"shape","id":"sh/1w7mp0bi","slide":52,"bbox":[78,483,13,13]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":52,"text":"Together they convert prompts into validated parametric CAD models","textPreview":"Together they convert prompts into validated parametric CAD models","textChars":66,"textLines":1,"bbox":[106,475,930,44]}
+{"kind":"notes","id":"nt/smhl3x","slide":52,"text":"Close by restating the system value: it bridges natural language and parametric CAD with retrieval, validation, repair, and export."}

@@ -30,6 +30,34 @@ HINGE TYPES
    - Fork + blade + pin; single-axis rotation
    - Common in linkage mechanisms
 
+BUTT HINGE WITH KNURLED FINIALS
+───────────────────────────────
+Use this pattern when the prompt asks for a butt hinge, door hinge, reference-image hinge,
+knurled hinge tips, finials, countersunk screw holes, or Emtek-style hinge hardware.
+This is NOT a print-in-place hinge.
+Prefer butt_hinge_knurled_finials over print_in_place_hinge_5knuckle whenever the prompt
+mentions Emtek, photo/reference image, rectangular leaves, countersunk screw holes,
+visible continuous pin, central barrel hardware, or knurled finial tips.
+
+Required features:
+  - Rectangular leaves left/right of a central barrel.
+  - Three countersunk screw holes per leaf.
+  - Five alternating cylindrical barrel knuckles along hinge_h.
+  - Visible continuous hinge pin through the knuckles.
+  - Knurled finial tips at top and bottom.
+  - No hinge_leaf_a, hinge_leaf_b, bore_a, bore_b, knuckle_z, leaf_gap,
+    clear_gap, or clearance leaf layout.
+
+Authoritative OpenSCAD record:
+  Use the part database record butt_hinge_knurled_finials. It contains screw_hole(),
+  leaf(side), knurled_finial(), knuckle(len), and hinge() modules.
+  Use cube([leaf_w, leaf_t, hinge_h]) for leaves, barrel_d directly for knuckles,
+  a visible continuous pin, and direct countersink cylinders in screw_hole().
+  Do not add print-in-place clearance leaf layout, tolerance blocks, minkowski(),
+  fillet_r, chamfer_r, or manufacturing string variables to this butt hinge style.
+  Never use hinge_leaf_a, hinge_leaf_b, bore_a, bore_b, knuckle_z, leaf_gap, or clear_gap
+  for this butt hinge hardware record.
+
 PRINT-IN-PLACE HINGE PARAMETERS
 ──────────────────────────────────
   leaf_length          — length of each hinge plate (e.g. 40 mm)
@@ -38,7 +66,7 @@ PRINT-IN-PLACE HINGE PARAMETERS
   pin_diameter         — 4–8 mm; larger = stronger barrel
   pin_clearance        — 0.3–0.4 mm between pin and barrel bore
   knuckle_count        — 3 or 5 knuckles
-  knuckle_length       — leaf_length / (knuckle_count × 2 − 1)
+  knuckle_length       — leaf_length / knuckle_count for interleaved 3/2 knuckles
   barrel_length        — leaf_length (continuous barrel)
   gap_between_leaves   — 0.3–0.5 mm (for free swing after printing)
   opening_angle        — 180° full open; constrain with stop feature if less needed
@@ -56,6 +84,9 @@ PRINT-IN-PLACE HINGE PARAMETERS
     All cylinders share axis y=0, z=knuckle_z — NOT at different X positions.
     Both leaf A and leaf B knuckles use difference() with bore.
     DO NOT ADD cylinders without difference() — leaf A pin will fuse to barrel.
+    BOTH leaf A and leaf B knuckle outer cylinders use d=knuckle_OD.
+    WRONG: d=pin_d with bore_a/bore_b subtraction; the bore is larger than the outside and the knuckle disappears.
+    DO NOT use minkowski() or sphere() to fillet the bore; it often subtracts the whole barrel. Use a plain cylinder bore.
     DO NOT use rotate([90,0,0]) — that makes cylinders run along Y, breaking the shared axis.
 
   leaf_length = 40;  leaf_width = 20;  leaf_thick = 3;
@@ -63,7 +94,7 @@ PRINT-IN-PLACE HINGE PARAMETERS
 
   knuckle_l  = leaf_length / knuckle_count;     // 8mm — equal sections
   knuckle_OD = pin_d + 2*wall;                  // 8mm barrel OD
-  bore_a     = pin_d + clearance;               // 5.35mm — leaf A (pin stays with A)
+  bore_a     = pin_d + clearance;               // 5.35mm — leaf A hollow knuckle bore
   bore_b     = pin_d + 2*clearance;             // 5.70mm — leaf B (free rotation)
   n_a        = (knuckle_count + 1) / 2;         // 3
   n_b        = (knuckle_count - 1) / 2;         // 2
@@ -76,7 +107,7 @@ PRINT-IN-PLACE HINGE PARAMETERS
       x_c = (2*i) * knuckle_l + knuckle_l/2;
       translate([x_c, 0, knuckle_z]) rotate([0, 90, 0])
         difference() {
-          cylinder(h=knuckle_l,     d=pin_d,  center=true);
+          cylinder(h=knuckle_l-clearance, d=knuckle_OD, center=true);
           cylinder(h=knuckle_l+2,   d=bore_a, center=true);
         }
     }

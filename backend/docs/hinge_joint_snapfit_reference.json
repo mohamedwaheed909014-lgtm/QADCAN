@@ -5,7 +5,7 @@
     "family": "hinge_joint_snapfit_reference",
     "family_label": "Hinges, Joints and Snap-Fits",
     "units": "millimeters",
-    "scope": "Print-in-place hinges, ball joints, snap-fit cantilever hooks, living hinges, clevis joints.",
+    "scope": "Butt hinges with screw leaves and knurled finials, print-in-place hinges, ball joints, snap-fit cantilever hooks, living hinges, clevis joints.",
     "retrieval": {
       "primary_keywords": [
         "hinge",
@@ -18,7 +18,17 @@
         "ball joint",
         "living hinge",
         "clevis",
-        "cantilever hook"
+        "cantilever hook",
+        "butt hinge",
+        "5 knuckle butt hinge",
+        "knurled hinge",
+        "knurled finials",
+        "knurled hinge tips",
+        "finial tips",
+        "countersunk screw holes",
+        "screw holes",
+        "emtek hinge",
+        "reference image hinge"
       ],
       "negative_keywords": [
         "bearing housing",
@@ -75,12 +85,13 @@
     {
       "id": "print_in_place_hinge_5knuckle",
       "category": "hinge",
-      "name": "5-knuckle print-in-place hinge",
+      "name": "FDM print-in-place hinge mechanism",
       "aliases": [
         "print in place hinge",
-        "pivot hinge",
-        "parametric hinge",
-        "openscad hinge"
+        "print-in-place hinge",
+        "FDM printed hinge",
+        "printed hinge mechanism",
+        "snapfit printed hinge"
       ],
       "standards": [
         "ISO 286-1"
@@ -140,22 +151,28 @@
         }
       },
       "main_features": [
+        "use only when the prompt explicitly asks for print-in-place, FDM, printable, clearance, rotating after printing, or snapfit printed hinge behavior",
         "pin axis along X — all knuckle cylinders use rotate([0,90,0]) and share y=0, z=knuckle_z",
-        "leaf A: n_a=3 solid-bore cylinders at x = k/2, 5k/2, 9k/2 (with bore = barrel_bore to avoid fusing)",
+        "leaf A: n_a=3 barrel cylinders at x = k/2, 5k/2, 9k/2, OD=knuckle_OD, bore=bore_a",
         "leaf B: n_b=2 barrel cylinders at x = 3k/2, 7k/2, OD=knuckle_OD, bore=barrel_bore",
         "leaf A plate extends in +Y from the hinge joint (clearance gap from y=0)",
         "leaf B plate extends in -Y from the hinge joint (clearance gap from y=0)",
-        "clearance gap between leaf plates in Y so they can rotate after printing"
+        "clearance gap between leaf plates in Y so they can rotate after printing",
+        "not for butt hinge hardware, door hinge reference images, Emtek style hinges, countersunk screw-hole hinges, visible-pin hinges, or knurled-finial hinges"
       ],
       "design_rules": [
+        "Select this record only for explicit print-in-place / FDM printable hinge prompts. For butt hinge, door hinge, Emtek reference image, rectangular leaves, countersunk screw holes, visible continuous pin, or knurled finials, use butt_hinge_knurled_finials instead.",
         "knuckle_l = leaf_length / knuckle_count. NEVER use leaf_length/(2*knuckle_count-1) — wrong formula.",
         "Leaf A loop: for(i=[0:n_a-1]) with x_c = (2*i)*knuckle_l + knuckle_l/2. n_a=3 for 5-knuckle.",
         "Leaf B loop: for(i=[0:n_b-1]) with x_c = (2*i+1)*knuckle_l + knuckle_l/2. n_b=2 for 5-knuckle.",
         "ALL knuckle cylinders share the SAME axis: y=0, z=knuckle_z. Pin axis is along X (rotate([0,90,0])). NEVER use rotate([90,0,0]) — that points cylinders along Y, destroying the shared axis.",
-        "Both leaf A and leaf B knuckles use difference(): solid cylinder OD minus bore. Bore = pin_d + 2*clearance in leaf B. Leaf A bore slightly tighter (pin_d + clearance) so pin stays with leaf A.",
+        "Both leaf A and leaf B knuckles use difference(): solid outer cylinder OD=knuckle_OD minus bore. Leaf A bore = pin_d + clearance; leaf B bore = pin_d + 2*clearance. NEVER use d=pin_d for a knuckle outer cylinder because the bore is larger than the outside and the knuckle disappears.",
+        "Do NOT use minkowski(), sphere(), or filleted_cylinder() for hinge bores; use plain cylinder subtraction to avoid deleting the barrel.",
         "Leaf A plate: translate([0, clearance, 0]) cube([leaf_length, leaf_width, leaf_thick]).",
         "Leaf B plate: translate([0, -(leaf_width+clearance), 0]) cube([leaf_length, leaf_width, leaf_thick]).",
-        "Do NOT span full leaf_width with a single cylinder — that gives one continuous tube, not interleaved knuckles."
+        "Do NOT span full leaf_width with a single cylinder — that gives one continuous tube, not interleaved knuckles.",
+        "Do not define fillet_r or chamfer_r. Do not create chamfered_plate(). Hinge leaves are plain cube plates; hinge bores are plain cylinder subtractions.",
+        "Do not use this print-in-place schema for visual butt hinge hardware with screw holes, continuous pin, or decorative tips."
       ],
       "validation_criteria": [
         "knuckle_l = leaf_length / knuckle_count — NOT leaf_length/(2*knuckle_count-1)",
@@ -163,7 +180,8 @@
         "leaf B loop runs exactly n_b=(knuckle_count-1)/2=2 iterations for 5-knuckle",
         "all cylinders use rotate([0,90,0]) — axis along X",
         "all knuckle centers are at y=0, z=knuckle_z (shared axis)",
-        "both leaf A and leaf B knuckles use difference() with bore",
+        "both leaf A and leaf B knuckles use difference() with outer d=knuckle_OD and bore subtraction",
+        "no knuckle outer cylinder uses d=pin_d",
         "leaf A bore = pin_d + clearance; leaf B bore = pin_d + 2*clearance",
         "leaf plates have clearance gap in Y between them"
       ],
@@ -171,9 +189,11 @@
         "knuckle_l = leaf_length/(2*knuckle_count-1) — gives 4.4mm instead of 8mm; 9 knuckle slots total",
         "leaf A loop [0:knuckle_count-1] = 5 knuckles, leaf B [0:knuckle_count-2] = 4 knuckles — 9 total instead of 5",
         "rotate([90,0,0]) on cylinders — axis along Y, each knuckle on different axis, not a hinge",
-        "leaf A cylinders ADDED (not in difference) — solid pins with no bore, pin will fuse to barrel",
+        "leaf A cylinders use d=pin_d or are added without difference() - bore may be larger than outer diameter or pin will fuse to barrel",
         "leaf B at z=leaf_thick+clearance with barrel at z=0 relative — pin and barrel offset by clearance in Z, not coaxial",
-        "cylinder h=leaf_width spanning full barrel width — single continuous tube, not interleaved knuckles"
+        "cylinder h=leaf_width spanning full barrel width — single continuous tube, not interleaved knuckles",
+        "minkowski() or filleted_cylinder() used for bore fillets - over-subtracts and can delete the barrel",
+        "fillet_r/chamfer_r/chamfered_plate added from generic FDM rules - distracts from hinge mechanics and often triggers minkowski over-subtraction"
       ],
       "constraint_checks": [
         {
@@ -183,7 +203,100 @@
           "message": "Hinge barrel bore must be pin_d + 2*clearance for freedom of movement."
         }
       ],
-      "openscad_module": "$fn = 96;\n\n// ── Parameters ───────────────────────────────────────────\nleaf_length   = 40;    // total hinge length along X (pin axis)\nleaf_width    = 20;    // leaf plate width along Y\nleaf_thick    = 3;     // plate thickness (Z)\npin_d         = 5;     // pin nominal diameter\nwall          = 1.5;   // barrel wall around pin\nknuckle_count = 5;     // total knuckles (odd)\nclearance     = 0.35;  // print-in-place gap\n\n// ── Derived ──────────────────────────────────────────────\nknuckle_l   = leaf_length / knuckle_count;    // 8 mm — NOT leaf_length/(2*count-1)\nknuckle_OD  = pin_d + 2 * wall;              // 8 mm\nbore_a      = pin_d + clearance;             // 5.35 mm — leaf A (tight, pin stays with A)\nbore_b      = pin_d + 2 * clearance;         // 5.7 mm  — leaf B (clearance for rotation)\nn_a         = (knuckle_count + 1) / 2;       // 3\nn_b         = (knuckle_count - 1) / 2;       // 2\nknuckle_z   = leaf_thick + knuckle_OD / 2;  // Z of shared pin axis\n\n// ── Leaf A: plate +Y, 3 pin knuckles ─────────────────────\n// Pin axis: along X, at y=0, z=knuckle_z\n// All cylinders: rotate([0,90,0]) — NOT rotate([90,0,0])\nmodule hinge_leaf_a() {\n    // Plate — positive Y side, clearance gap from hinge joint\n    translate([0, clearance, 0])\n        cube([leaf_length, leaf_width, leaf_thick]);\n\n    // n_a=3 pin knuckles at x = k/2, 5k/2, 9k/2\n    for (i = [0 : n_a - 1]) {\n        x_c = (2*i) * knuckle_l + knuckle_l / 2;\n        translate([x_c, 0, knuckle_z])\n            rotate([0, 90, 0])\n                difference() {\n                    cylinder(h = knuckle_l,     d = pin_d,  center = true);\n                    cylinder(h = knuckle_l + 2, d = bore_a, center = true);\n                }\n    }\n}\n\n// ── Leaf B: plate -Y, 2 barrel knuckles ──────────────────\nmodule hinge_leaf_b() {\n    // Plate — negative Y side, clearance gap from hinge joint\n    translate([0, -(leaf_width + clearance), 0])\n        cube([leaf_length, leaf_width, leaf_thick]);\n\n    // n_b=2 barrel knuckles at x = 3k/2, 7k/2\n    for (i = [0 : n_b - 1]) {\n        x_c = (2*i + 1) * knuckle_l + knuckle_l / 2;\n        translate([x_c, 0, knuckle_z])\n            rotate([0, 90, 0])\n                difference() {\n                    cylinder(h = knuckle_l - clearance, d = knuckle_OD, center = true);\n                    cylinder(h = knuckle_l + 2,         d = bore_b,     center = true);\n                }\n    }\n}\n\nmodule five_knuckle_hinge() {\n    hinge_leaf_a();\n    hinge_leaf_b();\n}\n\nfive_knuckle_hinge();"
+      "openscad_module": "$fn = 96;\n\n// ── Parameters ───────────────────────────────────────────\nleaf_length   = 40;    // total hinge length along X (pin axis)\nleaf_width    = 20;    // leaf plate width along Y\nleaf_thick    = 3;     // plate thickness (Z)\npin_d         = 5;     // pin nominal diameter\nwall          = 1.5;   // barrel wall around pin\nknuckle_count = 5;     // total knuckles (odd)\nclearance     = 0.35;  // print-in-place gap\n\n// ── Derived ──────────────────────────────────────────────\nknuckle_l   = leaf_length / knuckle_count;    // 8 mm — NOT leaf_length/(2*count-1)\nknuckle_OD  = pin_d + 2 * wall;              // 8 mm\nbore_a      = pin_d + clearance;             // 5.35 mm — leaf A hollow knuckle bore\nbore_b      = pin_d + 2 * clearance;         // 5.7 mm  — leaf B (clearance for rotation)\nn_a         = (knuckle_count + 1) / 2;       // 3\nn_b         = (knuckle_count - 1) / 2;       // 2\nknuckle_z   = leaf_thick + knuckle_OD / 2;  // Z of shared pin axis\n\n// ── Leaf A: plate +Y, 3 pin knuckles ─────────────────────\n// Pin axis: along X, at y=0, z=knuckle_z\n// All cylinders: rotate([0,90,0]) — NOT rotate([90,0,0])\nmodule hinge_leaf_a() {\n    // Plate — positive Y side, clearance gap from hinge joint\n    translate([0, clearance, 0])\n        cube([leaf_length, leaf_width, leaf_thick]);\n\n    // n_a=3 pin knuckles at x = k/2, 5k/2, 9k/2\n    for (i = [0 : n_a - 1]) {\n        x_c = (2*i) * knuckle_l + knuckle_l / 2;\n        translate([x_c, 0, knuckle_z])\n            rotate([0, 90, 0])\n                difference() {\n                    cylinder(h = knuckle_l - clearance, d = knuckle_OD, center = true);\n                    cylinder(h = knuckle_l + 2, d = bore_a, center = true);\n                }\n    }\n}\n\n// ── Leaf B: plate -Y, 2 barrel knuckles ──────────────────\nmodule hinge_leaf_b() {\n    // Plate — negative Y side, clearance gap from hinge joint\n    translate([0, -(leaf_width + clearance), 0])\n        cube([leaf_length, leaf_width, leaf_thick]);\n\n    // n_b=2 barrel knuckles at x = 3k/2, 7k/2\n    for (i = [0 : n_b - 1]) {\n        x_c = (2*i + 1) * knuckle_l + knuckle_l / 2;\n        translate([x_c, 0, knuckle_z])\n            rotate([0, 90, 0])\n                difference() {\n                    cylinder(h = knuckle_l - clearance, d = knuckle_OD, center = true);\n                    cylinder(h = knuckle_l + 2,         d = bore_b,     center = true);\n                }\n    }\n}\n\nmodule five_knuckle_hinge() {\n    hinge_leaf_a();\n    hinge_leaf_b();\n}\n\nfive_knuckle_hinge();"
+    },
+    {
+      "id": "butt_hinge_knurled_finials",
+      "category": "hinge",
+      "name": "5-knuckle butt hinge hardware with countersunk screws and knurled finials",
+      "aliases": [
+        "butt hinge",
+        "5 knuckle butt hinge",
+        "5-knuckle butt hinge",
+        "door hinge",
+        "cabinet hinge",
+        "hardware hinge",
+        "central barrel hinge",
+        "rectangular leaf hinge",
+        "rectangular leaves left right central barrel",
+        "rectangular leaves left and right of central barrel",
+        "countersunk screw holes",
+        "six countersunk screw holes",
+        "visible continuous pin",
+        "continuous hinge pin",
+        "knurled hinge tips",
+        "knurled finials",
+        "knurled hinge finials",
+        "countersunk screw hinge",
+        "Emtek hinge",
+        "Emtek style hinge",
+        "reference image hinge",
+        "photo reference butt hinge"
+      ],
+      "manufacturing_processes": [
+        "visual CAD model",
+        "machined or cast hardware reference",
+        "3D printed display model"
+      ],
+      "family": "hinge_joint_snapfit_reference",
+      "standard_dimensions_mm": {
+        "hinge_h": 100,
+        "leaf_w": 38,
+        "leaf_t": 3,
+        "barrel_d": 12,
+        "pin_d": 5,
+        "finial_len": 10,
+        "finial_d": 10
+      },
+      "main_features": [
+        "preferred match for butt hinge, door hinge, Emtek style hinge, reference image hinge, hardware hinge, countersunk screw holes, visible continuous pin, or knurled finials",
+        "5-knuckle butt hinge hardware, not print-in-place hinge geometry",
+        "rectangular leaves left/right of a central barrel",
+        "flat vertical rectangular leaves on the left and right side of the pin barrel",
+        "three countersunk screw holes per leaf",
+        "six countersunk screw holes total, arranged three per rectangular leaf",
+        "five alternating cylindrical barrel knuckles along hinge_h",
+        "visible continuous hinge pin through the center barrel",
+        "knurled finial tips at top and bottom",
+        "no print-in-place hinge_leaf_a/hinge_leaf_b split-leaf clearance layout",
+        "no bore_a, bore_b, knuckle_z, leaf_gap, clear_gap, clearance leaf layout, FDM tolerance block, or snapfit printed hinge schema"
+      ],
+      "design_rules": [
+        "This is the preferred record whenever a prompt says butt hinge, door hinge, Emtek, reference image, photo, rectangular leaves, countersunk screw holes, visible pin, continuous pin, knurled finials, or knurled hinge tips.",
+        "This is a butt hinge / hardware reference, not a print-in-place hinge.",
+        "Never answer a butt hinge hardware prompt with print_in_place_hinge_5knuckle.",
+        "Use rectangular leaves left/right of a central barrel.",
+        "Use screw_hole() with screw and countersink cylinders directly inside rotate([90,0,0]).",
+        "Use leaf(side) with cube([leaf_w, leaf_t, hinge_h], center=true). Do not use cube([hinge_h, leaf_w, leaf_t]).",
+        "Use barrel_d directly for knuckle(len); do not derive a separate knuckle_OD from pin_d + wall.",
+        "Use a visible continuous pin cylinder: cylinder(h = hinge_h + 2 * finial_len, d = pin_d).",
+        "Use knurled_finial() with repeated cube cuts controlled by knurl_count.",
+        "Use five barrel knuckles with loops for [0,2,4] and [1,3].",
+        "Do not use hinge_leaf_a, hinge_leaf_b, bore_a, bore_b, knuckle_z, leaf_gap, clear_gap, or clearance leaf layout.",
+        "Do not use minkowski(), fillet_r, chamfer_r, tolerance block variables, or manufacturing string variables."
+      ],
+      "validation_criteria": [
+        "leaf(side) module creates two rectangular leaves left/right of central barrel",
+        "leaf cube uses [leaf_w, leaf_t, hinge_h]",
+        "screw_hole() creates through screw cut and countersink cut directly, without nested difference()",
+        "knurled_finial() uses knurl_count loop",
+        "knuckle(len) subtracts pin_d bore from barrel_d cylinder",
+        "knuckle loops use [0,2,4] and [1,3]",
+        "continuous visible pin spans hinge_h + 2*finial_len",
+        "no hinge_leaf_a, hinge_leaf_b, bore_a, bore_b, knuckle_z, leaf_gap, clear_gap, or clearance leaf layout"
+      ],
+      "failure_modes": [
+        "retrieving print_in_place_hinge_5knuckle for a butt hinge hardware / Emtek / reference image / countersunk screw / knurled finial prompt",
+        "using print-in-place hinge_leaf_a/hinge_leaf_b layout instead of butt hinge leaves",
+        "using bore_a/bore_b/knuckle_z/leaf_gap/clear_gap from print-in-place hinge schema",
+        "using cube([hinge_h, leaf_w, leaf_t]) for leaves instead of cube([leaf_w, leaf_t, hinge_h])",
+        "omitting countersunk screw holes",
+        "omitting visible continuous pin",
+        "omitting knurled finials",
+        "wrapping screw_hole cylinders in nested difference()",
+        "using minkowski fillets or FDM tolerance block variables"
+      ],
+      "openscad_module": "$fn = 96;\n\n// Rectangular leaves left/right of a central barrel\n// Countersunk screw holes\n// Visible continuous pin\n// Knurled finials\n// Uses butt-hinge hardware layout, not print-in-place hinge layout\n\nhinge_h     = 100;\nleaf_w      = 38;\nleaf_t      = 3;\n\nbarrel_d    = 12;\npin_d       = 5;\n\nknuckle_gap = 0.4;\nknuckle_len = hinge_h / 5 - knuckle_gap;\n\nfinial_len  = 10;\nfinial_d    = 10;\nknurl_count = 32;\n\nscrew_d     = 5;\ncsk_d       = 9;\ncsk_depth   = 2;\n\nmodule screw_hole() {\n    rotate([90, 0, 0]) {\n        cylinder(h = leaf_t + 2, d = screw_d, center = true);\n\n        translate([0, 0, 0.45])\n            cylinder(h = csk_depth, d1 = csk_d, d2 = screw_d, center = true);\n    }\n}\n\nmodule leaf(side = 1) {\n    x_center = side * (barrel_d / 2 + leaf_w / 2 - 0.25);\n    screw_x  = side * (barrel_d / 2 + leaf_w * 0.55);\n\n    difference() {\n        translate([x_center, 0, hinge_h / 2])\n            cube([leaf_w, leaf_t, hinge_h], center = true);\n\n        for (z = [18, 50, 82])\n            translate([screw_x, 0, z])\n                screw_hole();\n    }\n}\n\nmodule knuckle(len) {\n    difference() {\n        cylinder(h = len, d = barrel_d, center = false);\n        translate([0, 0, -0.1])\n            cylinder(h = len + 0.2, d = pin_d + 0.3, center = false);\n    }\n}\n\nmodule knurled_finial() {\n    difference() {\n        cylinder(h = finial_len, d = finial_d, center = false);\n\n        for (i = [0 : knurl_count - 1])\n            rotate([0, 0, i * 360 / knurl_count])\n                translate([finial_d / 2, 0, finial_len / 2])\n                    cube([0.8, 0.8, finial_len + 2], center = true);\n    }\n}\n\nmodule hinge() {\n    leaf(-1);\n    leaf(1);\n\n    // visible continuous pin\n    translate([0, 0, -finial_len])\n        cylinder(h = hinge_h + 2 * finial_len, d = pin_d, center = false);\n\n    // five barrel knuckles\n    for (i = [0, 2, 4])\n        translate([0, 0, i * hinge_h / 5 + knuckle_gap / 2])\n            knuckle(knuckle_len);\n\n    for (i = [1, 3])\n        translate([0, 0, i * hinge_h / 5 + knuckle_gap / 2])\n            knuckle(knuckle_len);\n\n    // knurled finials\n    translate([0, 0, hinge_h])\n        knurled_finial();\n\n    rotate([180, 0, 0])\n        knurled_finial();\n}\n\nhinge();"
     }
   ]
 }

@@ -1,0 +1,528 @@
+{"kind":"deck","id":"pr/883gx5","name":"Deck"}
+{"kind":"layout","layoutId":"dadad4a3-1f07-4a82-86a6-088b7aa62558","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"920ff3de-514a-4bf4-b24b-767a5c5f2b9e","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/7wplry","slide":1,"title":"APP.PY + RAG.PY","textShapes":10}
+{"kind":"shape","id":"sh/b6xkf6dc","slide":1,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":1,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/tcj6tova","slide":1,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/idonyd0z","slide":1,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":1,"text":"7-slide section","textPreview":"7-slide section","textChars":15,"textLines":1,"bbox":[930,50,230,22]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":1,"text":"Backend Intelligence: app.py and rag.py","textPreview":"Backend Intelligence: app.py and rag.py","textChars":39,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/t47y1kre","slide":1,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/i9s36hcr","slide":1,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/bulwval8","slide":1,"text":"app.py controls the generation workflow","textPreview":"app.py controls the generation workflow","textChars":39,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/j6tovaho","slide":1,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/ulwval87","slide":1,"text":"rag.py supplies relevant mechanical knowledge","textPreview":"rag.py supplies relevant mechanical knowledge","textChars":45,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/1cfa9w3m","slide":1,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/crmhk3q5","slide":1,"text":"Together they convert user prompts into validated OpenSCAD code","textPreview":"Together they convert user prompts into validated OpenSCAD code","textChars":63,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/ji5snelo","slide":1,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/1kre1w7m","slide":1,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/c3ylc7u5","slide":1,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/7wplry","slide":1,"text":"Open this section by saying that these two files form the core backend intelligence. app.py coordinates the process, while rag.py grounds the model with mechanical references."}
+{"kind":"slide","id":"sl/72rm1a","slide":2,"title":"APP.PY + RAG.PY","textShapes":11}
+{"kind":"shape","id":"sh/w3m94fu1","slide":2,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":2,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":2,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/lwval87e","slide":2,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":2,"text":"app.py: Main Orchestration Layer","textPreview":"app.py: Main Orchestration Layer","textChars":32,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/3q5o7qpg","slide":2,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/e9cvixcz","slide":2,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/l87ed8ba","slide":2,"text":"Creates the FastAPI backend server","textPreview":"Creates the FastAPI backend server","textChars":34,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/sneloj2t","slide":2,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":2,"text":"Receives frontend requests through API endpoints","textPreview":"Receives frontend requests through API endpoints","textChars":48,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/fyxobm58","slide":2,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":2,"text":"Selects model provider and generation settings","textPreview":"Selects model provider and generation settings","textChars":46,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/x4nap4r6","slide":2,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/qpg3ex0n","slide":2,"text":"Coordinates RAG, prompt building, validation, repair, and export","textPreview":"Coordinates RAG, prompt building, validation, repair, and export","textChars":64,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":2,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/8v6psfil","slide":2,"text":"Returns code plus engineering analysis to the frontend","textPreview":"Returns code plus engineering analysis to the frontend","textChars":54,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/xczed8v6","slide":2,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/je9cvixc","slide":2,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/rqd4vmtw","slide":2,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/25kb6xkf","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/72rm1a","slide":2,"text":"Explain app.py as the control center. It does not only call the AI model; it manages the complete request lifecycle."}
+{"kind":"slide","id":"sl/w56tkw","slide":3,"title":"APP.PY + RAG.PY","textShapes":12}
+{"kind":"shape","id":"sh/i9s36hcr","slide":3,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/p0bi9s36","slide":3,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/0fepkzup","slide":3,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":3,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":3,"text":"Main /api/chat Workflow","textPreview":"Main /api/chat Workflow","textChars":23,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/tovahoza","slide":3,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/032lszqt","slide":3,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":3,"text":"Validate prompt and model settings","textPreview":"Validate prompt and model settings","textChars":34,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":3,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/ovahoza1","slide":3,"text":"Build conversation memory from recent user messages","textPreview":"Build conversation memory from recent user messages","textChars":51,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/dg7adsji","slide":3,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/6tovahoz","slide":3,"text":"Detect the requested mechanical part family","textPreview":"Detect the requested mechanical part family","textChars":43,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/vahoza1g","slide":3,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/onyd0z61","slide":3,"text":"Retrieve relevant RAG knowledge unless disabled","textPreview":"Retrieve relevant RAG knowledge unless disabled","textChars":47,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/d8v6psfi","slide":3,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/6hcrmhk3","slide":3,"text":"Generate OpenSCAD with the selected model","textPreview":"Generate OpenSCAD with the selected model","textChars":41,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/z25kb6xk","slide":3,"bbox":[94,508,12,12]}
+{"kind":"textbox","id":"sh/oj2t83it","slide":3,"text":"Validate, repair, or fallback when needed","textPreview":"Validate, repair, or fallback when needed","textChars":41,"textLines":1,"bbox":[122,499,890,40]}
+{"kind":"shape","id":"sh/d4vmtwra","slide":3,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/hwfyxobm","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/obm58z25","slide":3,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":3,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/65wjudg7","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/w56tkw","slide":3,"text":"This slide should be explained as the most important backend workflow. /api/chat is where natural language becomes CAD output."}
+{"kind":"slide","id":"sl/mysy9a","slide":4,"title":"APP.PY + RAG.PY","textShapes":11}
+{"kind":"shape","id":"sh/yxobm58z","slide":4,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":4,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/g3ex0nux","slide":4,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":4,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":4,"text":"Model Gateway and Provider Handling","textPreview":"Model Gateway and Provider Handling","textChars":35,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/9cvixcze","slide":4,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/gr2p8nqx","slide":4,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":4,"text":"Supports Ollama, OpenAI, OpenRouter, and Hugging Face","textPreview":"Supports Ollama, OpenAI, OpenRouter, and Hugging Face","textChars":53,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/yd0z6103","slide":4,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":4,"text":"Provides one generate() interface for all providers","textPreview":"Provides one generate() interface for all providers","textChars":51,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/lwval87e","slide":4,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":4,"text":"Checks which providers are available","textPreview":"Checks which providers are available","textChars":36,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/3q5o7qpg","slide":4,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":4,"text":"Uses fallback when selected provider fails","textPreview":"Uses fallback when selected provider fails","textChars":42,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/loj2t83i","slide":4,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":4,"text":"Keeps provider-specific API logic isolated","textPreview":"Keeps provider-specific API logic isolated","textChars":42,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":4,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/szqtcj6t","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":4,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":4,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/wra5gbq1","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/mysy9a","slide":4,"text":"The ModelGateway is an abstraction. It lets the system switch model providers without changing the rest of the application logic."}
+{"kind":"slide","id":"sl/oc4ay0","slide":5,"title":"APP.PY + RAG.PY","textShapes":11}
+{"kind":"shape","id":"sh/6psfil0r","slide":5,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/dcbulwva","slide":5,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/kre1w7mp","slide":5,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/vixczed8","slide":5,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/2x4nap4r","slide":5,"text":"rag.py: Retrieval Knowledge Engine","textPreview":"rag.py: Retrieval Knowledge Engine","textChars":34,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/donyd0z6","slide":5,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":5,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":5,"text":"Loads mechanical documents from backend/docs","textPreview":"Loads mechanical documents from backend/docs","textChars":44,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/29gr2p8n","slide":5,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":5,"text":"Converts text and JSON records into searchable documents","textPreview":"Converts text and JSON records into searchable documents","textChars":56,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/dcbulwva","slide":5,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":5,"text":"Detects part families such as gear, pulley, bearing housing, and bracket","textPreview":"Detects part families such as gear, pulley, bearing housing, and bracket","textChars":72,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/val87ed8","slide":5,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":5,"text":"Ranks relevant references for each prompt","textPreview":"Ranks relevant references for each prompt","textChars":41,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/donyd0z6","slide":5,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/2x4nap4r","slide":5,"text":"Returns context that app.py injects into the AI prompt","textPreview":"Returns context that app.py injects into the AI prompt","textChars":54,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/vixczed8","slide":5,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/d0z61032","slide":5,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/dsji5sne","slide":5,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/o7qpg3ex","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/oc4ay0","slide":5,"text":"rag.py does not generate code. Its job is to find the right engineering knowledge before the model generates code."}
+{"kind":"slide","id":"sl/mcn49l","slide":6,"title":"APP.PY + RAG.PY","textShapes":12}
+{"kind":"shape","id":"sh/fa9w3m94","slide":6,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/8v6psfil","slide":6,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/xczed8v6","slide":6,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/qd4vmtwr","slide":6,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/fyxobm58","slide":6,"text":"Retrieval and Ranking Strategy","textPreview":"Retrieval and Ranking Strategy","textChars":30,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/8jqh0fep","slide":6,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/x4nap4r6","slide":6,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/q1orytsv","slide":6,"text":"Uses keyword family detection","textPreview":"Uses keyword family detection","textChars":29,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/fmlkjm1c","slide":6,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":6,"text":"Supports embeddings for semantic similarity","textPreview":"Supports embeddings for semantic similarity","textChars":43,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/q5o7qpg3","slide":6,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":6,"text":"Falls back to TF-IDF when embeddings are unavailable","textPreview":"Falls back to TF-IDF when embeddings are unavailable","textChars":52,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/8bat47y1","slide":6,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/j2t83itg","slide":6,"text":"Boosts documents from the detected family","textPreview":"Boosts documents from the detected family","textChars":41,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/qh0fepkz","slide":6,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/18jqh0fe","slide":6,"text":"Penalizes unrelated or negative-keyword matches","textPreview":"Penalizes unrelated or negative-keyword matches","textChars":47,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/8nqxs72x","slide":6,"bbox":[94,508,12,12]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":6,"text":"Keeps scores interpretable between 0 and 1","textPreview":"Keeps scores interpretable between 0 and 1","textChars":42,"textLines":1,"bbox":[122,499,890,40]}
+{"kind":"shape","id":"sh/ulwval87","slide":6,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":6,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":6,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/p4r65wju","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/mcn49l","slide":6,"text":"Explain that retrieval is domain-aware. It does not just search by text similarity; it adjusts scores using mechanical family logic."}
+{"kind":"slide","id":"sl/ob9fz9","slide":7,"title":"APP.PY + RAG.PY","textShapes":11}
+{"kind":"shape","id":"sh/7adsji5s","slide":7,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/wval87ed","slide":7,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/pg3ex0nu","slide":7,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":7,"text":"APP.PY + RAG.PY","textPreview":"APP.PY + RAG.PY","textChars":15,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":7,"text":"How app.py and rag.py Work Together","textPreview":"How app.py and rag.py Work Together","textChars":35,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/w7mp0bi9","slide":7,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/psfil0rq","slide":7,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":7,"text":"app.py receives the prompt","textPreview":"app.py receives the prompt","textChars":26,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/7u54zido","slide":7,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":7,"text":"rag.py classifies and retrieves relevant knowledge","textPreview":"rag.py classifies and retrieves relevant knowledge","textChars":50,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/e9cvixcz","slide":7,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/lwval87e","slide":7,"text":"app.py adds retrieved references to the prompt","textPreview":"app.py adds retrieved references to the prompt","textChars":46,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":7,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":7,"text":"The AI model generates grounded OpenSCAD","textPreview":"The AI model generates grounded OpenSCAD","textChars":40,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":7,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":7,"text":"app.py validates and returns the final result","textPreview":"app.py validates and returns the final result","textChars":45,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/w3m94fu1","slide":7,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/3ex0nuxc","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":7,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/ixczed8v","slide":7,"text":"app.py + rag.py","textPreview":"app.py + rag.py","textChars":15,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/bi9s36hc","slide":7,"text":"07","textPreview":"07","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/ob9fz9","slide":7,"text":"Use this as the bridge slide. The key point is that app.py is the controller and rag.py is the knowledge supplier."}
+{"kind":"slide","id":"sl/86mbqk","slide":8,"title":"SYSTEM PROMPTS","textShapes":12}
+{"kind":"shape","id":"sh/h0fepkzu","slide":8,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/a9w3m94f","slide":8,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/zupwb2hw","slide":8,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/orytsvu9","slide":8,"text":"SYSTEM PROMPTS","textPreview":"SYSTEM PROMPTS","textChars":14,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/hcrmhk3q","slide":8,"text":"5-slide section","textPreview":"5-slide section","textChars":15,"textLines":1,"bbox":[930,50,230,22]}
+{"kind":"textbox","id":"sh/al87ed8b","slide":8,"text":"System Prompt Role in app.py","textPreview":"System Prompt Role in app.py","textChars":28,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/z61032ls","slide":8,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/oza1gvy9","slide":8,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/hk3q5o7q","slide":8,"text":"Defines the model as a senior mechanical OpenSCAD copilot","textPreview":"Defines the model as a senior mechanical OpenSCAD copilot","textChars":57,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/hgn29gr2","slide":8,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/svu9knih","slide":8,"text":"Requires raw .scad output only","textPreview":"Requires raw .scad output only","textChars":30,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/za1gvy90","slide":8,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":8,"text":"Prevents markdown, prose, and language labels","textPreview":"Prevents markdown, prose, and language labels","textChars":45,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":8,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":8,"text":"Prioritizes parametric editable geometry","textPreview":"Prioritizes parametric editable geometry","textChars":40,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/zidonyd0","slide":8,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":8,"text":"Controls the model before validation happens","textPreview":"Controls the model before validation happens","textChars":44,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/lszqtcj6","slide":8,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/s72x4nap","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/8z25kb6x","slide":8,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/1gvy90je","slide":8,"text":"System Prompts","textPreview":"System Prompts","textChars":14,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/qtcj6tov","slide":8,"text":"08","textPreview":"08","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/86mbqk","slide":8,"text":"The system prompt is the first quality layer. It tells the model what role to take and what output format is acceptable."}
+{"kind":"slide","id":"sl/4ugs7j","slide":9,"title":"SYSTEM PROMPTS","textShapes":11}
+{"kind":"shape","id":"sh/yhgn29gr","slide":9,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/58z25kb6","slide":9,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/gn29gr2p","slide":9,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/nuxc3ylc","slide":9,"text":"SYSTEM PROMPTS","textPreview":"SYSTEM PROMPTS","textChars":14,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/y90je9cv","slide":9,"text":"OpenSCAD Rules Inside the Prompt","textPreview":"OpenSCAD Rules Inside the Prompt","textChars":32,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/5wjudg7a","slide":9,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/gbq1oryt","slide":9,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":9,"text":"Includes syntax guidance for variables, modules, loops, and transforms","textPreview":"Includes syntax guidance for variables, modules, loops, and transforms","textChars":70,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/u54zidon","slide":9,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/cbulwval","slide":9,"text":"Lists valid 2D and 3D primitives","textPreview":"Lists valid 2D and 3D primitives","textChars":32,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/5sneloj2","slide":9,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/u54zidon","slide":9,"text":"Requires difference() for holes, bores, and cutouts","textPreview":"Requires difference() for holes, bores, and cutouts","textChars":51,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/nqxs72x4","slide":9,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":9,"text":"Warns that modules do not return values","textPreview":"Warns that modules do not return values","textChars":39,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/5kb6xkf6","slide":9,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/ytsvu9kn","slide":9,"text":"Requires the main module to be called once at the end","textPreview":"Requires the main module to be called once at the end","textChars":53,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/neloj2t8","slide":9,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/58z25kb6","slide":9,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/tcj6tova","slide":9,"text":"System Prompts","textPreview":"System Prompts","textChars":14,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/0rqd4vmt","slide":9,"text":"09","textPreview":"09","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/4ugs7j","slide":9,"text":"This is domain-specific prompt engineering. The prompt directly teaches or reminds the model about OpenSCAD rules and common failure cases."}
+{"kind":"slide","id":"sl/eelhg6","slide":10,"title":"SYSTEM PROMPTS","textShapes":11}
+{"kind":"shape","id":"sh/3q5o7qpg","slide":10,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":10,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/lwval87e","slide":10,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":10,"text":"SYSTEM PROMPTS","textPreview":"SYSTEM PROMPTS","textChars":14,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":10,"text":"Family-Specific Prompt Engineering","textPreview":"Family-Specific Prompt Engineering","textChars":34,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/w3m94fu1","slide":10,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/loj2t83i","slide":10,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/at47y1kr","slide":10,"text":"Bearing housing prompts require base, pedestal, boss, bearing seat, and paired holes","textPreview":"Bearing housing prompts require base, pedestal, boss, bearing seat, and paired holes","textChars":84,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/3ex0nuxc","slide":10,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/3itgfmlk","slide":10,"text":"Gear prompts prefer gears.scad instead of fake cube teeth","textPreview":"Gear prompts prefer gears.scad instead of fake cube teeth","textChars":57,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":10,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/loj2t83i","slide":10,"text":"Pulley prompts enforce pulley-generator.scad for timing pulleys","textPreview":"Pulley prompts enforce pulley-generator.scad for timing pulleys","textChars":63,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/w3m94fu1","slide":10,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":10,"text":"Bracket prompts define correct plate orientation and hole direction","textPreview":"Bracket prompts define correct plate orientation and hole direction","textChars":67,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/e9cvixcz","slide":10,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/lwval87e","slide":10,"text":"These rules reduce known AI failure modes","textPreview":"These rules reduce known AI failure modes","textChars":41,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/wb2hwfyx","slide":10,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/ahoza1gv","slide":10,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/il0rqd4v","slide":10,"text":"System Prompts","textPreview":"System Prompts","textChars":14,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/b6xkf6dc","slide":10,"text":"10","textPreview":"10","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/eelhg6","slide":10,"text":"app.py adds instructions depending on the detected part family. This makes the prompt more precise than the original user request."}
+{"kind":"slide","id":"sl/g8tgha","slide":11,"title":"SYSTEM PROMPTS","textShapes":11}
+{"kind":"shape","id":"sh/tovahoza","slide":11,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/ixczed8v","slide":11,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/bi9s36hc","slide":11,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/0fepkzup","slide":11,"text":"SYSTEM PROMPTS","textPreview":"SYSTEM PROMPTS","textChars":14,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":11,"text":"Material Suggestions Handling","textPreview":"Material Suggestions Handling","textChars":29,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/i9s36hcr","slide":11,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/bulwval8","slide":11,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":11,"text":"Material suggestions come from engineering profiles and JSON docs","textPreview":"Material suggestions come from engineering profiles and JSON docs","textChars":65,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/t47y1kre","slide":11,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/9s36hcrm","slide":11,"text":"Materials are returned in design notes or frontend panels","textPreview":"Materials are returned in design notes or frontend panels","textChars":57,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/g7adsji5","slide":11,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/rmhk3q5o","slide":11,"text":"The prompt forbids material prose inside OpenSCAD code","textPreview":"The prompt forbids material prose inside OpenSCAD code","textChars":54,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/y1kre1w7","slide":11,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":11,"text":"Examples include aluminum, cast iron, steel, nylon-CF, PETG, and PLA","textPreview":"Examples include aluminum, cast iron, steel, nylon-CF, PETG, and PLA","textChars":68,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/gfmlkjm1","slide":11,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":11,"text":"This separates CAD geometry from engineering recommendation text","textPreview":"This separates CAD geometry from engineering recommendation text","textChars":64,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/yd0z6103","slide":11,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/9cvixcze","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":11,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":11,"text":"System Prompts","textPreview":"System Prompts","textChars":14,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":11,"text":"11","textPreview":"11","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/g8tgha","slide":11,"text":"Material information is useful, but it should not pollute the .scad file. Geometry remains in code, while material guidance appears separately."}
+{"kind":"slide","id":"sl/cn6pkd","slide":12,"title":"SYSTEM PROMPTS","textShapes":11}
+{"kind":"shape","id":"sh/al87ed8b","slide":12,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/hcrmhk3q","slide":12,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/orytsvu9","slide":12,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/zupwb2hw","slide":12,"text":"SYSTEM PROMPTS","textPreview":"SYSTEM PROMPTS","textChars":14,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/a9w3m94f","slide":12,"text":"Manufacturing and Tolerance Context","textPreview":"Manufacturing and Tolerance Context","textChars":35,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/h0fepkzu","slide":12,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/sfil0rqd","slide":12,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/zqtcj6to","slide":12,"text":"User can select FDM, resin, CNC, or laser process","textPreview":"User can select FDM, resin, CNC, or laser process","textChars":49,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/65wjudg7","slide":12,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":12,"text":"app.py formats manufacturing context before generation","textPreview":"app.py formats manufacturing context before generation","textChars":54,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/5o7qpg3e","slide":12,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/yxobm58z","slide":12,"text":"Tolerance blocks guide clearances and fit decisions","textPreview":"Tolerance blocks guide clearances and fit decisions","textChars":51,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/nih4byhg","slide":12,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":12,"text":"FDM may require extra shaft or hole clearance","textPreview":"FDM may require extra shaft or hole clearance","textChars":45,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/9cvixcze","slide":12,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":12,"text":"Tolerance guidance helps produce more practical CAD","textPreview":"Tolerance guidance helps produce more practical CAD","textChars":51,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/r65wjudg","slide":12,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/gfmlkjm1","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/90je9cvi","slide":12,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/t83itgfm","slide":12,"text":"System Prompts","textPreview":"System Prompts","textChars":14,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/4nap4r65","slide":12,"text":"12","textPreview":"12","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/cn6pkd","slide":12,"text":"Tolerances are part of engineering-aware prompting. The model receives manufacturing context so the result is not only visually correct but also more usable."}
+{"kind":"slide","id":"sl/nksf1w","slide":13,"title":"FRONTEND","textShapes":11}
+{"kind":"shape","id":"sh/wra5gbq1","slide":13,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/36hcrmhk","slide":13,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/eloj2t83","slide":13,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":13,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/wfyxobm5","slide":13,"text":"3-slide section","textPreview":"3-slide section","textChars":15,"textLines":1,"bbox":[930,50,230,22]}
+{"kind":"textbox","id":"sh/7u54zido","slide":13,"text":"Frontend Overview","textPreview":"Frontend Overview","textChars":17,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/ed8bat47","slide":13,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/psfil0rq","slide":13,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":13,"text":"Static web workspace served by FastAPI","textPreview":"Static web workspace served by FastAPI","textChars":38,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/eloj2t83","slide":13,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":13,"text":"Main files: index.html, main.js, styles.css","textPreview":"Main files: index.html, main.js, styles.css","textChars":43,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/wra5gbq1","slide":13,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/lc7u54zi","slide":13,"text":"Lets users select model, write prompts, enable RAG, and inspect results","textPreview":"Lets users select model, write prompts, enable RAG, and inspect results","textChars":71,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/ed8bat47","slide":13,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/7u54zido","slide":13,"text":"Displays code, preview, validation, materials, and references","textPreview":"Displays code, preview, validation, materials, and references","textChars":61,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/wfyxobm5","slide":13,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/l0rqd4vm","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/e1w7mp0b","slide":13,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":13,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/zed8v6ps","slide":13,"text":"13","textPreview":"13","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/nksf1w","slide":13,"text":"The frontend is the user-facing CAD workspace. It is lightweight but shows many backend outputs in an organized way."}
+{"kind":"slide","id":"sl/w1gowa","slide":14,"title":"FRONTEND","textShapes":11}
+{"kind":"shape","id":"sh/8v6psfil","slide":14,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/fa9w3m94","slide":14,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/qpg3ex0n","slide":14,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/x4nap4r6","slide":14,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/8jqh0fep","slide":14,"text":"main.js: Interaction and API Logic","textPreview":"main.js: Interaction and API Logic","textChars":34,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/fyxobm58","slide":14,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/qd4vmtwr","slide":14,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/xs72x4na","slide":14,"text":"Loads /api/status, /api/models, and /api/knowledge on startup","textPreview":"Loads /api/status, /api/models, and /api/knowledge on startup","textChars":61,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/87ed8bat","slide":14,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":14,"text":"Sends prompt payloads to /api/chat","textPreview":"Sends prompt payloads to /api/chat","textChars":34,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/7y1kre1w","slide":14,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/wjudg7ad","slide":14,"text":"Stores conversation history and selected RAG documents","textPreview":"Stores conversation history and selected RAG documents","textChars":54,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/p4r65wju","slide":14,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/i5sneloj","slide":14,"text":"Renders validation, materials, references, and quality panels","textPreview":"Renders validation, materials, references, and quality panels","textChars":61,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/7qpg3ex0","slide":14,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":14,"text":"Calls /api/export-stl for preview and STL download","textPreview":"Calls /api/export-stl for preview and STL download","textChars":50,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/pwb2hwfy","slide":14,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/7ed8bat4","slide":14,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/jqh0fepk","slide":14,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":14,"text":"14","textPreview":"14","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/w1gowa","slide":14,"text":"main.js is the frontend controller. It connects the UI to backend endpoints and updates the screen after each generation."}
+{"kind":"slide","id":"sl/zt5pgr","slide":15,"title":"FRONTEND","textShapes":11}
+{"kind":"shape","id":"sh/cfa9w3m9","slide":15,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/judg7ads","slide":15,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/u9knih4b","slide":15,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/1orytsvu","slide":15,"text":"FRONTEND","textPreview":"FRONTEND","textChars":8,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":15,"text":"User Workflow in the Interface","textPreview":"User Workflow in the Interface","textChars":30,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/jm1cfa9w","slide":15,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":15,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":15,"text":"Choose provider, model, temperature, and RAG settings","textPreview":"Choose provider, model, temperature, and RAG settings","textChars":53,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/cvixczed","slide":15,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/m1cfa9w3","slide":15,"text":"Enter or refine a mechanical design prompt","textPreview":"Enter or refine a mechanical design prompt","textChars":42,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/bm58z25k","slide":15,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/47y1kre1","slide":15,"text":"Review generated OpenSCAD code","textPreview":"Review generated OpenSCAD code","textChars":30,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":15,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/mp0bi9s3","slide":15,"text":"Preview STL mesh in the browser using Three.js","textPreview":"Preview STL mesh in the browser using Three.js","textChars":46,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/bat47y1k","slide":15,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/4vmtwra5","slide":15,"text":"Accept, copy, download .scad, or export STL","textPreview":"Accept, copy, download .scad, or export STL","textChars":43,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":15,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/mhk3q5o7","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/b2hwfyxo","slide":15,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/7u54zido","slide":15,"text":"Frontend","textPreview":"Frontend","textChars":8,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/ed8bat47","slide":15,"text":"15","textPreview":"15","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/zt5pgr","slide":15,"text":"Explain this slide as the practical user experience. The interface supports design, inspection, and export in one place."}
+{"kind":"slide","id":"sl/nfnj90","slide":16,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/loj2t83i","slide":16,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/ex0nuxc3","slide":16,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":16,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":16,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/lwval87e","slide":16,"text":"8-slide section","textPreview":"8-slide section","textChars":15,"textLines":1,"bbox":[930,50,230,22]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":16,"text":"backend/docs: Knowledge Base Folder","textPreview":"backend/docs: Knowledge Base Folder","textChars":35,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/3q5o7qpg","slide":16,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/sneloj2t","slide":16,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/l87ed8ba","slide":16,"text":"Active RAG documents are stored under backend/docs","textPreview":"Active RAG documents are stored under backend/docs","textChars":50,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/5kb6xkf6","slide":16,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/czed8v6p","slide":16,"text":"Files represent mechanical families and support references","textPreview":"Files represent mechanical families and support references","textChars":58,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/neloj2t8","slide":16,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/ytsvu9kn","slide":16,"text":"rag.py loads these files during KnowledgeBase initialization","textPreview":"rag.py loads these files during KnowledgeBase initialization","textChars":60,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/5sneloj2","slide":16,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/cbulwval","slide":16,"text":"The folder is the engineering memory of the application","textPreview":"The folder is the engineering memory of the application","textChars":55,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/nqxs72x4","slide":16,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/u54zidon","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/5wjudg7a","slide":16,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/gbq1oryt","slide":16,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":16,"text":"16","textPreview":"16","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/nfnj90","slide":16,"text":"This section explains where the system knowledge comes from. backend/docs is not just documentation; it is used actively during generation."}
+{"kind":"slide","id":"sl/9xe7q6","slide":17,"title":"DOCS + KNOWLEDGE BASE","textShapes":10}
+{"kind":"shape","id":"sh/s36hcrmh","slide":17,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/zidonyd0","slide":17,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/a1gvy90j","slide":17,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":17,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/svu9knih","slide":17,"text":"Knowledge File Types","textPreview":"Knowledge File Types","textChars":20,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/za1gvy90","slide":17,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/ap4r65wj","slide":17,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/h4byhgn2","slide":17,"text":".txt files: human-readable rulebooks and examples","textPreview":".txt files: human-readable rulebooks and examples","textChars":49,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/sji5snel","slide":17,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/qh0fepkz","slide":17,"text":".json files: structured mechanical part databases","textPreview":".json files: structured mechanical part databases","textChars":49,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/j2t83itg","slide":17,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/8nqxs72x","slide":17,"text":".scad files: reusable OpenSCAD library modules","textPreview":".scad files: reusable OpenSCAD library modules","textChars":46,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/18jqh0fe","slide":17,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/q5o7qpg3","slide":17,"text":"Each format supports a different retrieval or generation need","textPreview":"Each format supports a different retrieval or generation need","textChars":61,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/jqh0fepk","slide":17,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/8bat47y1","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/1w7mp0bi","slide":17,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/uxc3ylc7","slide":17,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/ji5snelo","slide":17,"text":"17","textPreview":"17","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/9xe7q6","slide":17,"text":"Different knowledge types are used because some engineering knowledge is better as prose, some as structured records, and some as executable library code."}
+{"kind":"slide","id":"sl/g43a1c","slide":18,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/fil0rqd4","slide":18,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/83itgfml","slide":18,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/xobm58z2","slide":18,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/m94fu18j","slide":18,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":18,"text":"JSON Database Structure","textPreview":"JSON Database Structure","textChars":23,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/4fu18jqh","slide":18,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/x0nuxc3y","slide":18,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":18,"text":"metadata defines family, label, units, and scope","textPreview":"metadata defines family, label, units, and scope","textChars":48,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/f6dcbulw","slide":18,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/vixczed8","slide":18,"text":"parts contain named mechanical records","textPreview":"parts contain named mechanical records","textChars":38,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/2x4nap4r","slide":18,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":18,"text":"records include dimensions, features, constraints, and standards","textPreview":"records include dimensions, features, constraints, and standards","textChars":64,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/k3q5o7qp","slide":18,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/val87ed8","slide":18,"text":"material suggestions are marked for chat-after-code output","textPreview":"material suggestions are marked for chat-after-code output","textChars":58,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/6psfil0r","slide":18,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":18,"text":"validation criteria become quality expectations","textPreview":"validation criteria become quality expectations","textChars":47,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/kre1w7mp","slide":18,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":18,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":18,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/za1gvy90","slide":18,"text":"18","textPreview":"18","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/g43a1c","slide":18,"text":"JSON files are the structured part of the knowledge base. They help the system extract features, parameters, and engineering rules."}
+{"kind":"slide","id":"sl/531txn","slide":19,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/bat47y1k","slide":19,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/4vmtwra5","slide":19,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/tgfmlkjm","slide":19,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/m1cfa9w3","slide":19,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/bm58z25k","slide":19,"text":"TXT Reference Structure","textPreview":"TXT Reference Structure","textChars":23,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/47y1kre1","slide":19,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/tsvu9kni","slide":19,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":19,"text":"Describes part families in readable engineering language","textPreview":"Describes part families in readable engineering language","textChars":56,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/bq1oryts","slide":19,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/3ex0nuxc","slide":19,"text":"Contains standard dimensions and key parameters","textPreview":"Contains standard dimensions and key parameters","textChars":47,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/at47y1kr","slide":19,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/lkjm1cfa","slide":19,"text":"Includes OpenSCAD modeling patterns","textPreview":"Includes OpenSCAD modeling patterns","textChars":35,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/szqtcj6t","slide":19,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":19,"text":"Documents common failure modes","textPreview":"Documents common failure modes","textChars":30,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/ahoza1gv","slide":19,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/l87ed8ba","slide":19,"text":"Provides examples for RAG prompt grounding","textPreview":"Provides examples for RAG prompt grounding","textChars":42,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/sneloj2t","slide":19,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":19,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/m58z25kb","slide":19,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/bq1oryts","slide":19,"text":"19","textPreview":"19","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/531txn","slide":19,"text":"TXT files act like engineering rulebooks. They help the AI understand how a real part should be modeled."}
+{"kind":"slide","id":"sl/p6fml6","slide":20,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/p4r65wju","slide":20,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/ed8v6psf","slide":20,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/7y1kre1w","slide":20,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/0bi9s36h","slide":20,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/pwb2hwfy","slide":20,"text":"SCAD Reference Libraries","textPreview":"SCAD Reference Libraries","textChars":24,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/i5sneloj","slide":20,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/7qpg3ex0","slide":20,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/0z61032l","slide":20,"text":"Example: sprocket.scad in backend/docs","textPreview":"Example: sprocket.scad in backend/docs","textChars":38,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":20,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/5sneloj2","slide":20,"text":"Provides reusable CAD modules","textPreview":"Provides reusable CAD modules","textChars":29,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/cbulwval","slide":20,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/nqxs72x4","slide":20,"text":"Prevents the model from reinventing complex geometry","textPreview":"Prevents the model from reinventing complex geometry","textChars":52,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/u54zidon","slide":20,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/5kb6xkf6","slide":20,"text":"Improves accuracy for specialized mechanical parts","textPreview":"Improves accuracy for specialized mechanical parts","textChars":50,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/czed8v6p","slide":20,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/neloj2t8","slide":20,"text":"Can be referenced through RAG and prompt instructions","textPreview":"Can be referenced through RAG and prompt instructions","textChars":53,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/ytsvu9kn","slide":20,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/58z25kb6","slide":20,"text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/gn29gr2p","slide":20,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/cvixczed","slide":20,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/5gbq1ory","slide":20,"text":"20","textPreview":"20","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/p6fml6","slide":20,"text":"Some geometry is too specialized to generate from scratch reliably. Reusing OpenSCAD libraries improves output quality."}
+{"kind":"slide","id":"sl/zj43lo","slide":21,"title":"DOCS + KNOWLEDGE BASE","textShapes":10}
+{"kind":"shape","id":"sh/ixczed8v","slide":21,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/tovahoza","slide":21,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/032lszqt","slide":21,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/bulwval8","slide":21,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/i9s36hcr","slide":21,"text":"Family-Based Organization","textPreview":"Family-Based Organization","textChars":25,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/p0bi9s36","slide":21,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/0fepkzup","slide":21,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/byhgn29g","slide":21,"text":"Files are named by mechanical family","textPreview":"Files are named by mechanical family","textChars":36,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/idonyd0z","slide":21,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/c7u54zid","slide":21,"text":"Examples: bearing_housing_reference, gear_reference, pulley_belt_drive_reference","textPreview":"Examples: bearing_housing_reference, gear_reference, pulley_belt_drive_reference","textChars":80,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/1orytsvu","slide":21,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/u18jqh0f","slide":21,"text":"Family IDs connect docs, RAG retrieval, prompts, and validation","textPreview":"Family IDs connect docs, RAG retrieval, prompts, and validation","textChars":63,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/jm1cfa9w","slide":21,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/cfa9w3m9","slide":21,"text":"This creates a consistent domain taxonomy","textPreview":"This creates a consistent domain taxonomy","textChars":41,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/1032lszq","slide":21,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/u9knih4b","slide":21,"text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/judg7ads","slide":21,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/cj6tovah","slide":21,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/54zidony","slide":21,"text":"21","textPreview":"21","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/zj43lo","slide":21,"text":"Family names are important because they tie together retrieval, prompting, and validation."}
+{"kind":"slide","id":"sl/3o9vgp","slide":22,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/0rqd4vmt","slide":22,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/b6xkf6dc","slide":22,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/il0rqd4v","slide":22,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/t47y1kre","slide":22,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/0je9cvix","slide":22,"text":"From Docs to Retrieved Context","textPreview":"From Docs to Retrieved Context","textChars":30,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/byhgn29g","slide":22,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/idonyd0z","slide":22,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/p0bi9s36","slide":22,"text":"rag.py loads docs as Document objects","textPreview":"rag.py loads docs as Document objects","textChars":37,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/0fepkzup","slide":22,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/itgfmlkj","slide":22,"text":"Embeddings or TF-IDF make documents searchable","textPreview":"Embeddings or TF-IDF make documents searchable","textChars":46,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/7ed8bat4","slide":22,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/0z61032l","slide":22,"text":"Family-aware ranking selects the most relevant records","textPreview":"Family-aware ranking selects the most relevant records","textChars":54,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/pkzupwb2","slide":22,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/ih4byhgn","slide":22,"text":"app.py injects retrieved text into the AI prompt","textPreview":"app.py injects retrieved text into the AI prompt","textChars":48,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/72x4nap4","slide":22,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/0nuxc3yl","slide":22,"text":"Frontend displays retrieved references for explainability","textPreview":"Frontend displays retrieved references for explainability","textChars":57,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/p8nqxs72","slide":22,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/ed8v6psf","slide":22,"text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/7y1kre1w","slide":22,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/j6tovaho","slide":22,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/ulwval87","slide":22,"text":"22","textPreview":"22","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/3o9vgp","slide":22,"text":"This slide explains how static files become active generation context."}
+{"kind":"slide","id":"sl/rwfutt","slide":23,"title":"DOCS + KNOWLEDGE BASE","textShapes":11}
+{"kind":"shape","id":"sh/c7u54zid","slide":23,"bbox":[0,0,1280,720]}
+{"kind":"shape","id":"sh/jm1cfa9w","slide":23,"bbox":[0,0,18,720]}
+{"kind":"shape","id":"sh/u18jqh0f","slide":23,"bbox":[54,44,230,30]}
+{"kind":"textbox","id":"sh/1032lszq","slide":23,"text":"DOCS + KNOWLEDGE BASE","textPreview":"DOCS + KNOWLEDGE BASE","textChars":21,"textLines":1,"bbox":[70,51,198,18]}
+{"kind":"textbox","id":"sh/cfa9w3m9","slide":23,"text":"Knowledge Base and Validation Link","textPreview":"Knowledge Base and Validation Link","textChars":34,"textLines":1,"bbox":[54,104,950,58]}
+{"kind":"shape","id":"sh/judg7ads","slide":23,"bbox":[54,184,1038,392]}
+{"kind":"shape","id":"sh/u9knih4b","slide":23,"bbox":[94,233,12,12]}
+{"kind":"textbox","id":"sh/54zidony","slide":23,"text":"Docs define required mechanical features","textPreview":"Docs define required mechanical features","textChars":40,"textLines":1,"bbox":[122,224,890,40]}
+{"kind":"shape","id":"sh/cj6tovah","slide":23,"bbox":[94,288,12,12]}
+{"kind":"textbox","id":"sh/ex0nuxc3","slide":23,"text":"Derived formulas in docs guide validation checks","textPreview":"Derived formulas in docs guide validation checks","textChars":48,"textLines":1,"bbox":[122,279,890,40]}
+{"kind":"shape","id":"sh/3itgfmlk","slide":23,"bbox":[94,343,12,12]}
+{"kind":"textbox","id":"sh/w3m94fu1","slide":23,"text":"Failure modes become warnings or hard checks","textPreview":"Failure modes become warnings or hard checks","textChars":44,"textLines":1,"bbox":[122,334,890,40]}
+{"kind":"shape","id":"sh/loj2t83i","slide":23,"bbox":[94,398,12,12]}
+{"kind":"textbox","id":"sh/e9cvixcz","slide":23,"text":"Material and output policies shape final responses","textPreview":"Material and output policies shape final responses","textChars":50,"textLines":1,"bbox":[122,389,890,40]}
+{"kind":"shape","id":"sh/3q5o7qpg","slide":23,"bbox":[94,453,12,12]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":23,"text":"Knowledge, generation, and validation form a closed loop","textPreview":"Knowledge, generation, and validation form a closed loop","textChars":56,"textLines":1,"bbox":[122,444,890,40]}
+{"kind":"shape","id":"sh/lwval87e","slide":23,"bbox":[1118,184,86,86]}
+{"kind":"textbox","id":"sh/ahoza1gv","slide":23,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[1130,207,62,34]}
+{"kind":"textbox","id":"sh/32lszqtc","slide":23,"text":"OpenSCAD Copilot Thesis Deck","textPreview":"OpenSCAD Copilot Thesis Deck","textChars":28,"textLines":1,"bbox":[54,684,330,20]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":23,"text":"Docs + Knowledge Base","textPreview":"Docs + Knowledge Base","textChars":21,"textLines":1,"bbox":[475,684,330,20]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":23,"text":"23","textPreview":"23","textChars":2,"textLines":1,"bbox":[1165,684,60,20]}
+{"kind":"notes","id":"nt/rwfutt","slide":23,"text":"End by showing that docs influence both generation and quality control. This is a major research strength of the system."}

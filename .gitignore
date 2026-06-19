@@ -6,10 +6,12 @@ __pycache__/
 *.log
 server*.log
 cloudflared*.log
+cloudflared.exe
+cloudflare-*.log
+keep-cloudflare-*.log
+.cloudflared/
 backend/*.log
 backend/users.db
 node_modules/
 dist/
 build/
-cloudflared.exe
-.vercel/
