@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: openscad-copilot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: EMBEDDING_BACKEND
+        value: tfidf
+      - key: OPENROUTER_ALLOW_PAID
+        value: "false"
+      - key: ENABLE_CLARIFICATION
+        value: "false"
